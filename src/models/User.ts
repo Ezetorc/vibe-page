@@ -70,7 +70,8 @@ export class User {
       const response = await fetch(url, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body)
+        body: JSON.stringify(body),
+        credentials: 'include'
       })
 
       if (!response.ok) {
@@ -89,20 +90,30 @@ export class User {
       const url: string = `${api}/users/login`
       const body = { name, password }
 
-      const response = await fetch(url, {
+      const response: Response = await fetch(url, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body)
+        body: JSON.stringify(body),
+        credentials: 'include'
       })
 
       if (!response.ok) {
-        const errorData = await response.json()
-        throw new Error(errorData.message || 'Error logging in')
+        throw new Error('Login failed')
       }
+
+      console.log('User logged in successfully')
     } catch (error) {
       console.error('Error during login:', error)
-      throw error
     }
+  }
+
+  static async logout () {
+    fetch(`${api}/logout`, {
+      method: 'POST',
+      credentials: 'include'
+    }).then(() => {
+      console.log('Logout successful')
+    })
   }
 
   public async likePost (postId: number): Promise<void> {

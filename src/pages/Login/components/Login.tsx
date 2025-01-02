@@ -2,6 +2,7 @@ import { FormInput } from '../../../components/FormInput'
 import { User } from '../../../models/User'
 import { useRef } from 'react'
 import { useValidation } from '../../../hooks/useValidation'
+import { WelcomeToVibe } from '../../../components/WelcomeToVibe'
 
 export default function Login () {
   const { errorMessage, validateName, validatePassword } = useValidation()
@@ -22,14 +23,7 @@ export default function Login () {
 
   return (
     <section className='justify-items-center grid grid-rows-[1fr,4fr] w-[clamp(320px,100%,700px)] gap-y-[20px] p-[clamp(5px,3%,10px)] min-h-screen'>
-      <div className='w-full flex flex-col items-center pt-[10%]'>
-        <span className='font-poppins-light text-white text-[clamp(20px,2vw,25px)]'>
-          Welcome to
-        </span>
-        <h2 className='my-[-6%] font-poppins-semibold text-[clamp(60px,15vw,100px)] bg-clip-text text-transparent bg-orange-gradient'>
-          VIBE
-        </h2>
-      </div>
+      <WelcomeToVibe />
 
       <form className='w-full flex flex-col gap-y-[20px]'>
         <FormInput
