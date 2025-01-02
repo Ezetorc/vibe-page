@@ -10,7 +10,18 @@ export default {
         'orange-crayola': '#EE7C48'
       },
       borderWidth: {
-        vibe: '1px'
+        vibe: '2px'
+      },
+      padding: {
+        nav: '80px'
+      },
+      borderRadius: {
+        vibe: '5px'
+      },
+      fontFamily: {
+        'poppins-light': 'poppins-light',
+        'poppins-regular': 'poppins-regular',
+        'poppins-semibold': 'poppins-semibold'
       }
     }
   },
