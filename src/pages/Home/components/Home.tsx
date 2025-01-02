@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { PostDisplay } from '../../../components/PostDisplay'
 import { Post } from '../../../models/Post'
+import { Nav } from '../../../components/Nav'
 
 export default function Home () {
   const [posts, setPosts] = useState<Post[] | null>(null)
@@ -31,6 +32,7 @@ export default function Home () {
       {posts.map(post => (
         <PostDisplay key={post.id} post={post} />
       ))}
+      <Nav />
     </main>
   )
 }

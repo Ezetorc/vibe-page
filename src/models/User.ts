@@ -58,6 +58,53 @@ export class User {
     return Boolean(userLike)
   }
 
+  static async register (
+    name: string,
+    email: string,
+    password: string
+  ): Promise<void> {
+    const url: string = `${api}/users/register`
+    const body = { name, email, password }
+
+    try {
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json()
+        console.error('Server error:', errorData)
+        throw new Error(errorData.message || 'Error registering user')
+      }
+    } catch (error) {
+      console.error('Error during registration:', error)
+      throw error
+    }
+  }
+
+  static async login (name: string, password: string): Promise<void> {
+    try {
+      const url: string = `${api}/users/login`
+      const body = { name, password }
+
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.message || 'Error logging in')
+      }
+    } catch (error) {
+      console.error('Error during login:', error)
+      throw error
+    }
+  }
+
   public async likePost (postId: number): Promise<void> {
     const url: string = `${api}/likes`
     const body = {

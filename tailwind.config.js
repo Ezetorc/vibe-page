@@ -22,6 +22,9 @@ export default {
         'poppins-light': 'poppins-light',
         'poppins-regular': 'poppins-regular',
         'poppins-semibold': 'poppins-semibold'
+      },
+      backgroundImage: {
+        'orange-gradient': 'linear-gradient(90deg, #EE7C48 0%, #FF5000 100%)'
       }
     }
   },

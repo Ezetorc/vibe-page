@@ -1,8 +1,11 @@
 import { Routes, HashRouter as Router, Route } from 'react-router'
-import { Nav } from './components/Nav'
 import { lazy, Suspense } from 'react'
 
 const LazyHome = lazy(() => import('./pages/Home/components/Home.tsx'))
+const LazyRegister = lazy(
+  () => import('./pages/Register/components/Register.tsx')
+)
+const LazyLogin = lazy(() => import('./pages/Login/components/Login.tsx'))
 
 export default function App () {
   return (
@@ -11,8 +14,9 @@ export default function App () {
         <Router>
           <Routes>
             <Route path='/' element={<LazyHome />} />
+            <Route path='/register' element={<LazyRegister />} />
+            <Route path='/login' element={<LazyLogin />} />
           </Routes>
-          <Nav />
         </Router>
       </Suspense>
     </>
