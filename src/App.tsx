@@ -8,6 +8,7 @@ const LazyHome = lazy(() => import('./pages/Home/components/Home.tsx'))
 const LazyLogin = lazy(() => import('./pages/Login/components/Login.tsx'))
 const LazySearch = lazy(() => import('./pages/Search/components/Search.tsx'))
 const LazyCreate = lazy(() => import('./pages/Create/components/Create.tsx'))
+const LazyAccount = lazy(() => import('./pages/Account/components/Account.tsx'))
 const LazyRegister = lazy(
   () => import('./pages/Register/components/Register.tsx')
 )
@@ -32,6 +33,7 @@ export default function App () {
             <Route path='/login' element={<LazyLogin />} />
             <Route path='/search' element={<LazySearch />} />
             <Route path='/create' element={<LazyCreate />} />
+            <Route path='/account' element={<LazyAccount />} />
           </Routes>
         </Router>
       </Suspense>

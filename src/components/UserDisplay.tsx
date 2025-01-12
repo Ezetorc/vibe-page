@@ -22,7 +22,9 @@ export function UserDisplay ({ user }: { user: User }) {
 
       <div className='flex h-full flex-col'>
         <p className='break-words text-white text-[clamp(5px,6vw,20px)] font-poppins-regular'>
-          {user.description}
+          {user.description
+            ? user.description
+            : 'This user has not description.'}
         </p>
       </div>
     </article>

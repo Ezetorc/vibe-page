@@ -6,6 +6,7 @@ import { User } from '../../../models/User'
 import { UserDisplay } from '../../../components/UserDisplay'
 import clsx from 'clsx'
 import { useDebounce } from '../../../hooks/useDebounce'
+import { SearchBar } from '../../../components/SearchBar'
 
 export default function Search () {
   const [toSearch, setToSearch] = useState<'users' | 'posts'>('users')
@@ -36,10 +37,9 @@ export default function Search () {
 
   return (
     <section className='pb-nav w-[clamp(320px,100%,700px)] gap-y-[20px] p-[clamp(5px,3%,10px)] items-center flex flex-col min-h-screen'>
-      <input
+      <SearchBar
         onInput={event => setSearch(event.currentTarget.value)}
-        placeholder='Search posts...'
-        className='bg-transparent font-poppins-regular outline-none placeholder:text-caribbean-current w-full h-[45px] border-vibe border-caribbean-current rounded-vibe px-[2%]'
+        placeholder={`Search ${toSearch}...`}
       />
       <header className='w-full h-[40px] grid grid-cols-2'>
         <button
