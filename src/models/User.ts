@@ -40,8 +40,11 @@ export class User {
   }
 
   static async getById (userId: number): Promise<User> {
-    const url: string = `${api}/users/${userId}`
-    const response: Response = await fetch(url)
+    const url: string = `${api}/users/id/${userId}`
+    const response: Response = await fetch(url, {
+      method: 'GET',
+      credentials: 'include'
+    })
     const userEndpoint: UserEndpoint = await response.json()
     const user: User = getAdaptedUser(userEndpoint)
 
@@ -62,7 +65,7 @@ export class User {
     name: string,
     email: string,
     password: string
-  ): Promise<void> {
+  ): Promise<boolean> {
     const url: string = `${api}/users/register`
     const body = { name, email, password }
 
@@ -75,17 +78,16 @@ export class User {
       })
 
       if (!response.ok) {
-        const errorData = await response.json()
-        console.error('Server error:', errorData)
-        throw new Error(errorData.message || 'Error registering user')
+        return false
       }
-    } catch (error) {
-      console.error('Error during registration:', error)
-      throw error
+
+      return true
+    } catch {
+      return false
     }
   }
 
-  static async login (name: string, password: string): Promise<void> {
+  static async login (name: string, password: string): Promise<boolean> {
     try {
       const url: string = `${api}/users/login`
       const body = { name, password }
@@ -98,41 +100,52 @@ export class User {
       })
 
       if (!response.ok) {
-        throw new Error('Login failed')
+        return false
       }
 
-      console.log('User logged in successfully')
-    } catch (error) {
-      console.error('Error during login:', error)
+      return true
+    } catch {
+      return false
     }
   }
 
-  static async logout () {
-    fetch(`${api}/logout`, {
+  static async logout (): Promise<boolean> {
+    const response: Response = await fetch(`${api}/logout`, {
       method: 'POST',
       credentials: 'include'
-    }).then(() => {
-      console.log('Logout successful')
     })
+
+    if (!response.ok) {
+      return false
+    }
+
+    return true
   }
 
-  public async likePost (postId: number): Promise<void> {
+  public async likePost (postId: number): Promise<boolean> {
     const url: string = `${api}/likes`
     const body = {
       post_id: postId,
       user_id: this.id
     }
 
-    fetch(url, {
+    const response: Response = await fetch(url, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
       },
+      credentials: 'include',
       body: JSON.stringify(body)
     })
+
+    if (!response.ok) {
+      return false
+    }
+
+    return true
   }
 
-  public async unlikePost (postId: number): Promise<void> {
+  public async unlikePost (postId: number): Promise<boolean> {
     try {
       const post = await Post.getById(postId)
       const postLikes: Like[] = await post.getLikes()
@@ -141,19 +154,37 @@ export class User {
       )
 
       if (!likeToDelete) {
-        throw new Error('Like not found')
+        return false
       }
 
-      const url: string = `${api}/likes/${likeToDelete.id}`
+      const url: string = `${api}/likes/id/${likeToDelete.id}`
 
-      await fetch(url, {
+      const response: Response = await fetch(url, {
         method: 'DELETE',
+        credentials: 'include',
         headers: {
           'Content-Type': 'application/json'
         }
       })
-    } catch (error) {
-      console.error('Error unliking post:', error)
+
+      if (!response.ok) {
+        return false
+      }
+
+      return true
+    } catch {
+      return false
     }
+  }
+
+  static async search (query: string): Promise<User[]> {
+    const url: string = `${api}/users/search/${encodeURIComponent(query)}`
+    const response = await fetch(url)
+    const usersEndpoints: UserEndpoint[] = await response.json()
+    const users: User[] = usersEndpoints.map(userEndpoint =>
+      getAdaptedUser(userEndpoint)
+    )
+
+    return users
   }
 }

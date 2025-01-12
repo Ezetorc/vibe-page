@@ -4,8 +4,12 @@ import { Post } from '../models/Post'
 import { LikeIcon } from './Icons'
 import { Like } from '../models/Like'
 import { User } from '../models/User'
+import { useUser } from '../hooks/useUser'
+import { useSettings } from '../hooks/useSettings'
 
 export function PostDisplay ({ post }: { post: Post }) {
+  const { isSessionActive } = useUser()
+  const { setSessionModalVisible } = useSettings()
   const [likes, setLikes] = useState<Like[] | null>(null)
   const [user, setUser] = useState<User | null>(null)
   const [hasUserLikedPost, setHasUserLikedPost] = useState<boolean>(false)
@@ -17,6 +21,11 @@ export function PostDisplay ({ post }: { post: Post }) {
 
   const handleLike = async () => {
     if (isProcessing || !user) return
+
+    if (!isSessionActive()) {
+      setSessionModalVisible(true)
+      return
+    }
 
     setIsProcessing(true)
     try {
@@ -57,7 +66,7 @@ export function PostDisplay ({ post }: { post: Post }) {
   }, [post])
 
   return (
-    <article className='w-[clamp(300px,100%,600px)] py-[10px] px-[20px] rounded-vibe border-vibe border-caribbean-current overflow-hidden'>
+    <article className='w-[clamp(300px,100%,700px)] py-[10px] px-[20px] rounded-vibe border-vibe border-caribbean-current overflow-hidden'>
       <header className='w-full h-[70px] grid grid-cols-2 items-center'>
         <div className='flex items-center gap-x-[10px]'>
           <img className='rounded-full w-[50px] aspect-square bg-orange-crayola' />

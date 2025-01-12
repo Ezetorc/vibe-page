@@ -1,25 +1,30 @@
-import { Link } from 'react-router'
+import { Link, useNavigate } from 'react-router'
 import { User } from '../../../models/User'
 import { useRef } from 'react'
 import { useValidation } from '../../../hooks/useValidation'
 import { FormInput } from '../../../components/FormInput'
 import { WelcomeToVibe } from '../../../components/WelcomeToVibe'
+import { Button } from '../../../components/Button'
+import { useUser } from '../../../hooks/useUser'
 
 export default function Register () {
   const {
     errorMessage,
+    setErrorMessage,
     validateName,
     validateEmail,
     validatePasswords,
     validateAgreeWithTerms
   } = useValidation()
+  const { handleToken } = useUser()
+  const navigate = useNavigate()
   const nameInputRef = useRef<HTMLInputElement | null>(null)
   const emailInputRef = useRef<HTMLInputElement | null>(null)
   const passwordInputRef = useRef<HTMLInputElement | null>(null)
   const confirmPasswordInputRef = useRef<HTMLInputElement | null>(null)
   const agreeWithTermsInputRef = useRef<HTMLInputElement | null>(null)
 
-  const handleRegister = () => {
+  const handleRegister = async (): Promise<void> => {
     const name = nameInputRef.current?.value
     const email = emailInputRef.current?.value
     const password = passwordInputRef.current?.value
@@ -33,7 +38,14 @@ export default function Register () {
       validateAgreeWithTerms(agreeWithTerms)
 
     if (isFormValid && name && email && password) {
-      User.register(name, email, password)
+      const registerSuccessful = await User.register(name, email, password)
+
+      if (registerSuccessful) {
+        handleToken()
+        navigate('/')
+      } else {
+        setErrorMessage('User already exists!')
+      }
     }
   }
 
@@ -43,7 +55,7 @@ export default function Register () {
 
       <form className='w-full flex flex-col gap-y-[20px]'>
         <FormInput
-          min={1}
+          min={3}
           max={20}
           reference={nameInputRef}
           placeholder='Name'
@@ -89,14 +101,12 @@ export default function Register () {
         </div>
         {errorMessage && <p className='text-red-500'>{errorMessage}</p>}
 
-        <input
-          className='cursor-pointer hover:bg-white hover:text-orange-crayola w-full h-[50px] bg-orange-crayola font-poppins-regular rounded-vibe'
-          type='submit'
-          value='Register'
+        <Button
           onClick={event => {
             event.preventDefault()
             handleRegister()
           }}
+          text='Register'
         />
       </form>
     </section>

@@ -3,13 +3,19 @@ import { User } from '../../../models/User'
 import { useRef } from 'react'
 import { useValidation } from '../../../hooks/useValidation'
 import { WelcomeToVibe } from '../../../components/WelcomeToVibe'
+import { useNavigate } from 'react-router'
+import { Button } from '../../../components/Button'
+import { useUser } from '../../../hooks/useUser'
 
 export default function Login () {
-  const { errorMessage, validateName, validatePassword } = useValidation()
+  const { errorMessage, validateName, validatePassword, setErrorMessage } =
+    useValidation()
+  const { handleToken } = useUser()
+  const navigate = useNavigate()
   const nameInputRef = useRef<HTMLInputElement | null>(null)
   const passwordInputRef = useRef<HTMLInputElement | null>(null)
 
-  const handleLogin = () => {
+  const handleLogin = async (): Promise<void> => {
     const name = nameInputRef.current?.value
     const password = passwordInputRef.current?.value
 
@@ -17,7 +23,14 @@ export default function Login () {
       validateName(name) && validatePassword(password)
 
     if (isFormValid && name && password) {
-      User.login(name, password)
+      const logSuccesfull = await User.login(name, password)
+
+      if (logSuccesfull) {
+        handleToken()
+        navigate('/')
+      } else {
+        setErrorMessage('The name or password is wrong!')
+      }
     }
   }
 
@@ -27,7 +40,7 @@ export default function Login () {
 
       <form className='w-full flex flex-col gap-y-[20px]'>
         <FormInput
-          min={1}
+          min={3}
           max={20}
           reference={nameInputRef}
           placeholder='Name'
@@ -42,14 +55,12 @@ export default function Login () {
 
         {errorMessage && <p className='text-red-500'>{errorMessage}</p>}
 
-        <input
-          className='cursor-pointer hover:bg-white hover:text-orange-crayola w-full h-[50px] bg-orange-crayola font-poppins-regular rounded-vibe'
-          type='submit'
-          value='Login'
+        <Button
           onClick={event => {
             event.preventDefault()
             handleLogin()
           }}
+          text='Login'
         />
       </form>
     </section>

@@ -9,8 +9,8 @@ export function useValidation () {
       return false
     }
 
-    if (name.length > 20 || name.length < 6) {
-      setErrorMessage('Name must be between 6 and 20 characters long')
+    if (name.length > 20 || name.length < 2) {
+      setErrorMessage('Name must be between 2 and 20 characters long')
       return false
     }
 
@@ -86,12 +86,29 @@ export function useValidation () {
     return true
   }
 
+  const validatePost = (post: string) => {
+    if (post.length === 0) {
+      setErrorMessage('Post is empty')
+      return false
+    }
+
+    if (post.length > 200) {
+      setErrorMessage('Post is too large')
+      return false
+    }
+
+    setErrorMessage(null)
+    return true
+  }
+
   return {
     errorMessage,
+    setErrorMessage,
     validateName,
     validateEmail,
     validatePasswords,
     validateAgreeWithTerms,
-    validatePassword
+    validatePassword,
+    validatePost
   }
 }
