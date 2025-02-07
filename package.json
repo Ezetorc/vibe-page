@@ -13,6 +13,7 @@
     "@formkit/tempo": "^0.1.2",
     "clsx": "^2.1.1",
     "jwt-decode": "^4.0.0",
+    "papaparse": "^5.5.2",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-router": "^7.1.1",
@@ -20,6 +21,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.17.0",
+    "@types/papaparse": "^5.3.15",
     "@types/react": "^18.3.18",
     "@types/react-dom": "^18.3.5",
     "@vitejs/plugin-react-swc": "^3.5.0",

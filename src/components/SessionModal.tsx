@@ -4,7 +4,7 @@ import { Modal } from './Modal'
 import { useSettings } from '../hooks/useSettings'
 
 export function SessionModal () {
-  const { setSessionModalVisible } = useSettings()
+  const { setSessionModalVisible, dictionary } = useSettings()
   const navigate = useNavigate()
 
   const handleLogin = (): void => {
@@ -32,19 +32,19 @@ export function SessionModal () {
         </button>
 
         <h2 className='text-center font-poppins-semibold text-[clamp(20px,7vw,60px)] bg-clip-text text-transparent bg-orange-gradient'>
-          You are not logged!
+          {dictionary.youAreNotLogged?.value}
         </h2>
 
         <div className='flex flex-col h-full gap-y-[5px] items-center'>
           <span className='font-poppins-light text-[clamp(20px,4vw,25px)]'>
-            I have an account
+            {dictionary.iHaveAnAccount?.value}
           </span>
-          <Button onClick={handleLogin} text='Log In' />
+          <Button onClick={handleLogin} text={dictionary.login?.value} />
 
           <span className='font-poppins-light text-[clamp(20px,4vw,25px)] mt-[40px]'>
-            I don't have an account
+            {dictionary.iDontHaveAnAccount?.value}
           </span>
-          <Button onClick={handleRegister} text='Register' />
+          <Button onClick={handleRegister} text={dictionary.register?.value} />
         </div>
       </article>
     </Modal>

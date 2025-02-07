@@ -1,23 +1,25 @@
 import { useEffect, useState } from 'react'
-import { format, parse } from '@formkit/tempo'
-import { Post } from '../models/Post'
 import { LikeIcon } from './Icons'
 import { Like } from '../models/Like'
 import { User } from '../models/User'
 import { useUser } from '../hooks/useUser'
 import { useSettings } from '../hooks/useSettings'
+import { PostDisplayProps } from '../models/PostDisplayProps'
+import { Link } from 'react-router'
 
-export function PostDisplay ({ post }: { post: Post }) {
+export function PostDisplay ({ post, onDelete }: PostDisplayProps) {
   const { isSessionActive } = useUser()
-  const { setSessionModalVisible } = useSettings()
+  const { setSessionModalVisible, dictionary } = useSettings()
   const [likes, setLikes] = useState<Like[] | null>(null)
   const [user, setUser] = useState<User | null>(null)
   const [hasUserLikedPost, setHasUserLikedPost] = useState<boolean>(false)
   const [isProcessing, setIsProcessing] = useState<boolean>(false)
+  const postDate: string = post.getDate()
 
-  const storedDate: string = post.createdAt
-  const parsedDate: Date = parse(storedDate, 'yyyy-MM-dd HH:mm:ss')
-  const formattedDate: string = format(parsedDate, 'DD/MM/YYYY')
+  const handleDelete = async () => {
+    await post.delete()
+    onDelete(post.id)
+  }
 
   const handleLike = async () => {
     if (isProcessing || !user) return
@@ -70,13 +72,24 @@ export function PostDisplay ({ post }: { post: Post }) {
       <header className='w-full h-[70px] grid grid-cols-2 items-center'>
         <div className='flex items-center gap-x-[10px]'>
           <img className='rounded-full w-[50px] aspect-square bg-orange-crayola' />
-          <h3 className='text-orange-crayola font-poppins-regular text-[clamp(10px,7vw,20px)]'>
-            {user?.name || 'Loading...'}
-          </h3>
+          {user ? (
+            <Link
+              className='text-orange-crayola font-poppins-regular content-end text-[clamp(20px,7vw,25px)]'
+              to={`/account/${user.name}`}
+            >
+              {user.name}
+            </Link>
+          ) : (
+            <h3>{dictionary.loading?.value}</h3>
+          )}
         </div>
         <span className='text-caribbean-current text-right font-poppins-light text-[clamp(5px,6vw,20px)]'>
-          {formattedDate}
+          {postDate}
         </span>
+
+        {user?.id === post.userId && (
+          <button onClick={handleDelete}>delete</button>
+        )}
       </header>
 
       <main className='w-full flex flex-col'>
@@ -91,7 +104,7 @@ export function PostDisplay ({ post }: { post: Post }) {
             <LikeIcon filled={hasUserLikedPost} />
           </button>
           <span className='text-verdigris font-poppins-semibold'>
-            {likes === null ? 'Loading...' : likes.length}
+            {likes === null ? dictionary.loading?.value : likes.length}
           </span>
         </div>
       </footer>

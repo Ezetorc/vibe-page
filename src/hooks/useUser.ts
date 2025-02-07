@@ -1,44 +1,45 @@
 import { useCallback } from 'react'
 import { UserStore } from '../models/UserStore'
 import { getUserStore } from '../stores/getUserStore'
-import { UserEndpoint } from '../models/UserEndpoint'
-import { getAdaptedUser } from '../adapters/getAdaptedUser'
-import { JwtPayload, jwtDecode } from 'jwt-decode'
+import { jwtDecode } from 'jwt-decode'
 import { getAccessToken } from '../utilities/getAccessToken'
 import { User } from '../models/User'
+import { AccessToken } from '../models/AccessToken'
 
 export function useUser () {
   const userStore: UserStore = getUserStore()
   const { user, setUser } = userStore
 
-  const adaptUser = useCallback(
-    (userEndpoint: UserEndpoint): void => {
-      const adaptedUser: User = getAdaptedUser(userEndpoint)
+  const updateUser = useCallback(
+    async (userId: number) => {
+      const newUser: User = await User.getById(userId)
 
-      setUser(adaptedUser)
+      setUser(newUser)
     },
     [setUser]
   )
 
-  const handleToken = useCallback((): void => {
+  const handleSession = useCallback(async (): Promise<void> => {
     const accessToken: string | undefined = getAccessToken()
 
     if (!accessToken) return
 
     try {
-      const user: JwtPayload = jwtDecode(accessToken)
+      const session: AccessToken = jwtDecode(accessToken)
 
-      if ('user' in user) {
-        adaptUser(user.user as UserEndpoint)
+      if ('id' in session.user) {
+        const newUser: User = await User.getById(session.user.id)
+
+        setUser(newUser)
       }
     } catch (error) {
       console.error('Error decoding token:', error)
     }
-  }, [adaptUser])
+  }, [setUser])
 
   const isSessionActive = (): boolean => {
     return Boolean(user)
   }
 
-  return { ...userStore, isSessionActive, handleToken }
+  return { ...userStore, isSessionActive, handleSession, updateUser }
 }

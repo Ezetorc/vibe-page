@@ -1,3 +1,4 @@
+import { format } from '@formkit/tempo'
 import { getAdaptedLike } from '../adapters/getAdaptedLike'
 import { getAdaptedPost } from '../adapters/getAdaptedPost'
 import { api } from '../constants/api'
@@ -26,6 +27,31 @@ export class Post {
     this.userId = userId
     this.content = content
     this.createdAt = createdAt
+  }
+
+  public async delete (): Promise<boolean> {
+    try {
+      const url: string = `${api}/posts/id/${this.id}`
+      const response: Response = await fetch(url, {
+        method: 'DELETE',
+        credentials: 'include'
+      })
+
+      if (!response.ok) {
+        return false
+      }
+
+      return true
+    } catch {
+      return false
+    }
+  }
+
+  public getDate (): string {
+    const parsedDate: Date = new Date(this.createdAt.replace(' ', 'T'))
+    const formattedDate: string = format(parsedDate, 'DD/MM/YYYY')
+
+    return formattedDate
   }
 
   static async create (userId: number, content: string): Promise<boolean> {

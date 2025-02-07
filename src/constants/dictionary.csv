@@ -1,0 +1,59 @@
+key,es,en
+change,Cambiar,Change
+search,Buscar,Search
+posts,Publicaciones,Posts
+users,Usuarios,Users
+post,Publicar,Post
+my,Mis,My
+account,Cuenta,Account
+display,Visualización,Display
+password,Contraseña,Password
+language,Idioma,Language
+email,Email,Email
+errorDuringAccountEditing,Error mientras se editaba la cuenta,Error during account editing
+loading,Cargando,Loading
+youAreNotLogged,No iniciaste sesión!,You aren't logged!
+iHaveAnAccount,Tengo una cuenta,I have an account
+iDontHaveAnAccount,No tengo una cuenta,I don't have an account
+thisUserHasnotDescription,Este usuario no tiene descripción,This user hasn't description
+joined,Se unió el,Joined
+welcomeTo,Bienvenido a,Welcome to
+emptyNameError,Completá tu nombre,Complete name field
+nameLengthError,Tu nombre debe tener entre 3 y 20 caracteres,Name must be between 3 and 20 characters long
+emptyDescriptionError,Completá tu descripción,Complete description field
+descriptionLengthError,Tu descripción no puede tener más de 200 caracteres,Description can't have more than 200 characters
+emptyEmailError,Completá tu email,Complete email field
+invalidEmailError,Tu email es inválido,Invalid email format
+emailAlreadyExists,Tu email ya está siendo usado,Email already exists
+emptyPasswordError,Completá tu contraseña,Complete password field
+passwordLengthError,Tu contraseña debe tener como mínimo 6 caracteres,Password must be at least 6 characters long
+confirmPassword,Confirmá tu contraseña,Confirm password
+passwordsDontMatch,Tus contraseñas no coinciden,Passwords don't match
+youMustAgreeWithTerms,Debes estar de acuerdo con los términos,You must agree with the terms
+emptyPostError,Tu publicación está vacía,Post is empty
+postLengthError,Tu publicación no puede tener más de 200 caracteres,Post can't have more than 200 characters
+youDontHaveDescription,No tienes descripción,You don't have description
+myNewDescription,Mi nueva descripción...,My new description...
+errorDuringDescriptionChange,"Error mientras se editaba la descripción, intenta de nuevo","Error during description change, try again"
+errorDuringNameChange,"Error mientras se editaba el nombre, intenta de nuevo","Error during name change, try again"
+somethingWentWrong,"Algo salió mal, intenta de nuevo","Something went wrong, try again"
+noPostsYet,Todavía no hay posts...,No posts yet...
+login,Iniciar sesión,Login
+register,Registrarse,Register
+name,Nombre,Name
+nameOrPasswordWrong,El nombre o la contraseña están mal!,The name or password are wrong!
+userAlreadyExists,Este usuario ya existe!,This user already exists!
+iAgreeWith,Estoy de acuerdo con los,I agree with
+termsAndConditions,Términos y Condiciones,Terms & Conditions
+emailPlaceholder,mi_nuevo@email.com,my_new@email.com
+createPlaceholder0,No puedo creer que vi un OVNI...,I can't believe I just saw a UFO...
+createPlaceholder1,"Estoy muy enojado, no puedo creer que hayan hecho eso...","I'm so angry, I can't believe they did that..."
+createPlaceholder2,No puedo dejar de pensar en...,I can't stop thinking about...
+createPlaceholder3,Hoy me pasó la cosa más vergonsoza del mundo...,The most embarrassing thing happened to me today...
+createPlaceholder4,Mi mascota acaba de hacer algo muy gracioso...,My pet just did the funniest thing...
+createPlaceholder5,¿Alguien tiene tips para estar motivado?,Does anyone have tips on how to stay motivated?
+createPlaceholder6,No puedo esperar para compartirles mi idea...,I can't wait to share this idea with you all...
+createPlaceholder7,Me siento nostálgico sobre...,I'm feeling nostalgic about...
+createPlaceholder8,¿Quién más recuerda cuando...?,Who else remembers when we used to...
+createPlaceholder9,"Acabo de ver la mejor película de todas, se llama...",I just watched the best movie ever! It’s called...
+createPlaceholder10,Tuve el sueño más raro de mi vida...,I had the weirdest dream last night...

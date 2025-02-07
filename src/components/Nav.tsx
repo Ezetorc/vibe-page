@@ -1,5 +1,5 @@
 import { HomeIcon, PlusIcon, SearchIcon, SettingsIcon, UserIcon } from './Icons'
-import { NavButton } from '../pages/Home/components/NavButton'
+import { NavButton } from './NavButton'
 
 export function Nav () {
   return (
@@ -7,7 +7,7 @@ export function Nav () {
       <NavButton to='/' icon={<HomeIcon />} />
       <NavButton to='/search' icon={<SearchIcon />} />
       <NavButton to='/create' icon={<PlusIcon />} needsSession={true} />
-      <NavButton to='/account' icon={<UserIcon />} />
+      <NavButton to='/account/me' icon={<UserIcon />} needsSession={true} />
       <NavButton to='/settings' icon={<SettingsIcon />} />
     </nav>
   )

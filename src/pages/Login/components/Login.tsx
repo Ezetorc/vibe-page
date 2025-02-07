@@ -6,11 +6,14 @@ import { WelcomeToVibe } from '../../../components/WelcomeToVibe'
 import { useNavigate } from 'react-router'
 import { Button } from '../../../components/Button'
 import { useUser } from '../../../hooks/useUser'
+import { useSettings } from '../../../hooks/useSettings'
+import { Section } from '../../../components/Section'
 
 export default function Login () {
+  const { dictionary } = useSettings()
   const { errorMessage, validateName, validatePassword, setErrorMessage } =
     useValidation()
-  const { handleToken } = useUser()
+  const { handleSession } = useUser()
   const navigate = useNavigate()
   const nameInputRef = useRef<HTMLInputElement | null>(null)
   const passwordInputRef = useRef<HTMLInputElement | null>(null)
@@ -23,34 +26,34 @@ export default function Login () {
       validateName(name) && validatePassword(password)
 
     if (isFormValid && name && password) {
-      const logSuccesfull = await User.login(name, password)
+      const logSuccesfull: boolean = await User.login(name, password)
 
       if (logSuccesfull) {
-        handleToken()
+        await handleSession()
         navigate('/')
       } else {
-        setErrorMessage('The name or password is wrong!')
+        setErrorMessage(dictionary.nameOrPasswordWrong?.value)
       }
     }
   }
 
   return (
-    <section className='justify-items-center grid grid-rows-[1fr,4fr] w-[clamp(320px,100%,700px)] gap-y-[20px] p-[clamp(5px,3%,10px)] min-h-screen'>
+    <Section className='h-full gap-y-[50px]'>
       <WelcomeToVibe />
 
-      <form className='w-full flex flex-col gap-y-[20px]'>
+      <form className='w-full flex flex-col gap-y-[30px]'>
         <FormInput
           min={3}
           max={20}
           reference={nameInputRef}
-          placeholder='Name'
+          placeholder={dictionary.name?.value}
         />
         <FormInput
           min={6}
           max={30}
           reference={passwordInputRef}
           type='password'
-          placeholder='Password'
+          placeholder={dictionary.password?.value}
         />
 
         {errorMessage && <p className='text-red-500'>{errorMessage}</p>}
@@ -60,9 +63,9 @@ export default function Login () {
             event.preventDefault()
             handleLogin()
           }}
-          text='Login'
+          text={dictionary.login?.value}
         />
       </form>
-    </section>
+    </Section>
   )
 }

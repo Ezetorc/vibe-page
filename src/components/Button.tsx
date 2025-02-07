@@ -1,7 +1,4 @@
-interface ButtonProps {
-  onClick: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void
-  text: string
-}
+import { ButtonProps } from '../models/ButtonProps'
 
 export function Button ({ onClick, text }: ButtonProps) {
   return (

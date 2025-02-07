@@ -27,7 +27,7 @@ export function HomeIcon ({ filled }: IconProps) {
 
 export function SearchIcon ({ filled }: IconProps) {
   return filled ? (
-    <svg width='49' height='49' viewBox='0 0 29 29' fill='none'>
+    <svg width='55' height='55' viewBox='0 0 29 29' fill='none'>
       <path
         d='M12.0833 2.41669C9.51957 2.41669 7.06082 3.43514 5.24797 5.24799C3.43511 7.06084 2.41666 9.51959 2.41666 12.0834C2.41666 14.6471 3.43511 17.1059 5.24797 18.9187C7.06082 20.7316 9.51957 21.75 12.0833 21.75C14.6471 21.75 17.1058 20.7316 18.9187 18.9187C20.7315 17.1059 21.75 14.6471 21.75 12.0834C21.75 9.51959 20.7315 7.06084 18.9187 5.24799C17.1058 3.43514 14.6471 2.41669 12.0833 2.41669Z'
         fill='#63B5B1'
@@ -40,7 +40,7 @@ export function SearchIcon ({ filled }: IconProps) {
       />
     </svg>
   ) : (
-    <svg width='49' height='49' viewBox='0 0 29 29' fill='none'>
+    <svg width='55' height='55' viewBox='0 0 29 29' fill='none'>
       <path
         d='M25.375 25.375L21.1458 21.1458M20.5417 12.0833C20.5417 13.1941 20.3229 14.294 19.8978 15.3202C19.4727 16.3464 18.8497 17.2788 18.0643 18.0643C17.2788 18.8497 16.3464 19.4727 15.3202 19.8978C14.294 20.3229 13.1941 20.5417 12.0833 20.5417C10.9726 20.5417 9.87268 20.3229 8.84647 19.8978C7.82026 19.4727 6.88782 18.8497 6.10239 18.0643C5.31696 17.2788 4.69392 16.3464 4.26885 15.3202C3.84378 14.294 3.625 13.1941 3.625 12.0833C3.625 9.84004 4.51614 7.68863 6.10239 6.10239C7.68863 4.51614 9.84004 3.625 12.0833 3.625C14.3266 3.625 16.478 4.51614 18.0643 6.10239C19.6505 7.68863 20.5417 9.84004 20.5417 12.0833Z'
         stroke='#63B5B1'
@@ -65,6 +65,8 @@ export function UserIcon ({ filled }: IconProps) {
     <svg width='55' height='55' viewBox='0 0 35 35' fill='none'>
       <path
         d='M10.2083 24.7917V26.25C10.2083 26.6368 10.362 27.0077 10.6355 27.2812C10.909 27.5547 11.2799 27.7084 11.6667 27.7084H23.3333C23.7201 27.7084 24.091 27.5547 24.3645 27.2812C24.638 27.0077 24.7917 26.6368 24.7917 26.25V24.7917C24.7917 23.6314 24.3307 22.5186 23.5103 21.6981C22.6898 20.8776 21.577 20.4167 20.4167 20.4167H14.5833C13.423 20.4167 12.3102 20.8776 11.4897 21.6981C10.6693 22.5186 10.2083 23.6314 10.2083 24.7917ZM21.875 11.6667C21.875 12.827 21.4141 13.9398 20.5936 14.7603C19.7731 15.5808 18.6603 16.0417 17.5 16.0417C16.3397 16.0417 15.2269 15.5808 14.4064 14.7603C13.5859 13.9398 13.125 12.827 13.125 11.6667C13.125 10.5064 13.5859 9.39357 14.4064 8.57309C15.2269 7.75262 16.3397 7.29169 17.5 7.29169C18.6603 7.29169 19.7731 7.75262 20.5936 8.57309C21.4141 9.39357 21.875 10.5064 21.875 11.6667Z'
+        fillRule='evenodd'
+        clipRule='evenodd'
         stroke='#63B5B1'
         strokeWidth='1.5'
       />
@@ -97,7 +99,7 @@ export function PlusIcon ({ filled }: IconProps) {
 
 export function SettingsIcon ({ filled }: IconProps) {
   return filled ? (
-    <svg width='53' height='53' viewBox='0 0 33 33' fill='none'>
+    <svg width='55' height='55' viewBox='0 0 33 33' fill='none'>
       <path
         fillRule='evenodd'
         clipRule='evenodd'
@@ -120,6 +122,48 @@ export function SettingsIcon ({ filled }: IconProps) {
         strokeWidth='1.5'
         strokeLinecap='round'
         strokeLinejoin='round'
+      />
+    </svg>
+  )
+}
+
+export function PencilIcon () {
+  return (
+    <svg
+      className='w-6 h-6 text-[#2C6B6C]'
+      aria-hidden='true'
+      width='24'
+      height='24'
+      fill='none'
+      viewBox='0 0 24 24'
+    >
+      <path
+        stroke='currentColor'
+        strokeLinecap='round'
+        strokeLinejoin='round'
+        strokeWidth='2'
+        d='M10.779 17.779 4.36 19.918 6.5 13.5m4.279 4.279 8.364-8.643a3.027 3.027 0 0 0-2.14-5.165 3.03 3.03 0 0 0-2.14.886L6.5 13.5m4.279 4.279L6.499 13.5m2.14 2.14 6.213-6.504M12.75 7.04 17 11.28'
+      />
+    </svg>
+  )
+}
+
+export function CheckIcon () {
+  return (
+    <svg
+      className='w-6 h-6 text-[#2C6B6C]'
+      aria-hidden='true'
+      width='24'
+      height='24'
+      fill='none'
+      viewBox='0 0 24 24'
+    >
+      <path
+        stroke='currentColor'
+        strokeLinecap='round'
+        strokeLinejoin='round'
+        strokeWidth='2'
+        d='M5 11.917 9.724 16.5 19 7.5'
       />
     </svg>
   )

@@ -1,16 +1,19 @@
 import { useState } from 'react'
+import { User } from '../models/User'
+import { useSettings } from './useSettings'
 
 export function useValidation () {
+  const { dictionary } = useSettings()
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
 
-  const validateName = (name: string | undefined) => {
+  const validateName = (name: string | undefined | null) => {
     if (!name) {
-      setErrorMessage('Complete name field')
+      setErrorMessage(dictionary.emptyNameError?.value)
       return false
     }
 
-    if (name.length > 20 || name.length < 2) {
-      setErrorMessage('Name must be between 2 and 20 characters long')
+    if (name.length > 20 || name.length < 3) {
+      setErrorMessage(dictionary.nameLengthError?.value)
       return false
     }
 
@@ -18,14 +21,38 @@ export function useValidation () {
     return true
   }
 
-  const validateEmail = (email: string | undefined) => {
+  const validateDescription = (description: string | undefined | null) => {
+    console.log(description)
+
+    if (description == null || description == undefined) {
+      setErrorMessage(dictionary.emptyDescriptionError?.value)
+      return false
+    }
+
+    if (description.length > 200) {
+      setErrorMessage(dictionary.descriptionLengthError?.value)
+      return false
+    }
+
+    setErrorMessage(null)
+    return true
+  }
+
+  const validateEmail = async (email: string | undefined) => {
     if (!email) {
-      setErrorMessage('Complete email field')
+      setErrorMessage(dictionary.emptyEmailError?.value)
       return false
     }
 
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      setErrorMessage('Invalid email format.')
+      setErrorMessage(dictionary.invalidEmailError?.value)
+      return false
+    }
+
+    const emailAlreadyExists: boolean = await User.emailAlreadyExists(email)
+
+    if (emailAlreadyExists) {
+      setErrorMessage(dictionary.emailAlreadyExists?.value)
       return false
     }
 
@@ -35,12 +62,12 @@ export function useValidation () {
 
   const validatePassword = (password: string | undefined) => {
     if (!password) {
-      setErrorMessage('Complete password field')
+      setErrorMessage(dictionary.emptyPasswordError?.value)
       return false
     }
 
     if (password.length < 6 || password.length > 30) {
-      setErrorMessage('Password must be at least 6 characters long')
+      setErrorMessage(dictionary.passwordLengthError?.value)
       return false
     }
 
@@ -53,22 +80,22 @@ export function useValidation () {
     confirmedPassword: string | undefined
   ) => {
     if (!password) {
-      setErrorMessage('Complete password field')
+      setErrorMessage(dictionary.emptyPasswordError?.value)
       return false
     }
 
     if (!confirmedPassword) {
-      setErrorMessage('Confirm password')
+      setErrorMessage(dictionary.confirmPassword?.value)
       return false
     }
 
     if (password.length < 6 || password.length > 30) {
-      setErrorMessage('Password must be at least 6 characters long')
+      setErrorMessage(dictionary.passwordLengthError?.value)
       return false
     }
 
     if (password !== confirmedPassword) {
-      setErrorMessage('Passwords do not match')
+      setErrorMessage(dictionary.passwordsDontMatch?.value)
       return false
     }
 
@@ -78,7 +105,7 @@ export function useValidation () {
 
   const validateAgreeWithTerms = (agreeWithTerms: boolean | undefined) => {
     if (!agreeWithTerms) {
-      setErrorMessage('You must agree with the terms')
+      setErrorMessage(dictionary.youMustAgreeWithTerms?.value)
       return false
     }
 
@@ -88,12 +115,12 @@ export function useValidation () {
 
   const validatePost = (post: string) => {
     if (post.length === 0) {
-      setErrorMessage('Post is empty')
+      setErrorMessage(dictionary.emptyPostError?.value)
       return false
     }
 
     if (post.length > 200) {
-      setErrorMessage('Post is too large')
+      setErrorMessage(dictionary.postLengthError?.value)
       return false
     }
 
@@ -109,6 +136,7 @@ export function useValidation () {
     validatePasswords,
     validateAgreeWithTerms,
     validatePassword,
-    validatePost
+    validatePost,
+    validateDescription
   }
 }

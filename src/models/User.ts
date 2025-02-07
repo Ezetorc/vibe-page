@@ -1,3 +1,4 @@
+import { format } from '@formkit/tempo'
 import { getAdaptedUser } from '../adapters/getAdaptedUser'
 import { api } from '../constants/api'
 import { Like } from './Like'
@@ -37,6 +38,18 @@ export class User {
     this.profileImageId = profileImageId
     this.description = description
     this.createdAt = createdAt
+  }
+
+  static async getByUsername (username: string): Promise<User> {
+    const url: string = `${api}/users/username/${username}`
+    const response: Response = await fetch(url, {
+      method: 'GET',
+      credentials: 'include'
+    })
+    const userEndpoint: UserEndpoint = await response.json()
+    const user: User = getAdaptedUser(userEndpoint)
+
+    return user
   }
 
   static async getById (userId: number): Promise<User> {
@@ -87,11 +100,17 @@ export class User {
     }
   }
 
+  public getDate (): string {
+    const parsedDate: Date = new Date(this.createdAt.replace(' ', 'T'))
+    const formattedDate: string = format(parsedDate, 'DD/MM/YYYY')
+
+    return formattedDate
+  }
+
   static async login (name: string, password: string): Promise<boolean> {
     try {
       const url: string = `${api}/users/login`
       const body = { name, password }
-
       const response: Response = await fetch(url, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -119,6 +138,100 @@ export class User {
       return false
     }
 
+    return true
+  }
+
+  public async changeName (newName: string): Promise<boolean> {
+    const url: string = `${api}/users/id/${this.id}`
+    const body = {
+      name: newName
+    }
+
+    const response: Response = await fetch(url, {
+      method: 'PATCH',
+      credentials: 'include',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(body)
+    })
+
+    if (!response.ok) {
+      return false
+    }
+
+    this.name = newName
+    return true
+  }
+
+  public async changeDescription (newDescription: string): Promise<boolean> {
+    const url: string = `${api}/users/id/${this.id}`
+    const body = {
+      description: newDescription
+    }
+
+    const response: Response = await fetch(url, {
+      method: 'PATCH',
+      credentials: 'include',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(body)
+    })
+
+    if (!response.ok) {
+      return false
+    }
+
+    this.description = newDescription
+    return true
+  }
+
+  static async getAll (): Promise<User[]> {
+    const url: string = `${api}/users`
+    const response: Response = await fetch(url)
+    const usersEndpoints: UserEndpoint[] = await response.json()
+    const users: User[] = usersEndpoints.map(userEndpoint =>
+      getAdaptedUser(userEndpoint)
+    )
+
+    return users
+  }
+
+  static async emailAlreadyExists (email: string): Promise<boolean> {
+    const users: User[] = await this.getAll()
+    const emailAlreadyExists: boolean = users.some(user => user.email === email)
+
+    return emailAlreadyExists
+  }
+
+  public async getPosts (): Promise<Post[]> {
+    const posts: Post[] = await Post.getAll()
+    const userPosts: Post[] = posts.filter(post => post.userId === this.id)
+
+    return userPosts
+  }
+
+  public async changeEmail (newEmail: string): Promise<boolean> {
+    const url: string = `${api}/users/id/${this.id}`
+    const body = {
+      email: newEmail
+    }
+
+    const response: Response = await fetch(url, {
+      method: 'PATCH',
+      credentials: 'include',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(body)
+    })
+
+    if (!response.ok) {
+      return false
+    }
+
+    this.email = newEmail
     return true
   }
 

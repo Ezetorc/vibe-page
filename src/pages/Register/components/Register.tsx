@@ -6,6 +6,8 @@ import { FormInput } from '../../../components/FormInput'
 import { WelcomeToVibe } from '../../../components/WelcomeToVibe'
 import { Button } from '../../../components/Button'
 import { useUser } from '../../../hooks/useUser'
+import { useSettings } from '../../../hooks/useSettings'
+import { Section } from '../../../components/Section'
 
 export default function Register () {
   const {
@@ -16,7 +18,8 @@ export default function Register () {
     validatePasswords,
     validateAgreeWithTerms
   } = useValidation()
-  const { handleToken } = useUser()
+  const { dictionary } = useSettings()
+  const { handleSession } = useUser()
   const navigate = useNavigate()
   const nameInputRef = useRef<HTMLInputElement | null>(null)
   const emailInputRef = useRef<HTMLInputElement | null>(null)
@@ -33,47 +36,55 @@ export default function Register () {
 
     const isFormValid: boolean =
       validateName(name) &&
-      validateEmail(email) &&
+      (await validateEmail(email)) &&
       validatePasswords(password, confirmedPassword) &&
       validateAgreeWithTerms(agreeWithTerms)
 
     if (isFormValid && name && email && password) {
-      const registerSuccessful = await User.register(name, email, password)
+      const registerSuccessful: boolean = await User.register(
+        name,
+        email,
+        password
+      )
 
       if (registerSuccessful) {
-        handleToken()
+        await handleSession()
         navigate('/')
       } else {
-        setErrorMessage('User already exists!')
+        setErrorMessage(dictionary.userAlreadyExists?.value)
       }
     }
   }
 
   return (
-    <section className='justify-items-center grid grid-rows-[1fr,4fr] w-[clamp(320px,100%,700px)] gap-y-[20px] p-[clamp(5px,3%,10px)] min-h-screen'>
+    <Section className='h-full gap-y-[50px]'>
       <WelcomeToVibe />
 
-      <form className='w-full flex flex-col gap-y-[20px]'>
+      <form className='w-full flex flex-col gap-y-[30px]'>
         <FormInput
           min={3}
           max={20}
           reference={nameInputRef}
-          placeholder='Name'
+          placeholder={dictionary.name?.value}
         />
-        <FormInput reference={emailInputRef} type='email' placeholder='Email' />
+        <FormInput
+          reference={emailInputRef}
+          type='email'
+          placeholder={dictionary.email?.value}
+        />
         <FormInput
           min={6}
           max={30}
           reference={passwordInputRef}
           type='password'
-          placeholder='Password'
+          placeholder={dictionary.password?.value}
         />
         <FormInput
           min={6}
           max={30}
           reference={confirmPasswordInputRef}
           type='password'
-          placeholder='Confirm Password'
+          placeholder={dictionary.confirmPassword?.value}
         />
 
         <div className='flex gap-x-5 items-center'>
@@ -90,12 +101,13 @@ export default function Register () {
             <span className='absolute w-3 h-3 bg-white rounded-full opacity-0 scale-0 peer-checked:opacity-100 peer-checked:scale-100'></span>
           </label>
           <label className='font-poppins-light' htmlFor='agree-with-terms'>
-            I agree with{` `}
+            {dictionary.iAgreeWith?.value}
+            {` `}
             <Link
               to='/terms'
               className='border-b-2 border-b-white hover:border-b-orange-crayola hover:text-orange-crayola'
             >
-              Terms & Conditions
+              {dictionary.termsAndConditions?.value}
             </Link>
           </label>
         </div>
@@ -106,9 +118,9 @@ export default function Register () {
             event.preventDefault()
             handleRegister()
           }}
-          text='Register'
+          text={dictionary.register?.value}
         />
       </form>
-    </section>
+    </Section>
   )
 }
