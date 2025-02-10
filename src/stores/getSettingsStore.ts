@@ -3,6 +3,7 @@ import { SettingsStore } from '../models/SettingsStore'
 import { Language } from '../models/Language'
 import { getDictionaries } from '../utilities/getDictionaries'
 import { Dictionaries } from '../models/Dictionaries'
+import { getLanguage } from '../utilities/getLanguage'
 
 export const getSettingsStore = create<SettingsStore>(set => ({
   dictionaries: null,
@@ -15,7 +16,7 @@ export const getSettingsStore = create<SettingsStore>(set => ({
   setChangeLanguageModalVisible: (newChangeLanguageModalVisible: boolean) =>
     set({ changeLanguageModalVisible: newChangeLanguageModalVisible }),
 
-  language: 'es',
+  language: getLanguage(),
   setLanguage: (newLanguage: Language) => set({ language: newLanguage }),
 
   sessionModalVisible: false,

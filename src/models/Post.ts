@@ -1,10 +1,10 @@
 import { format } from '@formkit/tempo'
 import { getAdaptedLike } from '../adapters/getAdaptedLike'
 import { getAdaptedPost } from '../adapters/getAdaptedPost'
-import { api } from '../constants/api'
 import { Like } from './Like'
 import { LikeEndpoint } from './LikeEndpoint'
 import { PostEndpoint } from './PostEndpoint'
+import { api } from '../constants/SETTINGS'
 
 export class Post {
   public id: number

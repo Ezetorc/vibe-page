@@ -1,6 +1,7 @@
 import { User } from '../models/User'
 import { useSettings } from '../hooks/useSettings'
-import { Link } from 'react-router'
+import { Username } from './Username'
+import { Loading } from './Loading'
 
 export function UserDisplay ({ user }: { user: User }) {
   const { dictionary } = useSettings()
@@ -11,14 +12,7 @@ export function UserDisplay ({ user }: { user: User }) {
       <div className='gap-x-[20px] grid h-full grid-cols-[1fr,2fr] grid-rows-[1fr,1fr]'>
         <img className='self-center mb-[10px] justify-self-end row-[span_2] rounded-full w-[clamp(70px,50%,90px)] aspect-square bg-orange-crayola' />
 
-        {user ? (
-          <Link
-            className='text-orange-crayola font-poppins-regular content-end text-[clamp(20px,7vw,25px)]'
-            to={`/account/${user.name}`}
-          >{user.name}</Link>
-        ) : (
-          <h3>{dictionary.loading?.value}</h3>
-        )}
+        {user ? <Username username={user.name} /> : <Loading />}
 
         <span className='text-caribbean-current font-poppins-light content-start text-[clamp(10px,4vw,20px)]'>
           {`${dictionary.joined?.value} ${userDate}`}

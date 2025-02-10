@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react'
-import { PostDisplay } from '../../../components/PostDisplay'
 import { Post } from '../../../models/Post'
 import { Nav } from '../../../components/Nav'
 import { useSettings } from '../../../hooks/useSettings'
+import { PostsDisplay } from '../../../components/PostsDisplay'
 
 export default function Home () {
   const { dictionary } = useSettings()
@@ -11,7 +11,7 @@ export default function Home () {
 
   const handlePostDelete = (postId: number) => {
     if (!posts) return
-    
+
     const newPosts: Post[] = posts?.filter(post => post.id !== postId)
 
     setPosts(newPosts)
@@ -35,13 +35,7 @@ export default function Home () {
         <div className='text-white'>{`${dictionary.loading?.value} ${dictionary.posts?.inMinus}`}</div>
       )}
 
-      {(!posts || posts.length === 0) && (
-        <div className='text-white'>{dictionary.noPostsYet?.value}</div>
-      )}
-
-      {posts?.map(post => (
-        <PostDisplay onDelete={handlePostDelete} key={post.id} post={post} />
-      ))}
+      <PostsDisplay posts={posts} onPostDelete={handlePostDelete} />
 
       <Nav />
     </main>

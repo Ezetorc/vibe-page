@@ -1,9 +1,9 @@
 import { format } from '@formkit/tempo'
 import { getAdaptedUser } from '../adapters/getAdaptedUser'
-import { api } from '../constants/api'
 import { Like } from './Like'
 import { Post } from './Post'
 import { UserEndpoint } from './UserEndpoint'
+import { api } from '../constants/SETTINGS'
 
 export class User {
   public id: number
@@ -50,6 +50,10 @@ export class User {
     const user: User = getAdaptedUser(userEndpoint)
 
     return user
+  }
+
+  public isOwnerOf (post: Post) {
+    return this.id === post.userId
   }
 
   static async getById (userId: number): Promise<User> {

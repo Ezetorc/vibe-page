@@ -121,6 +121,9 @@ export default function Register () {
           text={dictionary.register?.value}
         />
       </form>
+
+      <Link to="/login" className='text-verdigris underline'>{dictionary.iHaveAnAccount?.value}</Link>
+
     </Section>
   )
 }

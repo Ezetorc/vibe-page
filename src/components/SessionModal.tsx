@@ -2,34 +2,30 @@ import { useNavigate } from 'react-router'
 import { Button } from './Button'
 import { Modal } from './Modal'
 import { useSettings } from '../hooks/useSettings'
+import { CloseModalButton } from './CloseModalButton'
 
 export function SessionModal () {
   const { setSessionModalVisible, dictionary } = useSettings()
   const navigate = useNavigate()
 
-  const handleLogin = (): void => {
+  const handleLogin = () => {
     navigate('/login')
     setSessionModalVisible(false)
   }
 
-  const handleRegister = (): void => {
+  const handleRegister = () => {
     navigate('/register')
     setSessionModalVisible(false)
   }
 
-  const handleClose = (): void => {
+  const handleClose = () => {
     setSessionModalVisible(false)
   }
 
   return (
     <Modal>
       <article className='p-[clamp(10px,5%,20px)] relative gap-y-[clamp(20px,50%,40px)] flex flex-col rounded-vibe bg-caribbean-current w-[clamp(300px,70%,1000px)] h-[clamp(400px,80%,600px)]'>
-        <button
-          onClick={handleClose}
-          className='absolute top-0 right-0 pr-[2%] pt-[1%] font-poppins-semibold text-[clamp(15px,4vw,20px)]'
-        >
-          X
-        </button>
+        <CloseModalButton onClose={handleClose} />
 
         <h2 className='text-center font-poppins-semibold text-[clamp(20px,7vw,60px)] bg-clip-text text-transparent bg-orange-gradient'>
           {dictionary.youAreNotLogged?.value}

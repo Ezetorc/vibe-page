@@ -3,7 +3,6 @@ import { Nav } from '../../../components/Nav'
 import { SearchBar } from '../../../components/SearchBar'
 import { useUser } from '../../../hooks/useUser'
 import { Post } from '../../../models/Post'
-import { PostDisplay } from '../../../components/PostDisplay'
 import { useDebounce } from '../../../hooks/useDebounce'
 import { CheckIcon, PencilIcon } from '../../../components/Icons'
 import { useValidation } from '../../../hooks/useValidation'
@@ -11,6 +10,8 @@ import { useSettings } from '../../../hooks/useSettings'
 import { Section } from '../../../components/Section'
 import { useParams } from 'react-router'
 import { User } from '../../../models/User'
+import { PostsDisplay } from '../../../components/PostsDisplay'
+import { EditButton } from '../../../components/EditButton'
 
 export default function Account () {
   const { username } = useParams<{ username: string }>()
@@ -130,12 +131,9 @@ export default function Account () {
           <div className='flex items-end'>
             {toEdit === 'name' ? (
               <>
-                <button
-                  onClick={handleChangeName}
-                  className='p-[1%] transition-opacity rounded-vibe mb-[0.5%] mr-[1%]'
-                >
+                <EditButton onEdit={handleChangeName}>
                   <CheckIcon />
-                </button>
+                </EditButton>
 
                 <input
                   minLength={3}
@@ -148,12 +146,9 @@ export default function Account () {
             ) : (
               <>
                 {isAccountLogged && (
-                  <button
-                    onClick={handleChangeName}
-                    className='p-[1%] transition-opacity rounded-vibe mb-[0.5%] mr-[1%]'
-                  >
+                  <EditButton onEdit={handleChangeName}>
                     <PencilIcon />
-                  </button>
+                  </EditButton>
                 )}
 
                 <h2 className='text-orange-crayola text-left w-fit bg-transparent outline-none font-poppins-regular content-end text-[clamp(20px,7vw,25px)]'>
@@ -175,12 +170,9 @@ export default function Account () {
         >
           {toEdit === 'description' ? (
             <>
-              <button
-                onClick={handleChangeDescription}
-                className='p-[1%] mt-[10%] transition-opacity rounded-vibe h-[24px] aspect-square'
-              >
+              <EditButton onEdit={handleChangeDescription}>
                 <CheckIcon />
-              </button>
+              </EditButton>
 
               <textarea
                 minLength={0}
@@ -194,12 +186,9 @@ export default function Account () {
           ) : (
             <>
               {isAccountLogged && (
-                <button
-                  onClick={handleChangeDescription}
-                  className='p-[1%] mt-[10%] transition-opacity rounded-vibe h-[24px] aspect-square'
-                >
+                <EditButton onEdit={handleChangeDescription}>
                   <PencilIcon />
-                </button>
+                </EditButton>
               )}
 
               <p className='h-[160px] w-[90%] text-white text-[clamp(5px,6vw,20px)] font-poppins-regular break-words whitespace-pre-wrap overflow-hidden overflow-wrap-anywhere'>
@@ -219,19 +208,7 @@ export default function Account () {
         placeholder={`${dictionary.search?.value} ${dictionary.my?.inMinus} ${dictionary.posts?.inMinus}...`}
       />
 
-      <div className='w-full flex flex-col items-center gap-y-[20px]'>
-        {posts.length === 0 ? (
-          <span>{dictionary.noPostsYet?.value}</span>
-        ) : (
-          posts.map(post => (
-            <PostDisplay
-              onDelete={handlePostDelete}
-              key={post.id}
-              post={post}
-            />
-          ))
-        )}
-      </div>
+      <PostsDisplay posts={posts} onPostDelete={handlePostDelete} />
 
       <Nav />
     </Section>

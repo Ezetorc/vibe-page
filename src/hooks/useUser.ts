@@ -28,14 +28,12 @@ export function useUser () {
       const session: AccessToken = jwtDecode(accessToken)
 
       if ('id' in session.user) {
-        const newUser: User = await User.getById(session.user.id)
-
-        setUser(newUser)
+        updateUser(session.user.id)
       }
     } catch (error) {
       console.error('Error decoding token:', error)
     }
-  }, [setUser])
+  }, [updateUser])
 
   const isSessionActive = (): boolean => {
     return Boolean(user)

@@ -22,8 +22,6 @@ export function useValidation () {
   }
 
   const validateDescription = (description: string | undefined | null) => {
-    console.log(description)
-
     if (description == null || description == undefined) {
       setErrorMessage(dictionary.emptyDescriptionError?.value)
       return false

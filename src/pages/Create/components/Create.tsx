@@ -8,6 +8,7 @@ import { useNavigate } from 'react-router'
 import { useSettings } from '../../../hooks/useSettings'
 import { Section } from '../../../components/Section'
 import { getRandomNumber } from '../utilities/getRandomNumber'
+import { Username } from '../../../components/Username'
 
 export default function Create () {
   const navigate = useNavigate()
@@ -23,7 +24,7 @@ export default function Create () {
 
   if (!user) return
 
-  const handleWrite = (event: FormEvent<HTMLTextAreaElement>): void => {
+  const handleWrite = (event: FormEvent<HTMLTextAreaElement>) => {
     const text: string = event.currentTarget.value.slice(0, 200)
 
     spanRef.current!.textContent = `${text.length}/200`
@@ -32,7 +33,7 @@ export default function Create () {
     setPost(text)
   }
 
-  const handlePost = async (): Promise<void> => {
+  const handlePost = async () => {
     const isPostValid: boolean = validatePost(post)
 
     if (isPostValid) {
@@ -50,9 +51,7 @@ export default function Create () {
     <Section className='grid grid-rows-[1fr,6fr,1fr] h-screen'>
       <header className='w-full h-full flex items-center gap-x-[10px] my-[20px]'>
         <img className='rounded-full w-[50px] aspect-square bg-orange-crayola' />
-        <h3 className='text-orange-crayola font-poppins-regular text-[clamp(10px,7vw,20px)]'>
-          {user.name || dictionary.loading?.value}
-        </h3>
+        <Username username={user.name} />
       </header>
 
       <main className='relative w-full h-full border-vibe border-caribbean-current rounded-vibe p-[10px]'>

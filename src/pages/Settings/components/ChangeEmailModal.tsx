@@ -5,6 +5,7 @@ import { Modal } from '../../../components/Modal'
 import { useSettings } from '../../../hooks/useSettings'
 import { useUser } from '../../../hooks/useUser'
 import { useValidation } from '../../../hooks/useValidation'
+import { CloseModalButton } from '../../../components/CloseModalButton'
 
 export function ChangeEmailModal () {
   const { user } = useUser()
@@ -30,15 +31,10 @@ export function ChangeEmailModal () {
   return (
     <Modal>
       <article className='items-center p-[clamp(10px,5%,20px)] relative gap-y-[clamp(20px,50%,40px)] flex flex-col rounded-vibe bg-caribbean-current w-[clamp(300px,70%,1000px)] h-[clamp(200px,auto,600px)]'>
-        <button
-          onClick={handleClose}
-          className='absolute top-0 right-0 pr-[2%] pt-[1%] font-poppins-semibold text-[clamp(15px,4vw,20px)]'
-        >
-          X
-        </button>
+        <CloseModalButton onClose={handleClose} />
 
         <h2 className='text-center font-poppins-semibold text-[clamp(20px,7vw,60px)] bg-clip-text text-transparent bg-orange-gradient'>
-         {dictionary.change?.value} {dictionary.email?.value}
+          {dictionary.change?.value} {dictionary.email?.value}
         </h2>
 
         <FormInput

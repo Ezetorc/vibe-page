@@ -51,6 +51,26 @@ export function SearchIcon ({ filled }: IconProps) {
   )
 }
 
+export function DotsIcon () {
+  return (
+    <svg
+      className='w-6 h-6 text-verdigris'
+      aria-hidden='true'
+      width='24'
+      height='24'
+      fill='none'
+      viewBox='0 0 24 24'
+    >
+      <path
+        stroke='currentColor'
+        strokeLinecap='round'
+        strokeWidth='2'
+        d='M12 6h.01M12 12h.01M12 18h.01'
+      />
+    </svg>
+  )
+}
+
 export function UserIcon ({ filled }: IconProps) {
   return filled ? (
     <svg width='55' height='55' viewBox='0 0 35 35' fill='none'>

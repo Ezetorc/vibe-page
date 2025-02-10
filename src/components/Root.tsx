@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import App from '../App'
 import { getSettingsStore } from '../stores/getSettingsStore'
+import { Loading } from './Loading'
 
 export function Root () {
   const { loadDictionaries, dictionaries } = getSettingsStore()
@@ -11,7 +12,7 @@ export function Root () {
   }, [loadDictionaries])
 
   if (loading || !dictionaries) {
-    return <div>Loading...</div>
+    return <Loading />
   }
 
   return <App />

@@ -3,7 +3,7 @@ import { User } from '../../../models/User'
 import { useRef } from 'react'
 import { useValidation } from '../../../hooks/useValidation'
 import { WelcomeToVibe } from '../../../components/WelcomeToVibe'
-import { useNavigate } from 'react-router'
+import { Link, useNavigate } from 'react-router'
 import { Button } from '../../../components/Button'
 import { useUser } from '../../../hooks/useUser'
 import { useSettings } from '../../../hooks/useSettings'
@@ -66,6 +66,9 @@ export default function Login () {
           text={dictionary.login?.value}
         />
       </form>
+
+      <Link to="/register" className='text-verdigris underline'>{dictionary.iDontHaveAnAccount?.value}</Link>
+
     </Section>
   )
 }

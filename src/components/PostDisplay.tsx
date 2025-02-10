@@ -5,13 +5,15 @@ import { User } from '../models/User'
 import { useUser } from '../hooks/useUser'
 import { useSettings } from '../hooks/useSettings'
 import { PostDisplayProps } from '../models/PostDisplayProps'
-import { Link } from 'react-router'
+import { Username } from './Username'
+import { Loading } from './Loading'
+import { PostMenu } from './PostMenu'
 
 export function PostDisplay ({ post, onDelete }: PostDisplayProps) {
-  const { isSessionActive } = useUser()
+  const { isSessionActive, user } = useUser()
   const { setSessionModalVisible, dictionary } = useSettings()
   const [likes, setLikes] = useState<Like[] | null>(null)
-  const [user, setUser] = useState<User | null>(null)
+  const [postUser, setPostUser] = useState<User | null>(null)
   const [hasUserLikedPost, setHasUserLikedPost] = useState<boolean>(false)
   const [isProcessing, setIsProcessing] = useState<boolean>(false)
   const postDate: string = post.getDate()
@@ -22,7 +24,7 @@ export function PostDisplay ({ post, onDelete }: PostDisplayProps) {
   }
 
   const handleLike = async () => {
-    if (isProcessing || !user) return
+    if (isProcessing || !postUser) return
 
     if (!isSessionActive()) {
       setSessionModalVisible(true)
@@ -32,9 +34,9 @@ export function PostDisplay ({ post, onDelete }: PostDisplayProps) {
     setIsProcessing(true)
     try {
       if (hasUserLikedPost) {
-        await user.unlikePost(post.id)
+        await postUser.unlikePost(post.id)
       } else {
-        await user.likePost(post.id)
+        await postUser.likePost(post.id)
       }
 
       const updatedLikes = await post.getLikes()
@@ -51,7 +53,7 @@ export function PostDisplay ({ post, onDelete }: PostDisplayProps) {
     const fetchData = async () => {
       try {
         const user: User = await User.getById(post.userId)
-        setUser(user)
+        setPostUser(user)
 
         const likes: Like[] = await post.getLikes()
         setLikes(likes)
@@ -69,26 +71,19 @@ export function PostDisplay ({ post, onDelete }: PostDisplayProps) {
 
   return (
     <article className='w-[clamp(300px,100%,700px)] py-[10px] px-[20px] rounded-vibe border-vibe border-caribbean-current overflow-hidden'>
-      <header className='w-full h-[70px] grid grid-cols-2 items-center'>
+      <header className='w-full h-[70px] grid grid-cols-[10fr,10fr,1fr] items-center'>
         <div className='flex items-center gap-x-[10px]'>
           <img className='rounded-full w-[50px] aspect-square bg-orange-crayola' />
-          {user ? (
-            <Link
-              className='text-orange-crayola font-poppins-regular content-end text-[clamp(20px,7vw,25px)]'
-              to={`/account/${user.name}`}
-            >
-              {user.name}
-            </Link>
-          ) : (
-            <h3>{dictionary.loading?.value}</h3>
-          )}
+          {postUser ? <Username username={postUser.name} /> : <Loading />}
         </div>
         <span className='text-caribbean-current text-right font-poppins-light text-[clamp(5px,6vw,20px)]'>
           {postDate}
         </span>
 
-        {user?.id === post.userId && (
-          <button onClick={handleDelete}>delete</button>
+        {user?.isOwnerOf(post) && (
+          <div className='flex justify-end items-center'>
+            <PostMenu onDelete={handleDelete} />
+          </div>
         )}
       </header>
 

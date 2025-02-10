@@ -1,14 +1,14 @@
 import { useEffect, useState } from 'react'
 import { Nav } from '../../../components/Nav'
 import { Post } from '../../../models/Post'
-import { PostDisplay } from '../../../components/PostDisplay'
 import { User } from '../../../models/User'
-import { UserDisplay } from '../../../components/UserDisplay'
-import clsx from 'clsx'
 import { useDebounce } from '../../../hooks/useDebounce'
 import { SearchBar } from '../../../components/SearchBar'
 import { useSettings } from '../../../hooks/useSettings'
 import { Section } from '../../../components/Section'
+import { PostsDisplay } from '../../../components/PostsDisplay'
+import { UsersDisplay } from '../../../components/UsersDisplay'
+import { ToSearchButton } from './ToSearchButton'
 
 export default function Search () {
   const { dictionary } = useSettings()
@@ -54,34 +54,19 @@ export default function Search () {
   return (
     <Section className='pb-nav w-[clamp(320px,100%,700px)] gap-y-[20px] p-[clamp(5px,3%,10px)] items-center flex flex-col min-h-screen'>
       <header className='w-full h-[40px] grid grid-cols-2'>
-        <button
-          className={`${clsx([
-            {
-              'border-b-orange-crayola text-orange-crayola':
-                toSearch === 'posts'
-            },
-            {
-              'border-b-caribbean-current text-verdigris': toSearch !== 'posts'
-            }
-          ])} font-poppins-semibold border-b-vibe `}
+        <ToSearchButton
+          text={dictionary.posts?.value}
+          type='posts'
           onClick={() => setToSearch('posts')}
-        >
-          {dictionary.posts}
-        </button>
-        <button
-          className={`${clsx([
-            {
-              'border-b-orange-crayola text-orange-crayola':
-                toSearch === 'users'
-            },
-            {
-              'border-b-caribbean-current text-verdigris': toSearch !== 'users'
-            }
-          ])} font-poppins-semibold border-b-vibe `}
+          toSearch={toSearch}
+        />
+
+        <ToSearchButton
+          text={dictionary.users?.value}
+          type='users'
           onClick={() => setToSearch('users')}
-        >
-          {dictionary.users}
-        </button>
+          toSearch={toSearch}
+        />
       </header>
 
       <SearchBar
@@ -90,21 +75,9 @@ export default function Search () {
       />
 
       {toSearch === 'posts' ? (
-        <div className='w-full flex flex-col items-center gap-y-[20px]'>
-          {posts.map(post => (
-            <PostDisplay
-              onDelete={handlePostDelete}
-              key={post.id}
-              post={post}
-            />
-          ))}
-        </div>
+        <PostsDisplay posts={posts} onPostDelete={handlePostDelete} />
       ) : (
-        <div className='w-full flex flex-col items-center gap-y-[20px]'>
-          {users.map(user => (
-            <UserDisplay key={user.id} user={user} />
-          ))}
-        </div>
+        <UsersDisplay users={users} />
       )}
 
       <Nav />
