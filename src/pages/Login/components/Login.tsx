@@ -1,5 +1,4 @@
 import { FormInput } from '../../../components/FormInput'
-import { User } from '../../../models/User'
 import { useRef } from 'react'
 import { useValidation } from '../../../hooks/useValidation'
 import { WelcomeToVibe } from '../../../components/WelcomeToVibe'
@@ -8,6 +7,7 @@ import { Button } from '../../../components/Button'
 import { useUser } from '../../../hooks/useUser'
 import { useSettings } from '../../../hooks/useSettings'
 import { Section } from '../../../components/Section'
+import { UserService } from '../../../services/UserService'
 
 export default function Login () {
   const { dictionary } = useSettings()
@@ -26,7 +26,7 @@ export default function Login () {
       validateName(name) && validatePassword(password)
 
     if (isFormValid && name && password) {
-      const logSuccesfull: boolean = await User.login(name, password)
+      const logSuccesfull: boolean = await UserService.login(name, password)
 
       if (logSuccesfull) {
         await handleSession()

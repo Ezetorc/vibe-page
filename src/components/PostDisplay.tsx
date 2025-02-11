@@ -8,6 +8,7 @@ import { PostDisplayProps } from '../models/PostDisplayProps'
 import { Username } from './Username'
 import { Loading } from './Loading'
 import { PostMenu } from './PostMenu'
+import { UserService } from '../services/UserService'
 
 export function PostDisplay ({ post, onDelete }: PostDisplayProps) {
   const { isSessionActive, user } = useUser()
@@ -52,7 +53,7 @@ export function PostDisplay ({ post, onDelete }: PostDisplayProps) {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const user: User = await User.getById(post.userId)
+        const user: User = await UserService.getById(post.userId)
         setPostUser(user)
 
         const likes: Like[] = await post.getLikes()

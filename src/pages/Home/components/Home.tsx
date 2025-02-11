@@ -3,6 +3,7 @@ import { Post } from '../../../models/Post'
 import { Nav } from '../../../components/Nav'
 import { useSettings } from '../../../hooks/useSettings'
 import { PostsDisplay } from '../../../components/PostsDisplay'
+import { PostService } from '../../../services/PostService'
 
 export default function Home () {
   const { dictionary } = useSettings()
@@ -18,7 +19,7 @@ export default function Home () {
   }
 
   useEffect(() => {
-    Post.getAll()
+    PostService.getAll()
       .then(fetchedPosts => {
         setPosts(fetchedPosts)
         setLoading(false)

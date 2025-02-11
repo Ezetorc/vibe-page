@@ -1,9 +1,11 @@
 import { format } from '@formkit/tempo'
-import { getAdaptedUser } from '../adapters/getAdaptedUser'
 import { Like } from './Like'
 import { Post } from './Post'
-import { UserEndpoint } from './UserEndpoint'
 import { api } from '../constants/SETTINGS'
+import { FollowerService } from '../services/FollowerService'
+import { PostService } from '../services/PostService'
+import { LikeService } from '../services/LikeService'
+import { UserService } from '../services/UserService'
 
 export class User {
   public id: number
@@ -40,36 +42,26 @@ export class User {
     this.createdAt = createdAt
   }
 
-  static async getByUsername (username: string): Promise<User> {
-    const url: string = `${api}/users/username/${username}`
-    const response: Response = await fetch(url, {
-      method: 'GET',
-      credentials: 'include'
-    })
-    const userEndpoint: UserEndpoint = await response.json()
-    const user: User = getAdaptedUser(userEndpoint)
-
-    return user
-  }
-
   public isOwnerOf (post: Post) {
     return this.id === post.userId
   }
 
-  static async getById (userId: number): Promise<User> {
-    const url: string = `${api}/users/id/${userId}`
-    const response: Response = await fetch(url, {
-      method: 'GET',
-      credentials: 'include'
-    })
-    const userEndpoint: UserEndpoint = await response.json()
-    const user: User = getAdaptedUser(userEndpoint)
+  public async follow (userId: number): Promise<void> {
+    await FollowerService.create(this.id, userId)
+  }
 
-    return user
+  public async unfollow (userId: number): Promise<void> {
+    await FollowerService.delete(this.id, userId)
+  }
+
+  public async isFollowing (userId: number): Promise<boolean> {
+    const following: boolean = await FollowerService.exists(this.id, userId)
+
+    return following
   }
 
   public async hasLikedPost (postId: number): Promise<boolean> {
-    const post: Post = await Post.getById(postId)
+    const post: Post = await PostService.getById(postId)
     const postLikes: Like[] = await post.getLikes()
     const userLike: Like | undefined = postLikes.find(
       like => like.userId === this.id
@@ -78,71 +70,11 @@ export class User {
     return Boolean(userLike)
   }
 
-  static async register (
-    name: string,
-    email: string,
-    password: string
-  ): Promise<boolean> {
-    const url: string = `${api}/users/register`
-    const body = { name, email, password }
-
-    try {
-      const response = await fetch(url, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body),
-        credentials: 'include'
-      })
-
-      if (!response.ok) {
-        return false
-      }
-
-      return true
-    } catch {
-      return false
-    }
-  }
-
   public getDate (): string {
     const parsedDate: Date = new Date(this.createdAt.replace(' ', 'T'))
     const formattedDate: string = format(parsedDate, 'DD/MM/YYYY')
 
     return formattedDate
-  }
-
-  static async login (name: string, password: string): Promise<boolean> {
-    try {
-      const url: string = `${api}/users/login`
-      const body = { name, password }
-      const response: Response = await fetch(url, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body),
-        credentials: 'include'
-      })
-
-      if (!response.ok) {
-        return false
-      }
-
-      return true
-    } catch {
-      return false
-    }
-  }
-
-  static async logout (): Promise<boolean> {
-    const response: Response = await fetch(`${api}/logout`, {
-      method: 'POST',
-      credentials: 'include'
-    })
-
-    if (!response.ok) {
-      return false
-    }
-
-    return true
   }
 
   public async changeName (newName: string): Promise<boolean> {
@@ -191,26 +123,8 @@ export class User {
     return true
   }
 
-  static async getAll (): Promise<User[]> {
-    const url: string = `${api}/users`
-    const response: Response = await fetch(url)
-    const usersEndpoints: UserEndpoint[] = await response.json()
-    const users: User[] = usersEndpoints.map(userEndpoint =>
-      getAdaptedUser(userEndpoint)
-    )
-
-    return users
-  }
-
-  static async emailAlreadyExists (email: string): Promise<boolean> {
-    const users: User[] = await this.getAll()
-    const emailAlreadyExists: boolean = users.some(user => user.email === email)
-
-    return emailAlreadyExists
-  }
-
   public async getPosts (): Promise<Post[]> {
-    const posts: Post[] = await Post.getAll()
+    const posts: Post[] = await PostService.getAll()
     const userPosts: Post[] = posts.filter(post => post.userId === this.id)
 
     return userPosts
@@ -240,31 +154,26 @@ export class User {
   }
 
   public async likePost (postId: number): Promise<boolean> {
-    const url: string = `${api}/likes`
-    const body = {
-      post_id: postId,
-      user_id: this.id
-    }
-
-    const response: Response = await fetch(url, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      credentials: 'include',
-      body: JSON.stringify(body)
-    })
-
-    if (!response.ok) {
+    try {
+      await LikeService.create(this.id, postId)
+      return true
+    } catch {
       return false
     }
+  }
 
-    return true
+  public async getFollowers (): Promise<User[]> {
+    const followersIds: number[] = await FollowerService.getIdsOfUser(this.id)
+    const followers: User[] = await Promise.all(
+      followersIds.map(followerId => UserService.getById(followerId))
+    )
+
+    return followers
   }
 
   public async unlikePost (postId: number): Promise<boolean> {
     try {
-      const post = await Post.getById(postId)
+      const post: Post = await PostService.getById(postId)
       const postLikes: Like[] = await post.getLikes()
       const likeToDelete: Like | undefined = postLikes.find(
         like => like.userId === this.id
@@ -274,34 +183,13 @@ export class User {
         return false
       }
 
-      const url: string = `${api}/likes/id/${likeToDelete.id}`
+      const deleteSuccessful: boolean = await LikeService.delete(
+        likeToDelete.id
+      )
 
-      const response: Response = await fetch(url, {
-        method: 'DELETE',
-        credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      })
-
-      if (!response.ok) {
-        return false
-      }
-
-      return true
+      return deleteSuccessful
     } catch {
       return false
     }
-  }
-
-  static async search (query: string): Promise<User[]> {
-    const url: string = `${api}/users/search/${encodeURIComponent(query)}`
-    const response = await fetch(url)
-    const usersEndpoints: UserEndpoint[] = await response.json()
-    const users: User[] = usersEndpoints.map(userEndpoint =>
-      getAdaptedUser(userEndpoint)
-    )
-
-    return users
   }
 }

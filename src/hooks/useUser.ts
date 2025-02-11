@@ -5,6 +5,7 @@ import { jwtDecode } from 'jwt-decode'
 import { getAccessToken } from '../utilities/getAccessToken'
 import { User } from '../models/User'
 import { AccessToken } from '../models/AccessToken'
+import { UserService } from '../services/UserService'
 
 export function useUser () {
   const userStore: UserStore = getUserStore()
@@ -12,7 +13,7 @@ export function useUser () {
 
   const updateUser = useCallback(
     async (userId: number) => {
-      const newUser: User = await User.getById(userId)
+      const newUser: User = await UserService.getById(userId)
 
       setUser(newUser)
     },

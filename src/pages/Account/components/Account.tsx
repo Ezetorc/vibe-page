@@ -1,9 +1,8 @@
-import { FormEvent, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Nav } from '../../../components/Nav'
 import { SearchBar } from '../../../components/SearchBar'
 import { useUser } from '../../../hooks/useUser'
 import { Post } from '../../../models/Post'
-import { useDebounce } from '../../../hooks/useDebounce'
 import { CheckIcon, PencilIcon } from '../../../components/Icons'
 import { useValidation } from '../../../hooks/useValidation'
 import { useSettings } from '../../../hooks/useSettings'
@@ -12,20 +11,21 @@ import { useParams } from 'react-router'
 import { User } from '../../../models/User'
 import { PostsDisplay } from '../../../components/PostsDisplay'
 import { EditButton } from '../../../components/EditButton'
+import { UserService } from '../../../services/UserService'
+import { FollowButton } from './FollowButton'
+import { PostService } from '../../../services/PostService'
 
 export default function Account () {
   const { username } = useParams<{ username: string }>()
   const [account, setAccount] = useState<User | null>(null)
   const { updateUser, user } = useUser()
   const [posts, setPosts] = useState<Post[]>([])
-  const [search, setSearch] = useState<string>('')
   const [newName, setNewName] = useState<string | null>(null)
   const [newDescription, setNewDescription] = useState<string | null>(null)
   const [toEdit, setToEdit] = useState<'name' | 'description' | null>(null)
   const { errorMessage, validateName, validateDescription } = useValidation()
   const { setInvalidEditModalConfig, dictionary } = useSettings()
-  const debouncedSearch = useDebounce(search, 200)
-  const isAccountLogged: boolean = user?.id === account?.id
+  const accountIsUser: boolean = user?.id === account?.id
 
   useEffect(() => {
     const fetchAccount = async () => {
@@ -37,8 +37,9 @@ export default function Account () {
       if (!username) return
 
       try {
-        const fetchedUser: User = await User.getByUsername(username)
-        setAccount(fetchedUser)
+        const newAccount: User = await UserService.getByUsername(username)
+
+        setAccount(newAccount)
       } catch (error) {
         console.error('Error fetching account:', error)
       }
@@ -47,38 +48,29 @@ export default function Account () {
     fetchAccount()
   }, [username, user])
 
+  if (!account) return <div>{dictionary.loading?.value}</div>
+
   const handlePostDelete = (postId: number) => {
     if (!posts) return
 
     const newPosts: Post[] = posts.filter(post => post.id !== postId)
+
     setPosts(newPosts)
   }
 
-  useEffect(() => {
-    const fetchData = async () => {
-      if (debouncedSearch.trim() === '') {
-        const userPosts: Post[] = (await account?.getPosts()) || []
-        setPosts(userPosts)
-        return
-      }
-
-      try {
-        const newPosts: Post[] = await Post.search(debouncedSearch)
-        setPosts(newPosts)
-      } catch (error) {
-        console.error('Error fetching search results:', error)
-      }
+  const handleSearch = async (query: string) => {
+    if (query.trim() === '') {
+      const userPosts: Post[] = (await account?.getPosts()) || []
+      setPosts(userPosts)
+      return
     }
 
-    fetchData()
-  }, [debouncedSearch, account])
-
-  if (!account) return <div>{dictionary.loading?.value}</div>
-
-  const userDate: string = account.getDate()
-
-  const handleSearch = (event: FormEvent<HTMLInputElement>): void => {
-    setSearch(event.currentTarget.value)
+    try {
+      const newPosts: Post[] = await PostService.search(query)
+      setPosts(newPosts)
+    } catch (error) {
+      console.error('Error fetching search results:', error)
+    }
   }
 
   const handleChangeName = async (): Promise<void> => {
@@ -145,7 +137,7 @@ export default function Account () {
               </>
             ) : (
               <>
-                {isAccountLogged && (
+                {accountIsUser && (
                   <EditButton onEdit={handleChangeName}>
                     <PencilIcon />
                   </EditButton>
@@ -159,13 +151,13 @@ export default function Account () {
           </div>
 
           <span className='text-caribbean-current font-poppins-light content-start text-[clamp(10px,4vw,20px)]'>
-            {`${dictionary.joined} ${userDate}`}
+            {`${dictionary.joined} ${account.getDate()}`}
           </span>
         </div>
 
         <div
           className={`gap-x-[10px] justify-center w-full h-full grid ${
-            isAccountLogged ? 'grid-cols-[auto,1fr]' : 'grid-cols-[1fr]'
+            accountIsUser ? 'grid-cols-[auto,1fr]' : 'grid-cols-[1fr]'
           } grid-rows-1`}
         >
           {toEdit === 'description' ? (
@@ -185,7 +177,7 @@ export default function Account () {
             </>
           ) : (
             <>
-              {isAccountLogged && (
+              {accountIsUser && (
                 <EditButton onEdit={handleChangeDescription}>
                   <PencilIcon />
                 </EditButton>
@@ -194,7 +186,9 @@ export default function Account () {
               <p className='h-[160px] w-[90%] text-white text-[clamp(5px,6vw,20px)] font-poppins-regular break-words whitespace-pre-wrap overflow-hidden overflow-wrap-anywhere'>
                 {account.description || (
                   <span className='text-caribbean-current'>
-                    {dictionary.youDontHaveDescription.value}
+                    {accountIsUser
+                      ? dictionary.youDontHaveDescription.value
+                      : dictionary.thisUserHasnotDescription.value}
                   </span>
                 )}
               </p>
@@ -203,8 +197,10 @@ export default function Account () {
         </div>
       </article>
 
+      {!accountIsUser && <FollowButton account={account} />}
+
       <SearchBar
-        onInput={handleSearch}
+        onSearch={handleSearch}
         placeholder={`${dictionary.search?.value} ${dictionary.my?.inMinus} ${dictionary.posts?.inMinus}...`}
       />
 

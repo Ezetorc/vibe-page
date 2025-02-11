@@ -1,5 +1,4 @@
 import { Link, useNavigate } from 'react-router'
-import { User } from '../../../models/User'
 import { useRef } from 'react'
 import { useValidation } from '../../../hooks/useValidation'
 import { FormInput } from '../../../components/FormInput'
@@ -8,6 +7,7 @@ import { Button } from '../../../components/Button'
 import { useUser } from '../../../hooks/useUser'
 import { useSettings } from '../../../hooks/useSettings'
 import { Section } from '../../../components/Section'
+import { UserService } from '../../../services/UserService'
 
 export default function Register () {
   const {
@@ -41,7 +41,7 @@ export default function Register () {
       validateAgreeWithTerms(agreeWithTerms)
 
     if (isFormValid && name && email && password) {
-      const registerSuccessful: boolean = await User.register(
+      const registerSuccessful: boolean = await UserService.register(
         name,
         email,
         password

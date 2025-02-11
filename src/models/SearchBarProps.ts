@@ -1,6 +1,4 @@
-import { FormEvent } from "react"
-
 export interface SearchBarProps {
-  onInput: (event: FormEvent<HTMLInputElement>) => void
+  onSearch: (query: string) => void
   placeholder: string
 }

@@ -1,5 +1,5 @@
+import { UserService } from './../services/UserService';
 import { useState } from 'react'
-import { User } from '../models/User'
 import { useSettings } from './useSettings'
 
 export function useValidation () {
@@ -47,7 +47,7 @@ export function useValidation () {
       return false
     }
 
-    const emailAlreadyExists: boolean = await User.emailAlreadyExists(email)
+    const emailAlreadyExists: boolean = await UserService.emailAlreadyExists(email)
 
     if (emailAlreadyExists) {
       setErrorMessage(dictionary.emailAlreadyExists?.value)

@@ -3,12 +3,12 @@ import { Button } from '../../../components/Button'
 import { Nav } from '../../../components/Nav'
 import { useUser } from '../../../hooks/useUser'
 import { useValidation } from '../../../hooks/useValidation'
-import { Post } from '../../../models/Post'
 import { useNavigate } from 'react-router'
 import { useSettings } from '../../../hooks/useSettings'
 import { Section } from '../../../components/Section'
 import { getRandomNumber } from '../utilities/getRandomNumber'
 import { Username } from '../../../components/Username'
+import { PostService } from '../../../services/PostService'
 
 export default function Create () {
   const navigate = useNavigate()
@@ -37,7 +37,7 @@ export default function Create () {
     const isPostValid: boolean = validatePost(post)
 
     if (isPostValid) {
-      const success: boolean = await Post.create(user.id, post)
+      const success: boolean = await PostService.create(user.id, post)
 
       if (success) {
         navigate('/')
