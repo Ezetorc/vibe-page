@@ -35,23 +35,23 @@ export default function Register () {
     const agreeWithTerms = agreeWithTermsInputRef.current?.checked
 
     const isFormValid: boolean =
-      validateName(name) &&
-      (await validateEmail(email)) &&
-      validatePasswords(password, confirmedPassword) &&
-      validateAgreeWithTerms(agreeWithTerms)
+      validateName({name}) &&
+      (await validateEmail({email})) &&
+      validatePasswords({password, confirmedPassword}) &&
+      validateAgreeWithTerms({agreeWithTerms})
 
     if (isFormValid && name && email && password) {
-      const registerSuccessful: boolean = await UserService.register(
+      const registerSuccessful: boolean = await UserService.register({
         name,
         email,
         password
-      )
+      })
 
       if (registerSuccessful) {
         await handleSession()
         navigate('/')
       } else {
-        setErrorMessage(dictionary.userAlreadyExists?.value)
+        setErrorMessage(dictionary.userAlreadyExists)
       }
     }
   }
@@ -65,26 +65,26 @@ export default function Register () {
           min={3}
           max={20}
           reference={nameInputRef}
-          placeholder={dictionary.name?.value}
+          placeholder={dictionary.name}
         />
         <FormInput
           reference={emailInputRef}
           type='email'
-          placeholder={dictionary.email?.value}
+          placeholder={dictionary.email}
         />
         <FormInput
           min={6}
           max={30}
           reference={passwordInputRef}
           type='password'
-          placeholder={dictionary.password?.value}
+          placeholder={dictionary.password}
         />
         <FormInput
           min={6}
           max={30}
           reference={confirmPasswordInputRef}
           type='password'
-          placeholder={dictionary.confirmPassword?.value}
+          placeholder={dictionary.confirmPassword}
         />
 
         <div className='flex gap-x-5 items-center'>
@@ -101,13 +101,13 @@ export default function Register () {
             <span className='absolute w-3 h-3 bg-white rounded-full opacity-0 scale-0 peer-checked:opacity-100 peer-checked:scale-100'></span>
           </label>
           <label className='font-poppins-light' htmlFor='agree-with-terms'>
-            {dictionary.iAgreeWith?.value}
+            {dictionary.iAgreeWith}
             {` `}
             <Link
               to='/terms'
               className='border-b-2 border-b-white hover:border-b-orange-crayola hover:text-orange-crayola'
             >
-              {dictionary.termsAndConditions?.value}
+              {dictionary.termsAndConditions}
             </Link>
           </label>
         </div>
@@ -118,11 +118,11 @@ export default function Register () {
             event.preventDefault()
             handleRegister()
           }}
-          text={dictionary.register?.value}
+          text={dictionary.register}
         />
       </form>
 
-      <Link to="/login" className='text-verdigris underline'>{dictionary.iHaveAnAccount?.value}</Link>
+      <Link to="/login" className='text-verdigris underline'>{dictionary.iHaveAnAccount}</Link>
 
     </Section>
   )

@@ -39,22 +39,31 @@ export class Post {
       }
 
       return true
-    } catch {
+    } catch (error) {
+      console.error('Error deleting post:', error)
       return false
     }
   }
 
   public getDate (): string {
-    const parsedDate: Date = new Date(this.createdAt.replace(' ', 'T'))
-    const formattedDate: string = format(parsedDate, 'DD/MM/YYYY')
-
-    return formattedDate
+    try {
+      const parsedDate: Date = new Date(this.createdAt.replace(' ', 'T'))
+      const formattedDate: string = format(parsedDate, 'DD/MM/YYYY')
+      return formattedDate
+    } catch (error) {
+      console.error('Error formatting date:', error)
+      return ''
+    }
   }
 
   public async getLikes (): Promise<Like[]> {
-    const likes: Like[] = await LikeService.getAll()
-    const postLikes: Like[] = likes.filter(like => like.postId === this.id)
-
-    return postLikes
+    try {
+      const likes: Like[] = await LikeService.getAll()
+      const postLikes: Like[] = likes.filter(like => like.postId === this.id)
+      return postLikes
+    } catch (error) {
+      console.error('Error fetching likes for post:', error)
+      return []
+    }
   }
 }

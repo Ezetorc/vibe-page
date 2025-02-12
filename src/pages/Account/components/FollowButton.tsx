@@ -5,16 +5,16 @@ import { FollowButtonProps } from '../models/FollowButtonProps'
 import { useUser } from '../../../hooks/useUser'
 
 export function FollowButton ({ account }: FollowButtonProps) {
-  const { dictionary, setSessionModalVisible } = useSettings()
+  const { dictionary, setVisibleModal } = useSettings()
   const { user } = useUser()
   const [isFollowing, setIsFollowing] = useState<boolean>(false)
 
   useEffect(() => {
     const fetchFollowing = async () => {
       try {
-        const following: boolean | undefined = await user?.isFollowing(
-          account.id
-        )
+        const following: boolean | undefined = await user?.isFollowing({
+          userId: account.id
+        })
 
         setIsFollowing(following ?? false)
       } catch (error) {
@@ -29,15 +29,15 @@ export function FollowButton ({ account }: FollowButtonProps) {
     if (!account) return
 
     if (!user) {
-      setSessionModalVisible(true)
+      setVisibleModal({ name: 'session', message: '' })
       return
     }
 
     if (!isFollowing) {
-      await user.follow(account.id)
+      await user.follow({ userId: account.id })
       setIsFollowing(true)
     } else {
-      await user.unfollow(account.id)
+      await user.unfollow({ userId: account.id })
       setIsFollowing(false)
     }
   }
@@ -47,10 +47,10 @@ export function FollowButton ({ account }: FollowButtonProps) {
       onClick={handleFollow}
       text={
         isFollowing === null
-          ? dictionary.loading?.value
+          ? dictionary.loading
           : isFollowing
-          ? dictionary.unfollow?.value
-          : dictionary.follow?.value
+          ? dictionary.unfollow
+          : dictionary.follow
       }
     />
   )

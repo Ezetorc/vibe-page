@@ -23,16 +23,16 @@ export default function Login () {
     const password = passwordInputRef.current?.value
 
     const isFormValid: boolean =
-      validateName(name) && validatePassword(password)
+      validateName({ name }) && validatePassword({ password })
 
     if (isFormValid && name && password) {
-      const logSuccesfull: boolean = await UserService.login(name, password)
+      const logSuccesfull: boolean = await UserService.login({ name, password })
 
       if (logSuccesfull) {
         await handleSession()
         navigate('/')
       } else {
-        setErrorMessage(dictionary.nameOrPasswordWrong?.value)
+        setErrorMessage(dictionary.nameOrPasswordWrong)
       }
     }
   }
@@ -46,14 +46,14 @@ export default function Login () {
           min={3}
           max={20}
           reference={nameInputRef}
-          placeholder={dictionary.name?.value}
+          placeholder={dictionary.name}
         />
         <FormInput
           min={6}
           max={30}
           reference={passwordInputRef}
           type='password'
-          placeholder={dictionary.password?.value}
+          placeholder={dictionary.password}
         />
 
         {errorMessage && <p className='text-red-500'>{errorMessage}</p>}
@@ -63,12 +63,13 @@ export default function Login () {
             event.preventDefault()
             handleLogin()
           }}
-          text={dictionary.login?.value}
+          text={dictionary.login}
         />
       </form>
 
-      <Link to="/register" className='text-verdigris underline'>{dictionary.iDontHaveAnAccount?.value}</Link>
-
+      <Link to='/register' className='text-verdigris underline'>
+        {dictionary.iDontHaveAnAccount}
+      </Link>
     </Section>
   )
 }

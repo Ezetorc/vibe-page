@@ -1,4 +1,4 @@
-import { UserService } from './../services/UserService';
+import { UserService } from './../services/UserService'
 import { useState } from 'react'
 import { useSettings } from './useSettings'
 
@@ -6,14 +6,14 @@ export function useValidation () {
   const { dictionary } = useSettings()
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
 
-  const validateName = (name: string | undefined | null) => {
+  const validateName = ({ name }: { name: string | undefined | null }) => {
     if (!name) {
-      setErrorMessage(dictionary.emptyNameError?.value)
+      setErrorMessage(dictionary.emptyNameError)
       return false
     }
 
     if (name.length > 20 || name.length < 3) {
-      setErrorMessage(dictionary.nameLengthError?.value)
+      setErrorMessage(dictionary.nameLengthError)
       return false
     }
 
@@ -21,14 +21,18 @@ export function useValidation () {
     return true
   }
 
-  const validateDescription = (description: string | undefined | null) => {
+  const validateDescription = ({
+    description
+  }: {
+    description: string | undefined | null
+  }) => {
     if (description == null || description == undefined) {
-      setErrorMessage(dictionary.emptyDescriptionError?.value)
+      setErrorMessage(dictionary.emptyDescriptionError)
       return false
     }
 
     if (description.length > 200) {
-      setErrorMessage(dictionary.descriptionLengthError?.value)
+      setErrorMessage(dictionary.descriptionLengthError)
       return false
     }
 
@@ -36,21 +40,23 @@ export function useValidation () {
     return true
   }
 
-  const validateEmail = async (email: string | undefined) => {
+  const validateEmail = async ({ email }: { email: string | undefined }) => {
     if (!email) {
-      setErrorMessage(dictionary.emptyEmailError?.value)
+      setErrorMessage(dictionary.emptyEmailError)
       return false
     }
 
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      setErrorMessage(dictionary.invalidEmailError?.value)
+      setErrorMessage(dictionary.invalidEmailError)
       return false
     }
 
-    const emailAlreadyExists: boolean = await UserService.emailAlreadyExists(email)
+    const emailAlreadyExists: boolean = await UserService.emailAlreadyExists({
+      email
+    })
 
     if (emailAlreadyExists) {
-      setErrorMessage(dictionary.emailAlreadyExists?.value)
+      setErrorMessage(dictionary.emailAlreadyExists)
       return false
     }
 
@@ -58,14 +64,14 @@ export function useValidation () {
     return true
   }
 
-  const validatePassword = (password: string | undefined) => {
+  const validatePassword = ({ password }: { password: string | undefined }) => {
     if (!password) {
-      setErrorMessage(dictionary.emptyPasswordError?.value)
+      setErrorMessage(dictionary.emptyPasswordError)
       return false
     }
 
     if (password.length < 6 || password.length > 30) {
-      setErrorMessage(dictionary.passwordLengthError?.value)
+      setErrorMessage(dictionary.passwordLengthError)
       return false
     }
 
@@ -73,27 +79,30 @@ export function useValidation () {
     return true
   }
 
-  const validatePasswords = (
-    password: string | undefined,
+  const validatePasswords = ({
+    password,
+    confirmedPassword
+  }: {
+    password: string | undefined
     confirmedPassword: string | undefined
-  ) => {
+  }) => {
     if (!password) {
-      setErrorMessage(dictionary.emptyPasswordError?.value)
+      setErrorMessage(dictionary.emptyPasswordError)
       return false
     }
 
     if (!confirmedPassword) {
-      setErrorMessage(dictionary.confirmPassword?.value)
+      setErrorMessage(dictionary.confirmPassword)
       return false
     }
 
     if (password.length < 6 || password.length > 30) {
-      setErrorMessage(dictionary.passwordLengthError?.value)
+      setErrorMessage(dictionary.passwordLengthError)
       return false
     }
 
     if (password !== confirmedPassword) {
-      setErrorMessage(dictionary.passwordsDontMatch?.value)
+      setErrorMessage(dictionary.passwordsDontMatch)
       return false
     }
 
@@ -101,9 +110,13 @@ export function useValidation () {
     return true
   }
 
-  const validateAgreeWithTerms = (agreeWithTerms: boolean | undefined) => {
+  const validateAgreeWithTerms = ({
+    agreeWithTerms
+  }: {
+    agreeWithTerms: boolean | undefined
+  }) => {
     if (!agreeWithTerms) {
-      setErrorMessage(dictionary.youMustAgreeWithTerms?.value)
+      setErrorMessage(dictionary.youMustAgreeWithTerms)
       return false
     }
 
@@ -111,14 +124,14 @@ export function useValidation () {
     return true
   }
 
-  const validatePost = (post: string) => {
+  const validatePost = ({ post }: { post: string }) => {
     if (post.length === 0) {
-      setErrorMessage(dictionary.emptyPostError?.value)
+      setErrorMessage(dictionary.emptyPostError)
       return false
     }
 
     if (post.length > 200) {
-      setErrorMessage(dictionary.postLengthError?.value)
+      setErrorMessage(dictionary.postLengthError)
       return false
     }
 

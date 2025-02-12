@@ -1,5 +1,6 @@
-import { Dictionaries } from "./Dictionaries"
-import { Language } from "./Language"
+import { Dictionaries } from './Dictionaries'
+import { Language } from './Language'
+import { ModalName } from './VisibleModal'
 
 export interface SettingsStore {
   dictionaries: Dictionaries | null
@@ -8,21 +9,12 @@ export interface SettingsStore {
   language: Language
   setLanguage: (newLanguage: Language) => void
 
-  sessionModalVisible: boolean
-  setSessionModalVisible: (newSessionModalVisible: boolean) => void
-
-  changeLanguageModalVisible: boolean
-  setChangeLanguageModalVisible: (newChangeLanguageModalVisible: boolean) => void
-
-  changeEmailModalVisible: boolean
-  setChangeEmailModalVisible: (newChangeEmailModalVisible: boolean) => void
-
-  invalidEditModalConfig: {
-    visible: boolean
-    errorMessage: string
+  visibleModal: {
+    name: ModalName | null
+    message?: string | undefined
   }
-  setInvalidEditModalConfig: (newInvalidEditModalConfig: {
-    visible: boolean
-    errorMessage: string
+  setVisibleModal: (newVisibleModal: {
+    name: ModalName | null
+    message?: string | undefined
   }) => void
 }

@@ -1,6 +1,5 @@
 import { Dictionaries } from '../models/Dictionaries.ts'
 import { Language } from '../models/Language.ts'
-import { Word } from '../models/Word.ts'
 import Papa from 'papaparse'
 
 export async function getDictionaries (): Promise<Dictionaries> {
@@ -19,7 +18,7 @@ export async function getDictionaries (): Promise<Dictionaries> {
     const key: string = values[0]
 
     languages.forEach((language, languageIndex) => {
-      dictionaries[language]![key] = new Word(values[languageIndex + 1] || '')
+      dictionaries[language]![key] = values[languageIndex + 1]
     })
   }
 

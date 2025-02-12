@@ -8,12 +8,11 @@ import { CloseModalButton } from '../../../components/CloseModalButton'
 import { Languages } from './Languages'
 
 export function ChangeLanguageModal () {
-  const { setChangeLanguageModalVisible, language, setLanguage, dictionary } =
-    useSettings()
+  const { setVisibleModal, language, setLanguage, dictionary } = useSettings()
   const [newLanguage, setNewLanguage] = useState<Language>(language)
 
   const handleClose = () => {
-    setChangeLanguageModalVisible(false)
+    setVisibleModal({ name: null })
   }
 
   const handleChangeNewLanguage = async (
@@ -36,17 +35,14 @@ export function ChangeLanguageModal () {
         <CloseModalButton onClose={handleClose} />
 
         <h2 className='text-center font-poppins-semibold text-[clamp(20px,7vw,60px)] bg-clip-text text-transparent bg-orange-gradient'>
-          {dictionary.change?.value} {dictionary.language?.value}
+          {dictionary.change} {dictionary.language}
         </h2>
 
         <Select onInput={handleChangeNewLanguage} defaultValue={language}>
           <Languages />
         </Select>
 
-        <Button
-          text={dictionary.change?.value}
-          onClick={handleChangeLanguage}
-        />
+        <Button text={dictionary.change} onClick={handleChangeLanguage} />
       </article>
     </Modal>
   )

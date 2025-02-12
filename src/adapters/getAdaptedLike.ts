@@ -1,7 +1,11 @@
 import { Like } from '../models/Like'
 import { LikeEndpoint } from '../models/LikeEndpoint'
 
-export function getAdaptedLike (likeEndpoint: LikeEndpoint): Like {
+export function getAdaptedLike ({
+  likeEndpoint
+}: {
+  likeEndpoint: LikeEndpoint
+}): Like {
   return new Like({
     id: likeEndpoint.id,
     postId: likeEndpoint.post_id,

@@ -15,7 +15,7 @@ export function UserDisplay ({ user }: { user: User }) {
         {user ? <Username username={user.name} /> : <Loading />}
 
         <span className='text-caribbean-current font-poppins-light content-start text-[clamp(10px,4vw,20px)]'>
-          {`${dictionary.joined?.value} ${userDate}`}
+          {`${dictionary.joined} ${userDate}`}
         </span>
       </div>
 
@@ -26,7 +26,7 @@ export function UserDisplay ({ user }: { user: User }) {
           </p>
         ) : (
           <p className='break-words text-verdigris text-[clamp(5px,6vw,20px)] font-poppins-regular'>
-            {dictionary.thisUserHasnotDescription?.value}
+            {dictionary.thisUserHasnotDescription}
           </p>
         )}
       </div>

@@ -3,22 +3,29 @@ import { NavButtonProps } from '../models/NavButtonProps'
 import { useUser } from '../hooks/useUser'
 import { useSettings } from '../hooks/useSettings'
 
-export function NavButton({ icon, to, needsSession = false }: NavButtonProps) {
+export function NavButton ({ icon, to, needsSession = false }: NavButtonProps) {
   const location = useLocation()
   const { isSessionActive } = useUser()
-  const { setSessionModalVisible } = useSettings()
+  const { setVisibleModal } = useSettings()
 
   const handleClick = (event: React.MouseEvent<HTMLAnchorElement>): void => {
     if (!needsSession) return
 
     if (!isSessionActive()) {
       event.preventDefault()
-      setSessionModalVisible(true)
+      setVisibleModal({
+        name: 'session',
+        message: ''
+      })
     }
   }
 
   return (
-    <Link className='grid place-items-center aspect-square w-[60px] relative' onClick={handleClick} to={to}>
+    <Link
+      className='grid place-items-center aspect-square w-[60px] relative'
+      onClick={handleClick}
+      to={to}
+    >
       {<icon.type filled={location.pathname === to} />}
     </Link>
   )

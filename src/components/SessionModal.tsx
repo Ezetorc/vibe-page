@@ -5,21 +5,21 @@ import { useSettings } from '../hooks/useSettings'
 import { CloseModalButton } from './CloseModalButton'
 
 export function SessionModal () {
-  const { setSessionModalVisible, dictionary } = useSettings()
+  const { setVisibleModal, dictionary } = useSettings()
   const navigate = useNavigate()
 
   const handleLogin = () => {
     navigate('/login')
-    setSessionModalVisible(false)
+    setVisibleModal({ name: null, message: '' })
   }
 
   const handleRegister = () => {
     navigate('/register')
-    setSessionModalVisible(false)
+    setVisibleModal({ name: null, message: '' })
   }
 
   const handleClose = () => {
-    setSessionModalVisible(false)
+    setVisibleModal({ name: null, message: '' })
   }
 
   return (
@@ -28,19 +28,19 @@ export function SessionModal () {
         <CloseModalButton onClose={handleClose} />
 
         <h2 className='text-center font-poppins-semibold text-[clamp(20px,7vw,60px)] bg-clip-text text-transparent bg-orange-gradient'>
-          {dictionary.youAreNotLogged?.value}
+          {dictionary.youAreNotLogged}
         </h2>
 
         <div className='flex flex-col h-full gap-y-[5px] items-center'>
           <span className='font-poppins-light text-[clamp(20px,4vw,25px)]'>
-            {dictionary.iHaveAnAccount?.value}
+            {dictionary.iHaveAnAccount}
           </span>
-          <Button onClick={handleLogin} text={dictionary.login?.value} />
+          <Button onClick={handleLogin} text={dictionary.login} />
 
           <span className='font-poppins-light text-[clamp(20px,4vw,25px)] mt-[40px]'>
-            {dictionary.iDontHaveAnAccount?.value}
+            {dictionary.iDontHaveAnAccount}
           </span>
-          <Button onClick={handleRegister} text={dictionary.register?.value} />
+          <Button onClick={handleRegister} text={dictionary.register} />
         </div>
       </article>
     </Modal>

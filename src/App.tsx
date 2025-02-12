@@ -20,12 +20,7 @@ const LazyRegister = lazy(
 )
 
 export default function App () {
-  const {
-    sessionModalVisible,
-    invalidEditModalConfig,
-    changeEmailModalVisible,
-    changeLanguageModalVisible
-  } = useSettings()
+  const { visibleModal } = useSettings()
   const { handleSession } = useUser()
 
   useEffect(() => {
@@ -36,13 +31,11 @@ export default function App () {
     <>
       <Suspense fallback={<div>Loading...</div>}>
         <Router>
-          {sessionModalVisible && <SessionModal />}
-          {changeLanguageModalVisible && <ChangeLanguageModal />}
-          {changeEmailModalVisible && <ChangeEmailModal />}
-          {invalidEditModalConfig.visible && (
-            <InvalidEditModal
-              errorMessage={invalidEditModalConfig.errorMessage}
-            />
+          {visibleModal.name === 'session' && <SessionModal />}
+          {visibleModal.name === 'language' && <ChangeLanguageModal />}
+          {visibleModal.name === 'email' && <ChangeEmailModal />}
+          {visibleModal.name === 'edit' && (
+            <InvalidEditModal errorMessage={visibleModal.message} />
           )}
 
           <Routes>
@@ -51,7 +44,7 @@ export default function App () {
             <Route path='/login' element={<LazyLogin />} />
             <Route path='/search' element={<LazySearch />} />
             <Route path='/create' element={<LazyCreate />} />
-            <Route path="/account/:username" element={<LazyAccount />} />
+            <Route path='/account/:username' element={<LazyAccount />} />
             <Route path='/settings' element={<LazySettings />} />
           </Routes>
         </Router>

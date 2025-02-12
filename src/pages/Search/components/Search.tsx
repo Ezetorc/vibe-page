@@ -10,29 +10,32 @@ import { UsersDisplay } from '../../../components/UsersDisplay'
 import { ToSearchButton } from './ToSearchButton'
 import { PostService } from '../../../services/PostService'
 import { UserService } from '../../../services/UserService'
+import { getInMinus } from '../../../utilities/getInMinus'
 
 export default function Search () {
   const { dictionary } = useSettings()
-  const [toSearch, setToSearch] = useState<'users' | 'posts'>('users')
+  const [toSearch, setToSearch] = useState<'users' | 'posts'>('posts')
   const [posts, setPosts] = useState<Post[]>([])
   const [users, setUsers] = useState<User[]>([])
 
   const handleSearch = async (query: string) => {
     if (query.trim() === '') {
       const allPosts: Post[] = await PostService.getAll()
-      const allUsers: User[] = await UserService.getAll()
-
       setPosts(allPosts)
+
+      const allUsers: User[] = await UserService.getAll()
       setUsers(allUsers)
       return
     }
 
     try {
       if (toSearch === 'posts') {
-        const newPosts = await PostService.search(query)
+        const newPosts = await PostService.search({ query })
+
         setPosts(newPosts)
       } else {
-        const newUsers = await UserService.search(query)
+        const newUsers = await UserService.search({ query })
+
         setUsers(newUsers)
       }
     } catch (error) {
@@ -50,14 +53,14 @@ export default function Search () {
     <Section className='pb-nav w-[clamp(320px,100%,700px)] gap-y-[20px] p-[clamp(5px,3%,10px)] items-center flex flex-col min-h-screen'>
       <header className='w-full h-[40px] grid grid-cols-2'>
         <ToSearchButton
-          text={dictionary.posts?.value}
+          text={dictionary.posts}
           type='posts'
           onClick={() => setToSearch('posts')}
           toSearch={toSearch}
         />
 
         <ToSearchButton
-          text={dictionary.users?.value}
+          text={dictionary.users}
           type='users'
           onClick={() => setToSearch('users')}
           toSearch={toSearch}
@@ -66,7 +69,9 @@ export default function Search () {
 
       <SearchBar
         onSearch={handleSearch}
-        placeholder={`${dictionary.search} ${dictionary[toSearch]?.inMinus}...`}
+        placeholder={`${dictionary.search} ${getInMinus(
+          dictionary[toSearch]
+        )}...`}
       />
 
       {toSearch === 'posts' ? (

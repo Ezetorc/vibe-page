@@ -7,44 +7,39 @@ import { SettingsSection } from './SettingsSection'
 
 export default function Settings () {
   const { isSessionActive } = useUser()
-  const {
-    setSessionModalVisible,
-    setChangeEmailModalVisible,
-    setChangeLanguageModalVisible,
-    dictionary
-  } = useSettings()
+  const { setVisibleModal, dictionary } = useSettings()
 
   const handleChangeEmail = () => {
     if (!isSessionActive()) {
-      setSessionModalVisible(true)
+      setVisibleModal({ name: 'session' })
       return
     }
 
-    setChangeEmailModalVisible(true)
+    setVisibleModal({ name: 'email' })
   }
 
   const handleChangePassword = () => {}
 
   const handleChangeLanguage = () => {
-    setChangeLanguageModalVisible(true)
+    setVisibleModal({ name: 'email' })
   }
 
   return (
     <Section>
-      <SettingsSection name={dictionary.account?.value}>
+      <SettingsSection name={dictionary.account}>
         <Button
-          text={`${dictionary.change?.value} ${dictionary.password?.value}`}
+          text={`${dictionary.change} ${dictionary.password}`}
           onClick={handleChangePassword}
         />
         <Button
-          text={`${dictionary.change?.value} ${dictionary.email?.value}`}
+          text={`${dictionary.change} ${dictionary.email}`}
           onClick={handleChangeEmail}
         />
       </SettingsSection>
 
-      <SettingsSection name={dictionary.display?.value}>
+      <SettingsSection name={dictionary.display}>
         <Button
-          text={`${dictionary.change?.value} ${dictionary.language?.value}`}
+          text={`${dictionary.change} ${dictionary.language}`}
           onClick={handleChangeLanguage}
         />
       </SettingsSection>

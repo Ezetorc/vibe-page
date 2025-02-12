@@ -1,7 +1,7 @@
 import { Settings } from '../models/Settings'
 
 const SETTINGS: Settings = {
-  api: 'http://localhost:3000',
+  api: 'http://localhost:111',
   defaultLanguage: "en",
   languages: {
     en: 'English',

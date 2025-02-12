@@ -5,7 +5,7 @@ search,Buscar,Search
 posts,Publicaciones,Posts
 users,Usuarios,Users
 post,Publicar,Post
-my,Mis,My
+searchMyPosts,Buscar mis publicaciones...,Search my posts...
 account,Cuenta,Account
 display,Visualización,Display
 password,Contraseña,Password
@@ -38,7 +38,8 @@ myNewDescription,Mi nueva descripción...,My new description...
 errorDuringDescriptionChange,"Error mientras se editaba la descripción, intenta de nuevo","Error during description change, try again"
 errorDuringNameChange,"Error mientras se editaba el nombre, intenta de nuevo","Error during name change, try again"
 somethingWentWrong,"Algo salió mal, intenta de nuevo","Something went wrong, try again"
-noPostsYet,Todavía no hay posts...,No posts yet...
+noPosts,No hay posts...,No posts...
+noUsers,No hay usuarios...,No users...
 login,Iniciar sesión,Login
 register,Registrarse,Register
 name,Nombre,Name

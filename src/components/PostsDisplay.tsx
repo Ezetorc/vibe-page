@@ -8,7 +8,7 @@ export function PostsDisplay ( { posts, onPostDelete}: PostsDisplayProps) {
   return (
     <div className='w-full flex flex-col items-center gap-y-[20px]'>
       {posts?.length === 0 ? (
-        <span>{dictionary.noPostsYet?.value}</span>
+        <span>{dictionary.noPosts}</span>
       ) : (
         posts?.map(post => (
           <PostDisplay onDelete={onPostDelete} key={post.id} post={post} />

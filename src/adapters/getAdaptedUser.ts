@@ -1,7 +1,11 @@
 import { User } from '../models/User'
 import { UserEndpoint } from '../models/UserEndpoint'
 
-export function getAdaptedUser (userEndpoint: UserEndpoint): User {
+export function getAdaptedUser ({
+  userEndpoint
+}: {
+  userEndpoint: UserEndpoint
+}): User {
   return new User({
     id: userEndpoint.id,
     name: userEndpoint.name,

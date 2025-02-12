@@ -12,7 +12,7 @@ import { UserService } from '../services/UserService'
 
 export function PostDisplay ({ post, onDelete }: PostDisplayProps) {
   const { isSessionActive, user } = useUser()
-  const { setSessionModalVisible, dictionary } = useSettings()
+  const { setVisibleModal, dictionary } = useSettings()
   const [likes, setLikes] = useState<Like[] | null>(null)
   const [postUser, setPostUser] = useState<User | null>(null)
   const [hasUserLikedPost, setHasUserLikedPost] = useState<boolean>(false)
@@ -28,16 +28,20 @@ export function PostDisplay ({ post, onDelete }: PostDisplayProps) {
     if (isProcessing || !postUser) return
 
     if (!isSessionActive()) {
-      setSessionModalVisible(true)
+      setVisibleModal({
+        name: 'session',
+        message: ''
+      })
       return
     }
 
     setIsProcessing(true)
+
     try {
       if (hasUserLikedPost) {
-        await postUser.unlikePost(post.id)
+        await postUser.unlikePost({ postId: post.id })
       } else {
-        await postUser.likePost(post.id)
+        await postUser.likePost({ postId: post.id })
       }
 
       const updatedLikes = await post.getLikes()
@@ -53,14 +57,22 @@ export function PostDisplay ({ post, onDelete }: PostDisplayProps) {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const user: User = await UserService.getById(post.userId)
-        setPostUser(user)
+        const newPostUser: User | null = await UserService.getById({
+          userId: post.userId
+        })
 
-        const likes: Like[] = await post.getLikes()
-        setLikes(likes)
+        if (!newPostUser) return
 
-        const userLiked: boolean = await user.hasLikedPost(post.id)
-        setHasUserLikedPost(userLiked)
+        setPostUser(newPostUser)
+
+        const newLikes: Like[] = await post.getLikes()
+        setLikes(newLikes)
+
+        const newHasUserLikedPost: boolean | undefined =
+          await newPostUser.hasLikedPost({
+            postId: post.id
+          })
+        setHasUserLikedPost(newHasUserLikedPost)
       } catch (error) {
         console.error('Error fetching post data:', error)
         setLikes([])
@@ -81,7 +93,7 @@ export function PostDisplay ({ post, onDelete }: PostDisplayProps) {
           {postDate}
         </span>
 
-        {user?.isOwnerOf(post) && (
+        {user?.isOwnerOf({ post }) && (
           <div className='flex justify-end items-center'>
             <PostMenu onDelete={handleDelete} />
           </div>
@@ -100,7 +112,7 @@ export function PostDisplay ({ post, onDelete }: PostDisplayProps) {
             <LikeIcon filled={hasUserLikedPost} />
           </button>
           <span className='text-verdigris font-poppins-semibold'>
-            {likes === null ? dictionary.loading?.value : likes.length}
+            {likes === null ? dictionary.loading : likes.length}
           </span>
         </div>
       </footer>

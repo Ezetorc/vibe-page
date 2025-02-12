@@ -10,21 +10,21 @@ import { CloseModalButton } from '../../../components/CloseModalButton'
 export function ChangeEmailModal () {
   const { user } = useUser()
   const { validateEmail, errorMessage } = useValidation()
-  const { setChangeEmailModalVisible, dictionary } = useSettings()
+  const { setVisibleModal, dictionary } = useSettings()
 
   const newEmailRef = useRef<HTMLInputElement>(null)
 
   const handleClose = () => {
-    setChangeEmailModalVisible(false)
+    setVisibleModal({ name: null })
   }
 
   const handleChangeEmail = async () => {
     const newEmail: string | undefined = newEmailRef.current?.value
-    const isNewEmailValid: boolean = await validateEmail(newEmail)
+    const isNewEmailValid: boolean = await validateEmail({ email: newEmail })
 
     if (newEmail === undefined || !user || !isNewEmailValid) return
 
-    await user.changeEmail(newEmail)
+    await user.changeEmail({ newEmail })
     handleClose()
   }
 
@@ -34,7 +34,7 @@ export function ChangeEmailModal () {
         <CloseModalButton onClose={handleClose} />
 
         <h2 className='text-center font-poppins-semibold text-[clamp(20px,7vw,60px)] bg-clip-text text-transparent bg-orange-gradient'>
-          {dictionary.change?.value} {dictionary.email?.value}
+          {dictionary.change} {dictionary.email}
         </h2>
 
         <FormInput
@@ -42,13 +42,13 @@ export function ChangeEmailModal () {
           reference={newEmailRef}
           min={1}
           max={31}
-          placeholder={dictionary.emailPlaceholder?.value}
+          placeholder={dictionary.emailPlaceholder}
           className='placeholder:text-verdigris p-[5px]'
         />
 
         {errorMessage && <p className='text-red-500'>{errorMessage}</p>}
 
-        <Button text={dictionary.change?.value} onClick={handleChangeEmail} />
+        <Button text={dictionary.change} onClick={handleChangeEmail} />
       </article>
     </Modal>
   )

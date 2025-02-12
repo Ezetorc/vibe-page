@@ -19,7 +19,7 @@ export default function Create () {
   const spanRef = useRef<HTMLSpanElement | null>(null)
   const randomPlaceholderIndex = useRef<number>(getRandomNumber(0, 10))
   const placeholder: string =
-    dictionary[`createPlaceholder${randomPlaceholderIndex.current}`]?.value ||
+    dictionary[`createPlaceholder${randomPlaceholderIndex.current}`] ||
     ''
 
   if (!user) return
@@ -34,15 +34,18 @@ export default function Create () {
   }
 
   const handlePost = async () => {
-    const isPostValid: boolean = validatePost(post)
+    const isPostValid: boolean = validatePost({ post })
 
     if (isPostValid) {
-      const success: boolean = await PostService.create(user.id, post)
+      const success: boolean = await PostService.create({
+        userId: user.id,
+        content: post
+      })
 
       if (success) {
         navigate('/')
       } else {
-        setErrorMessage(dictionary.somethingWentWrong?.value)
+        setErrorMessage(dictionary.somethingWentWrong)
       }
     }
   }
@@ -73,7 +76,7 @@ export default function Create () {
         <div className='text-red-400 font-poppins-light w-full h-[30px]'>
           {errorMessage}
         </div>
-        <Button onClick={handlePost} text={dictionary.post?.value} />
+        <Button onClick={handlePost} text={dictionary.post} />
       </footer>
 
       <Nav />

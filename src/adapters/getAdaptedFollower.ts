@@ -1,9 +1,11 @@
 import { Follower } from '../models/Follower'
 import { FollowerEndpoint } from '../models/FollowerEndpoint'
 
-export function getAdaptedFollower (
+export function getAdaptedFollower ({
+  followerEndpoint
+}: {
   followerEndpoint: FollowerEndpoint
-): Follower {
+}): Follower {
   return new Follower({
     followerId: followerEndpoint.follower_id,
     followingId: followerEndpoint.following_id

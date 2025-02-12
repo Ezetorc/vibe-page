@@ -3,12 +3,12 @@ import { Modal } from '../../../components/Modal'
 import { useSettings } from '../../../hooks/useSettings'
 
 export function InvalidEditModal ({ errorMessage }: { errorMessage: string }) {
-  const { setInvalidEditModalConfig, dictionary } = useSettings()
+  const { setVisibleModal, dictionary } = useSettings()
 
   const handleClose = () => {
-    setInvalidEditModalConfig({
-      visible: false,
-      errorMessage: ''
+    setVisibleModal({
+      name: "edit",
+      message: ''
     })
   }
 
@@ -18,7 +18,7 @@ export function InvalidEditModal ({ errorMessage }: { errorMessage: string }) {
         <CloseModalButton onClose={handleClose} />
 
         <h2 className='text-center font-poppins-semibold text-[clamp(20px,7vw,60px)] bg-clip-text text-transparent bg-orange-gradient'>
-          {dictionary.errorDuringAccountEditing?.value}
+          {dictionary.errorDuringAccountEditing}
         </h2>
 
         <span className='text-center font-poppins-regular text-[clamp(20px,7vw,40px)]  '>

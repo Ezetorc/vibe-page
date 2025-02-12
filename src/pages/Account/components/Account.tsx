@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { useParams } from 'react-router'
 import { Nav } from '../../../components/Nav'
 import { SearchBar } from '../../../components/SearchBar'
 import { useUser } from '../../../hooks/useUser'
@@ -7,7 +8,6 @@ import { CheckIcon, PencilIcon } from '../../../components/Icons'
 import { useValidation } from '../../../hooks/useValidation'
 import { useSettings } from '../../../hooks/useSettings'
 import { Section } from '../../../components/Section'
-import { useParams } from 'react-router'
 import { User } from '../../../models/User'
 import { PostsDisplay } from '../../../components/PostsDisplay'
 import { EditButton } from '../../../components/EditButton'
@@ -17,100 +17,97 @@ import { PostService } from '../../../services/PostService'
 
 export default function Account () {
   const { username } = useParams<{ username: string }>()
-  const [account, setAccount] = useState<User | null>(null)
-  const { updateUser, user } = useUser()
-  const [posts, setPosts] = useState<Post[]>([])
-  const [newName, setNewName] = useState<string | null>(null)
-  const [newDescription, setNewDescription] = useState<string | null>(null)
-  const [toEdit, setToEdit] = useState<'name' | 'description' | null>(null)
   const { errorMessage, validateName, validateDescription } = useValidation()
-  const { setInvalidEditModalConfig, dictionary } = useSettings()
+  const { setVisibleModal, dictionary } = useSettings()
+  const { updateUser, user } = useUser()
+  const [account, setAccount] = useState<User | null>(null)
+  const [posts, setPosts] = useState<Post[]>([])
+  const [editState, setEditState] = useState<{
+    field: 'name' | 'description' | null
+    value: string
+  }>({
+    field: null,
+    value: ''
+  })
   const accountIsUser: boolean = user?.id === account?.id
 
   useEffect(() => {
     const fetchAccount = async () => {
       if (username === 'me') {
         setAccount(user)
-        return
-      }
+      } else if (username) {
+        try {
+          const newAccount: User | null = await UserService.getByUsername({
+            username
+          })
 
-      if (!username) return
-
-      try {
-        const newAccount: User = await UserService.getByUsername(username)
-
-        setAccount(newAccount)
-      } catch (error) {
-        console.error('Error fetching account:', error)
+          setEditState({
+            field: null,
+            value: ''
+          })
+          setPosts([])
+          setAccount(newAccount)
+        } catch (error) {
+          console.error('Error fetching account:', error)
+        }
       }
     }
 
     fetchAccount()
   }, [username, user])
 
-  if (!account) return <div>{dictionary.loading?.value}</div>
+  if (!account) return <div>{dictionary.loading}</div>
 
   const handlePostDelete = (postId: number) => {
-    if (!posts) return
-
     const newPosts: Post[] = posts.filter(post => post.id !== postId)
 
     setPosts(newPosts)
   }
 
+  const handleEdit = async () => {
+    const { field, value } = editState
+
+    if (!field) return
+
+    const isValid: boolean =
+      field === 'name'
+        ? validateName({ name: value })
+        : validateDescription({ description: value })
+
+    if (isValid) {
+      await (field === 'name'
+        ? account.changeName({ newName: value })
+        : account.changeDescription({ newDescription: value }))
+
+      await updateUser(account.id)
+
+      setEditState({ field: null, value: '' })
+    } else {
+      setVisibleModal({
+        name: 'edit',
+        message:
+          errorMessage ||
+          dictionary[
+            `errorDuring${field === 'name' ? 'Name' : 'Description'}Change`
+          ]
+      })
+    }
+  }
+
   const handleSearch = async (query: string) => {
     if (query.trim() === '') {
-      const userPosts: Post[] = (await account?.getPosts()) || []
+      const userPosts: Post[] = await account.getPosts()
+
       setPosts(userPosts)
       return
     }
 
     try {
-      const newPosts: Post[] = await PostService.search(query)
+      const newPosts: Post[] = await PostService.search({ query })
+
       setPosts(newPosts)
     } catch (error) {
       console.error('Error fetching search results:', error)
-    }
-  }
-
-  const handleChangeName = async (): Promise<void> => {
-    const isNewNameValid: boolean = validateName(newName)
-
-    if (isNewNameValid && newName) {
-      await account.changeName(newName)
-      await updateUser(account.id)
-
-      setToEdit(null)
-      setNewName(null)
-    } else if (toEdit === 'name') {
-      setInvalidEditModalConfig({
-        visible: true,
-        errorMessage: errorMessage || dictionary.errorDuringNameChange.value
-      })
-    } else {
-      setToEdit('name')
-      setNewName(account.name)
-    }
-  }
-
-  const handleChangeDescription = async (): Promise<void> => {
-    const isNewDescriptionValid: boolean = validateDescription(newDescription)
-
-    if (isNewDescriptionValid && newDescription != null) {
-      await account.changeDescription(newDescription)
-      await updateUser(account.id)
-
-      setToEdit(null)
-      setNewDescription(null)
-    } else if (toEdit === 'description') {
-      setInvalidEditModalConfig({
-        visible: true,
-        errorMessage:
-          errorMessage || dictionary.errorDuringDescriptionChange.value
-      })
-    } else {
-      setToEdit('description')
-      setNewDescription(account.description)
     }
   }
 
@@ -121,36 +118,40 @@ export default function Account () {
           <img className='self-center mb-[10px] justify-self-end row-[span_2] rounded-full w-[clamp(70px,50%,90px)] aspect-square bg-orange-crayola' />
 
           <div className='flex items-end'>
-            {toEdit === 'name' ? (
+            {editState.field === 'name' ? (
               <>
-                <EditButton onEdit={handleChangeName}>
+                <EditButton onEdit={handleEdit}>
                   <CheckIcon />
                 </EditButton>
-
                 <input
                   minLength={3}
                   maxLength={20}
-                  className='text-orange-crayola text-left w-fit bg-transparent outline-none font-poppins-regular content-end text-[clamp(20px,7vw,25px)]'
-                  onChange={event => setNewName(event.target.value)}
-                  defaultValue={account.name || dictionary.loading.value}
+                  className='text-orange-crayola bg-transparent outline-none font-poppins-regular text-[clamp(20px,7vw,25px)]'
+                  onChange={event =>
+                    setEditState({ field: 'name', value: event.target.value })
+                  }
+                  defaultValue={account.name || dictionary.loading}
                 />
               </>
             ) : (
               <>
                 {accountIsUser && (
-                  <EditButton onEdit={handleChangeName}>
+                  <EditButton
+                    onEdit={() =>
+                      setEditState({ field: 'name', value: account.name })
+                    }
+                  >
                     <PencilIcon />
                   </EditButton>
                 )}
-
-                <h2 className='text-orange-crayola text-left w-fit bg-transparent outline-none font-poppins-regular content-end text-[clamp(20px,7vw,25px)]'>
-                  {account.name || dictionary.loading.value}
+                <h2 className='text-orange-crayola bg-transparent font-poppins-regular text-[clamp(20px,7vw,25px)]'>
+                  {account.name || dictionary.loading}
                 </h2>
               </>
             )}
           </div>
 
-          <span className='text-caribbean-current font-poppins-light content-start text-[clamp(10px,4vw,20px)]'>
+          <span className='text-caribbean-current font-poppins-light text-[clamp(10px,4vw,20px)]'>
             {`${dictionary.joined} ${account.getDate()}`}
           </span>
         </div>
@@ -158,37 +159,47 @@ export default function Account () {
         <div
           className={`gap-x-[10px] justify-center w-full h-full grid ${
             accountIsUser ? 'grid-cols-[auto,1fr]' : 'grid-cols-[1fr]'
-          } grid-rows-1`}
+          }`}
         >
-          {toEdit === 'description' ? (
+          {editState.field === 'description' ? (
             <>
-              <EditButton onEdit={handleChangeDescription}>
+              <EditButton onEdit={handleEdit}>
                 <CheckIcon />
               </EditButton>
-
               <textarea
                 minLength={0}
                 maxLength={200}
                 className='w-[90%] bg-transparent h-[160px] placeholder:text-caribbean-current resize-none outline-none break-words text-white text-[clamp(5px,6vw,20px)] font-poppins-regular'
-                onChange={event => setNewDescription(event.target.value)}
-                placeholder={dictionary.myNewDescription.value}
+                onChange={event =>
+                  setEditState({
+                    field: 'description',
+                    value: event.target.value
+                  })
+                }
+                placeholder={dictionary.myNewDescription}
                 defaultValue={account.description || ''}
               />
             </>
           ) : (
             <>
               {accountIsUser && (
-                <EditButton onEdit={handleChangeDescription}>
+                <EditButton
+                  onEdit={() =>
+                    setEditState({
+                      field: 'description',
+                      value: account.description
+                    })
+                  }
+                >
                   <PencilIcon />
                 </EditButton>
               )}
-
               <p className='h-[160px] w-[90%] text-white text-[clamp(5px,6vw,20px)] font-poppins-regular break-words whitespace-pre-wrap overflow-hidden overflow-wrap-anywhere'>
                 {account.description || (
                   <span className='text-caribbean-current'>
                     {accountIsUser
-                      ? dictionary.youDontHaveDescription.value
-                      : dictionary.thisUserHasnotDescription.value}
+                      ? dictionary.youDontHaveDescription
+                      : dictionary.thisUserHasnotDescription}
                   </span>
                 )}
               </p>
@@ -201,11 +212,10 @@ export default function Account () {
 
       <SearchBar
         onSearch={handleSearch}
-        placeholder={`${dictionary.search?.value} ${dictionary.my?.inMinus} ${dictionary.posts?.inMinus}...`}
+        placeholder={dictionary.searchMyPosts}
       />
 
       <PostsDisplay posts={posts} onPostDelete={handlePostDelete} />
-
       <Nav />
     </Section>
   )

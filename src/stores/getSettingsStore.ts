@@ -4,6 +4,7 @@ import { Language } from '../models/Language'
 import { getDictionaries } from '../utilities/getDictionaries'
 import { Dictionaries } from '../models/Dictionaries'
 import { getLanguage } from '../utilities/getLanguage'
+import { ModalName } from '../models/VisibleModal'
 
 export const getSettingsStore = create<SettingsStore>(set => ({
   dictionaries: null,
@@ -12,25 +13,15 @@ export const getSettingsStore = create<SettingsStore>(set => ({
     set({ dictionaries: data })
   },
 
-  changeLanguageModalVisible: false,
-  setChangeLanguageModalVisible: (newChangeLanguageModalVisible: boolean) =>
-    set({ changeLanguageModalVisible: newChangeLanguageModalVisible }),
-
   language: getLanguage(),
   setLanguage: (newLanguage: Language) => set({ language: newLanguage }),
 
-  sessionModalVisible: false,
-  setSessionModalVisible: newSessionModalVisible =>
-    set({ sessionModalVisible: newSessionModalVisible }),
-
-  changeEmailModalVisible: false,
-  setChangeEmailModalVisible: newChangeEmailModalVisible =>
-    set({ changeEmailModalVisible: newChangeEmailModalVisible }),
-
-  invalidEditModalConfig: {
-    visible: false,
-    errorMessage: 'Try again.'
+  visibleModal: {
+    name: null,
+    message: undefined
   },
-  setInvalidEditModalConfig: newInvalidEditModalConfig =>
-    set({ invalidEditModalConfig: newInvalidEditModalConfig })
+  setVisibleModal: (newVisibleModal: {
+    name: ModalName | null
+    message?: string | undefined
+  }) => set({ visibleModal: newVisibleModal })
 }))
