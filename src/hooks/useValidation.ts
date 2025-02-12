@@ -51,11 +51,11 @@ export function useValidation () {
       return false
     }
 
-    const emailAlreadyExists: boolean = await UserService.emailAlreadyExists({
+    const emailAlreadyExists = await UserService.emailAlreadyExists({
       email
     })
 
-    if (emailAlreadyExists) {
+    if (emailAlreadyExists.value) {
       setErrorMessage(dictionary.emailAlreadyExists)
       return false
     }

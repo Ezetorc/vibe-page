@@ -1,7 +1,8 @@
 import { getAdaptedPost } from '../adapters/getAdaptedPost'
-import { api } from '../constants/SETTINGS'
 import { Post } from '../models/Post'
 import { PostEndpoint } from '../models/PostEndpoint'
+import { Data } from '../models/Data'
+import { fetchAPI } from '../utilities/fetchAPI'
 
 export class PostService {
   static async create ({
@@ -10,96 +11,51 @@ export class PostService {
   }: {
     userId: number
     content: string
-  }): Promise<boolean> {
-    try {
-      const url: string = `${api}/posts`
-      const body = {
-        user_id: userId,
-        content: content
-      }
-      const response: Response = await fetch(url, {
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body),
-        method: 'POST',
-        credentials: 'include'
-      })
-
-      if (!response.ok) {
-        return false
-      }
-
-      return true
-    } catch (error) {
-      console.error('Error creating post:', error)
-      return false
-    }
+  }): Promise<Data<boolean>> {
+    return fetchAPI<boolean>({
+      url: '/posts',
+      method: 'POST',
+      body: JSON.stringify({ user_id: userId, content })
+    })
   }
 
-  static async getAll (): Promise<Post[]> {
-    try {
-      const url: string = `${api}/posts`
-      const response: Response = await fetch(url, {
-        credentials: 'include'
-      })
+  static async getAll (): Promise<Data<Post[]>> {
+    const response = await fetchAPI<PostEndpoint[]>({
+      url: '/posts'
+    })
 
-      if (!response.ok) {
-        return []
-      }
+    if (!response.value) return Data.failure()
 
-      const postsEndpoints: PostEndpoint[] = await response.json()
-      const posts: Post[] = postsEndpoints.map((postEndpoint: PostEndpoint) =>
-        getAdaptedPost({ postEndpoint })
-      )
+    const posts: Post[] = response.value.map(postEndpoint =>
+      getAdaptedPost({ postEndpoint })
+    )
 
-      return posts
-    } catch (error) {
-      console.error('Error fetching all posts:', error)
-      return []
-    }
+    return Data.success(posts)
   }
 
-  static async getById ({ postId }: { postId: number }): Promise<Post | null> {
-    try {
-      const url: string = `${api}/posts/id/${postId}`
-      const response: Response = await fetch(url, {
-        method: 'GET',
-        credentials: 'include'
-      })
+  static async getById ({ postId }: { postId: number }): Promise<Data<Post>> {
+    const response = await fetchAPI<PostEndpoint>({
+      url: `/posts/id/${postId}`
+    })
 
-      if (!response.ok) {
-        return null
-      }
+    if (!response.value) return Data.failure()
 
-      const postEndpoint: PostEndpoint = await response.json()
-      const post: Post = getAdaptedPost({ postEndpoint })
+    const post: Post = getAdaptedPost({ postEndpoint: response.value })
 
-      return post
-    } catch (error) {
-      console.error('Error fetching post by ID:', error)
-      return null
-    }
+    return Data.success(post)
   }
 
-  static async search ({ query }: { query: string }): Promise<Post[]> {
-    try {
-      const url: string = `${api}/posts/search/${encodeURIComponent(query)}`
-      const response = await fetch(url, {
-        credentials: 'include'
-      })
+  static async search ({ query }: { query: string }): Promise<Data<Post[]>> {
+    const response = await fetchAPI<PostEndpoint[]>({
+      url: `/posts/search/${encodeURIComponent(query)}`
+    })
 
-      if (!response.ok) {
-        return []
-      }
+    if (!response.value) return Data.failure()
 
-      const postsEndpoints: PostEndpoint[] = await response.json()
-      const posts: Post[] = postsEndpoints.map(postEndpoint =>
-        getAdaptedPost({ postEndpoint })
-      )
+    const posts: Post[] = response.value.map(postEndpoint =>
+      getAdaptedPost({ postEndpoint })
+    )
 
-      return posts
-    } catch (error) {
-      console.error('Error searching for posts:', error)
-      return []
-    }
+    return Data.success(posts)
   }
 }

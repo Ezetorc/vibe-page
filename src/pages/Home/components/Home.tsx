@@ -17,14 +17,12 @@ export default function Home () {
 
   useEffect(() => {
     const fetchPosts = async () => {
-      try {
-        const allPosts: Post[] = await PostService.getAll()
+      const allPosts = await PostService.getAll()
 
-        setPosts(allPosts)
-        setLoading(false)
-      } catch {
-        setLoading(false)
-      }
+      if (!allPosts.value) return
+
+      setPosts(allPosts.value)
+      setLoading(false)
     }
 
     fetchPosts()

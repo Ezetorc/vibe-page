@@ -1,53 +1,36 @@
 import { getAdaptedUser } from '../adapters/getAdaptedUser'
-import { api } from '../constants/SETTINGS'
+import { Data } from '../models/Data'
 import { User } from '../models/User'
 import { UserEndpoint } from '../models/UserEndpoint'
+import { fetchAPI } from '../utilities/fetchAPI'
 
 export class UserService {
   static async getByUsername ({
     username
   }: {
     username: string
-  }): Promise<User | null> {
-    try {
-      const url: string = `${api}/users/username/${username}`
-      const response: Response = await fetch(url, {
-        credentials: 'include'
-      })
+  }): Promise<Data<User>> {
+    const response = await fetchAPI<UserEndpoint>({
+      url: `/users/username/${username}`
+    })
 
-      if (!response.ok) {
-        return null
-      }
+    if (!response.value) return Data.failure()
 
-      const userEndpoint: UserEndpoint = await response.json()
-      const user: User = getAdaptedUser({ userEndpoint })
+    const user: User = getAdaptedUser({ userEndpoint: response.value })
 
-      return user
-    } catch (error) {
-      console.error('Error fetching user by username:', error)
-      return null
-    }
+    return Data.success(user)
   }
 
-  static async getById ({ userId }: { userId: number }): Promise<User | null> {
-    try {
-      const url: string = `${api}/users/id/${userId}`
-      const response: Response = await fetch(url, {
-        credentials: 'include'
-      })
+  static async getById ({ userId }: { userId: number }): Promise<Data<User>> {
+    const response = await fetchAPI<UserEndpoint>({
+      url: `/users/id/${userId}`
+    })
 
-      if (!response.ok) {
-        return null
-      }
+    if (!response.value) return Data.failure()
 
-      const userEndpoint: UserEndpoint = await response.json()
-      const user: User = getAdaptedUser({ userEndpoint })
+    const user: User = getAdaptedUser({ userEndpoint: response.value })
 
-      return user
-    } catch (error) {
-      console.error('Error fetching user by ID:', error)
-      return null
-    }
+    return Data.success(user)
   }
 
   static async register ({
@@ -58,26 +41,18 @@ export class UserService {
     name: string
     email: string
     password: string
-  }): Promise<boolean> {
-    try {
-      const url: string = `${api}/users/register`
-      const body = { name, email, password }
-      const response = await fetch(url, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body),
-        credentials: 'include'
-      })
+  }): Promise<Data<boolean>> {
+    const response = await fetchAPI<boolean>({
+      url: `/users/register`,
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name, email, password }),
+      credentials: 'include'
+    })
 
-      if (!response.ok) {
-        return false
-      }
+    if (!response.value) return Data.failure()
 
-      return true
-    } catch (error) {
-      console.error('Error during registration:', error)
-      return false
-    }
+    return Data.success(true)
   }
 
   static async login ({
@@ -86,111 +61,74 @@ export class UserService {
   }: {
     name: string
     password: string
-  }): Promise<boolean> {
-    try {
-      const url: string = `${api}/users/login`
-      const body = { name, password }
-      const response: Response = await fetch(url, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body),
-        credentials: 'include'
-      })
+  }): Promise<Data<boolean>> {
+    const response = await fetchAPI<boolean>({
+      url: `/users/login`,
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name, password }),
+      credentials: 'include'
+    })
 
-      if (!response.ok) {
-        return false
-      }
+    if (!response.value) return Data.failure()
 
-      return true
-    } catch (error) {
-      console.error('Error during login:', error)
-      return false
-    }
+    return Data.success(true)
   }
 
-  static async logout (): Promise<boolean> {
-    try {
-      const response: Response = await fetch(`${api}/logout`, {
-        method: 'POST',
-        credentials: 'include'
-      })
+  static async logout (): Promise<Data<boolean>> {
+    const response = await fetchAPI<boolean>({
+      url: `/logout`,
+      method: 'POST',
+      credentials: 'include'
+    })
 
-      if (!response.ok) {
-        return false
-      }
+    if (!response.value) return Data.failure()
 
-      return true
-    } catch (error) {
-      console.error('Error during logout:', error)
-      return false
-    }
+    return Data.success(true)
   }
 
-  static async getAll (): Promise<User[]> {
-    try {
-      const url: string = `${api}/users`
-      const response: Response = await fetch(url, {
-        credentials: 'include'
-      })
+  static async getAll (): Promise<Data<User[]>> {
+    const response = await fetchAPI<UserEndpoint[]>({
+      url: `/users`,
+      credentials: 'include'
+    })
 
-      if (!response.ok) {
-        return []
-      }
+    if (!response.value) return Data.failure()
 
-      const usersEndpoints: UserEndpoint[] = await response.json()
-      const users: User[] = usersEndpoints.map(userEndpoint =>
-        getAdaptedUser({ userEndpoint })
-      )
+    const users: User[] = response.value.map(userEndpoint =>
+      getAdaptedUser({ userEndpoint })
+    )
 
-      return users
-    } catch (error) {
-      console.error('Error fetching all users:', error)
-      return []
-    }
+    return Data.success(users)
   }
 
   static async emailAlreadyExists ({
     email
   }: {
     email: string
-  }): Promise<boolean> {
-    try {
-      const url = `${api}/users/emailExists/${encodeURIComponent(email)}`
-      const response = await fetch(url, {
-        credentials: 'include'
-      })
+  }): Promise<Data<boolean>> {
+    const response = await fetchAPI({
+      url: `/users/emailExists/${encodeURIComponent(email)}`,
+      credentials: 'include'
+    })
 
-      if (!response.ok) {
-        return false
-      }
+    if (!response.value) return Data.failure()
 
-      return true
-    } catch (error) {
-      console.error('Error checking if email exists:', error)
-      return false
-    }
+    return Data.success(true)
   }
 
-  static async search ({ query }: { query: string }): Promise<User[]> {
-    try {
-      const url: string = `${api}/users/search/${encodeURIComponent(query)}`
-      const response = await fetch(url, {
-        credentials: 'include'
-      })
+  static async search ({ query }: { query: string }): Promise<Data<User[]>> {
+    const response = await fetchAPI<UserEndpoint[]>({
+      url: `/users/search/${encodeURIComponent(query)}`,
+      credentials: 'include'
+    })
 
-      if (!response.ok) {
-        return []
-      }
+    if (!response.value) return Data.failure()
 
-      const usersEndpoints: UserEndpoint[] = await response.json()
-      const users: User[] = usersEndpoints.map(userEndpoint =>
-        getAdaptedUser({ userEndpoint })
-      )
+    const users: User[] = response.value.map(userEndpoint =>
+      getAdaptedUser({ userEndpoint })
+    )
 
-      return users
-    } catch (error) {
-      console.error('Error searching for users:', error)
-      return []
-    }
+    return Data.success(users)
   }
 }

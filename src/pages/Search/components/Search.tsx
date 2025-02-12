@@ -20,26 +20,24 @@ export default function Search () {
 
   const handleSearch = async (query: string) => {
     if (query.trim() === '') {
-      const allPosts: Post[] = await PostService.getAll()
-      setPosts(allPosts)
+      const allPosts = await PostService.getAll()
 
-      const allUsers: User[] = await UserService.getAll()
-      setUsers(allUsers)
+      setPosts(allPosts.value ?? [])
+
+      const allUsers = await UserService.getAll()
+
+      setUsers(allUsers.value ?? [])
       return
     }
 
-    try {
-      if (toSearch === 'posts') {
-        const newPosts = await PostService.search({ query })
+    if (toSearch === 'posts') {
+      const newPosts = await PostService.search({ query })
 
-        setPosts(newPosts)
-      } else {
-        const newUsers = await UserService.search({ query })
+      setPosts(newPosts.value ?? [])
+    } else {
+      const newUsers = await UserService.search({ query })
 
-        setUsers(newUsers)
-      }
-    } catch (error) {
-      console.error('Error fetching search results:', error)
+      setUsers(newUsers.value ?? [])
     }
   }
 

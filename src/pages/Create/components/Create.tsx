@@ -37,12 +37,12 @@ export default function Create () {
     const isPostValid: boolean = validatePost({ post })
 
     if (isPostValid) {
-      const success: boolean = await PostService.create({
+      const success = await PostService.create({
         userId: user.id,
         content: post
       })
 
-      if (success) {
+      if (success.value) {
         navigate('/')
       } else {
         setErrorMessage(dictionary.somethingWentWrong)

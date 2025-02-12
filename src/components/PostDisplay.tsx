@@ -13,8 +13,8 @@ import { UserService } from '../services/UserService'
 export function PostDisplay ({ post, onDelete }: PostDisplayProps) {
   const { isSessionActive, user } = useUser()
   const { setVisibleModal, dictionary } = useSettings()
-  const [likes, setLikes] = useState<Like[] | null>(null)
-  const [postUser, setPostUser] = useState<User | null>(null)
+  const [likes, setLikes] = useState<Like[]>([])
+  const [postUser, setPostUser] = useState<User>()
   const [hasUserLikedPost, setHasUserLikedPost] = useState<boolean>(false)
   const [isProcessing, setIsProcessing] = useState<boolean>(false)
   const postDate: string = post.getDate()
@@ -37,45 +37,43 @@ export function PostDisplay ({ post, onDelete }: PostDisplayProps) {
 
     setIsProcessing(true)
 
-    try {
-      if (hasUserLikedPost) {
-        await postUser.unlikePost({ postId: post.id })
-      } else {
-        await postUser.likePost({ postId: post.id })
-      }
-
-      const updatedLikes = await post.getLikes()
-      setLikes(updatedLikes)
-      setHasUserLikedPost(!hasUserLikedPost)
-    } catch (error) {
-      console.error('Error while toggling like:', error)
-    } finally {
-      setIsProcessing(false)
+    if (hasUserLikedPost) {
+      await postUser.unlikePost({ postId: post.id })
+    } else {
+      await postUser.likePost({ postId: post.id })
     }
+
+    const updatedLikes = await post.getLikes()
+
+    if (!updatedLikes.value) return
+
+    setLikes(updatedLikes.value)
+    setHasUserLikedPost(!hasUserLikedPost)
+    setIsProcessing(false)
   }
 
   useEffect(() => {
     const fetchData = async () => {
-      try {
-        const newPostUser: User | null = await UserService.getById({
-          userId: post.userId
+      const newPostUser = await UserService.getById({
+        userId: post.userId
+      })
+
+      if (newPostUser.value) {
+        setPostUser(newPostUser.value)
+
+        const newHasUserLikedPost = await newPostUser.value.hasLikedPost({
+          postId: post.id
         })
 
-        if (!newPostUser) return
+        if (newHasUserLikedPost.value) {
+          setHasUserLikedPost(newHasUserLikedPost.value)
+        }
+      }
 
-        setPostUser(newPostUser)
+      const newLikes = await post.getLikes()
 
-        const newLikes: Like[] = await post.getLikes()
-        setLikes(newLikes)
-
-        const newHasUserLikedPost: boolean | undefined =
-          await newPostUser.hasLikedPost({
-            postId: post.id
-          })
-        setHasUserLikedPost(newHasUserLikedPost)
-      } catch (error) {
-        console.error('Error fetching post data:', error)
-        setLikes([])
+      if (newLikes.value) {
+        setLikes(newLikes.value)
       }
     }
 

@@ -1,116 +1,92 @@
 import { getAdaptedFollower } from '../adapters/getAdaptedFollower'
 import { api } from '../constants/SETTINGS'
+import { Data } from '../models/Data'
 import { Follower } from '../models/Follower'
 import { FollowerEndpoint } from '../models/FollowerEndpoint'
+import { fetchAPI } from '../utilities/fetchAPI'
 
 export class FollowerService {
   static async create ({
     followerId,
     followingId
   }: {
-    followerId: number,
+    followerId: number
     followingId: number
-  }): Promise<boolean> {
-    try {
-      const url = `${api}/followers`
-      const body = { follower_id: followerId, following_id: followingId }
-      const response = await fetch(url, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body),
-        credentials: "include"
+  }): Promise<Data<boolean>> {
+    const response = await fetchAPI({
+      url: `/followers`,
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        follower_id: followerId,
+        following_id: followingId
       })
+    })
 
-      return response.ok
-    } catch (error) {
-      console.error('Error creating follower:', error)
-      return false
-    }
+    if (!response.value) return Data.failure()
+
+    return Data.success(true)
   }
 
   static async delete ({
     followerId,
     followingId
   }: {
-    followerId: number,
+    followerId: number
     followingId: number
-  }): Promise<boolean> {
-    try {
-      const url = `${api}/followers`
-      const body = { follower_id: followerId, following_id: followingId }
-      const response = await fetch(url, {
-        method: 'DELETE',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body),
-        credentials: "include"
+  }): Promise<Data<boolean>> {
+    const response = await fetchAPI({
+      url: `${api}/followers`,
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        follower_id: followerId,
+        following_id: followingId
       })
+    })
 
-      return response.ok
-    } catch (error) {
-      console.error('Error deleting follower:', error)
-      return false
-    }
+    if (!response.value) return Data.failure()
+
+    return Data.success(true)
   }
 
   static async exists ({
     followerId,
     followingId
   }: {
-    followerId: number,
+    followerId: number
     followingId: number
-  }): Promise<boolean> {
-    try {
-      const url: string = `${api}/followers`
-      const response: Response = await fetch(url, {
-        credentials: 'include'
-      })
+  }): Promise<Data<boolean>> {
+    const response = await fetchAPI<FollowerEndpoint[]>({
+      url: `/followers`
+    })
 
-      if (!response.ok) {
-        return false
-      }
+    if (!response.value) return Data.failure()
 
-      const followerToCheck: Follower = new Follower({
-        followerId,
-        followingId
-      })
-      const followersEndpoint: FollowerEndpoint[] = await response.json()
-      const followers: Follower[] = followersEndpoint.map(followerEndpoint =>
-        getAdaptedFollower({followerEndpoint})
+    const followers: Follower[] = response.value.map(followerEndpoint =>
+      getAdaptedFollower({ followerEndpoint })
+    )
+    const followerExists: boolean = followers.some(follower => {
+      return (
+        follower.followerId === followerId &&
+        follower.followingId === followingId
       )
-      const followerExists: boolean = followers.some(follower => {
-        return (
-          follower.followerId === followerToCheck.followerId &&
-          follower.followingId === followerToCheck.followingId
-        )
-      })
+    })
 
-      return followerExists
-    } catch (error) {
-      console.error('Error checking follower existence:', error)
-      return false
-    }
+    return Data.success(followerExists)
   }
 
   static async getIdsOfUser ({
     userId
   }: {
     userId: number
-  }): Promise<number[]> {
-    try {
-      const url: string = `${api}/followers/user/${userId}`
-      const response: Response = await fetch(url, {
-        credentials: 'include'
-      })
+  }): Promise<Data<number[]>> {
+    const response = await fetchAPI<number[]>({
+      url: `/followers/user/${userId}`
+    })
 
-      if (!response.ok) {
-        return []
-      }
+    if (!response.value) return Data.failure()
 
-      const followersIds: number[] = await response.json()
-      return followersIds
-    } catch (error) {
-      console.error('Error fetching follower ids:', error)
-      return []
-    }
+    return Data.success(response.value)
   }
 }

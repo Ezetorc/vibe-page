@@ -26,9 +26,9 @@ export default function Login () {
       validateName({ name }) && validatePassword({ password })
 
     if (isFormValid && name && password) {
-      const logSuccesfull: boolean = await UserService.login({ name, password })
+      const logSuccesfull = await UserService.login({ name, password })
 
-      if (logSuccesfull) {
+      if (logSuccesfull.value) {
         await handleSession()
         navigate('/')
       } else {

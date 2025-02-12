@@ -1,7 +1,8 @@
 import { format } from '@formkit/tempo'
 import { Like } from './Like'
-import { api } from '../constants/SETTINGS'
 import { LikeService } from '../services/LikeService'
+import { Data } from './Data'
+import { fetchAPI } from '../utilities/fetchAPI'
 
 export class Post {
   public id: number
@@ -26,23 +27,14 @@ export class Post {
     this.createdAt = createdAt
   }
 
-  public async delete (): Promise<boolean> {
-    try {
-      const url: string = `${api}/posts/id/${this.id}`
-      const response: Response = await fetch(url, {
-        method: 'DELETE',
-        credentials: 'include'
-      })
+  public async delete (): Promise<Data<boolean>> {
+    const response = await fetchAPI<boolean>({
+      url: `/posts/id/${this.id}`,
+      method: 'DELETE',
+      credentials: 'include'
+    })
 
-      if (!response.ok) {
-        return false
-      }
-
-      return true
-    } catch (error) {
-      console.error('Error deleting post:', error)
-      return false
-    }
+    return response
   }
 
   public getDate (): string {
@@ -56,14 +48,13 @@ export class Post {
     }
   }
 
-  public async getLikes (): Promise<Like[]> {
-    try {
-      const likes: Like[] = await LikeService.getAll()
-      const postLikes: Like[] = likes.filter(like => like.postId === this.id)
-      return postLikes
-    } catch (error) {
-      console.error('Error fetching likes for post:', error)
-      return []
-    }
+  public async getLikes (): Promise<Data<Like[]>> {
+    const likes = await LikeService.getAll()
+
+    if (!likes.value) return Data.failure()
+
+    const postLikes = likes.value.filter(like => like.postId === this.id)
+
+    return Data.success(postLikes)
   }
 }

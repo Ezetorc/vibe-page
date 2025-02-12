@@ -37,7 +37,7 @@ export default function Account () {
         setAccount(user)
       } else if (username) {
         try {
-          const newAccount: User | null = await UserService.getByUsername({
+          const newAccount = await UserService.getByUsername({
             username
           })
 
@@ -46,7 +46,7 @@ export default function Account () {
             value: ''
           })
           setPosts([])
-          setAccount(newAccount)
+          setAccount(newAccount.value)
         } catch (error) {
           console.error('Error fetching account:', error)
         }
@@ -96,19 +96,19 @@ export default function Account () {
 
   const handleSearch = async (query: string) => {
     if (query.trim() === '') {
-      const userPosts: Post[] = await account.getPosts()
+      const userPosts = await account.getPosts()
 
-      setPosts(userPosts)
+      if (!userPosts.value) return
+
+      setPosts(userPosts.value)
       return
     }
 
-    try {
-      const newPosts: Post[] = await PostService.search({ query })
+    const newPosts = await PostService.search({ query })
 
-      setPosts(newPosts)
-    } catch (error) {
-      console.error('Error fetching search results:', error)
-    }
+    if (!newPosts.value) return
+
+    setPosts(newPosts.value)
   }
 
   return (

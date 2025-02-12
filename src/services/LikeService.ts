@@ -1,52 +1,38 @@
 import { getAdaptedLike } from '../adapters/getAdaptedLike'
-import { api } from '../constants/SETTINGS'
+import { Data } from '../models/Data'
 import { Like } from '../models/Like'
 import { LikeEndpoint } from '../models/LikeEndpoint'
+import { fetchAPI } from '../utilities/fetchAPI'
 
 export class LikeService {
-  static async getAll (): Promise<Like[]> {
-    try {
-      const url: string = `${api}/likes`
-      const response: Response = await fetch(url, {
-        credentials: 'include'
-      })
+  static async getAll (): Promise<Data<Like[]>> {
+    const response = await fetchAPI<LikeEndpoint[]>({
+      url: `/likes`,
+      credentials: 'include'
+    })
 
-      if (!response.ok) {
-        return []
-      }
+    if (!response.value) return Data.failure()
 
-      const likesEndpoints: LikeEndpoint[] = await response.json()
-      const likes: Like[] = likesEndpoints.map(likeEndpoint =>
-        getAdaptedLike({likeEndpoint})
-      )
+    const likes: Like[] = response.value.map(likeEndpoint =>
+      getAdaptedLike({ likeEndpoint })
+    )
 
-      return likes
-    } catch (error) {
-      console.error('Error fetching all likes:', error)
-      return []
-    }
+    return Data.success(likes)
   }
 
-  static async delete ({ likeId }: { likeId: number }): Promise<boolean> {
-    try {
-      const url: string = `${api}/likes/id/${likeId}`
-      const response: Response = await fetch(url, {
-        method: 'DELETE',
-        credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      })
-
-      if (!response.ok) {
-        return false
+  static async delete ({ likeId }: { likeId: number }): Promise<Data<boolean>> {
+    const response = await fetchAPI({
+      url: `/likes/id/${likeId}`,
+      method: 'DELETE',
+      credentials: 'include',
+      headers: {
+        'Content-Type': 'application/json'
       }
+    })
 
-      return true
-    } catch (error) {
-      console.error('Error deleting like:', error)
-      return false
-    }
+    if (!response.value) return Data.failure()
+
+    return Data.success(true)
   }
 
   static async create ({
@@ -55,31 +41,22 @@ export class LikeService {
   }: {
     userId: number
     postId: number
-  }): Promise<boolean> {
-    try {
-      const url: string = `${api}/likes`
-      const body = {
+  }): Promise<Data<boolean>> {
+    const response = await fetchAPI({
+      url: `/likes`,
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      credentials: 'include',
+      body: JSON.stringify({
         post_id: postId,
         user_id: userId
-      }
-
-      const response: Response = await fetch(url, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        credentials: 'include',
-        body: JSON.stringify(body)
       })
+    })
 
-      if (!response.ok) {
-        return false
-      }
+    if (!response.value) return Data.failure()
 
-      return true
-    } catch (error) {
-      console.error('Error creating like:', error)
-      return false
-    }
+    return Data.success(true)
   }
 }

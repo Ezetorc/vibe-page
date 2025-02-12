@@ -3,7 +3,6 @@ import { UserStore } from '../models/UserStore'
 import { getUserStore } from '../stores/getUserStore'
 import { jwtDecode } from 'jwt-decode'
 import { getAccessToken } from '../utilities/getAccessToken'
-import { User } from '../models/User'
 import { AccessToken } from '../models/AccessToken'
 import { UserService } from '../services/UserService'
 
@@ -13,9 +12,11 @@ export function useUser () {
 
   const updateUser = useCallback(
     async (userId: number) => {
-      const newUser: User | null = await UserService.getById({userId})
+      const newUser = await UserService.getById({userId})
 
-      setUser(newUser)
+      if (!newUser.value) return
+
+      setUser(newUser.value)
     },
     [setUser]
   )

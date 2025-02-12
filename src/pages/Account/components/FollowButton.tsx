@@ -10,13 +10,13 @@ export function FollowButton ({ account }: FollowButtonProps) {
   const [isFollowing, setIsFollowing] = useState<boolean>(false)
 
   useEffect(() => {
-    const fetchFollowing = async () => {
+    const fetchFollowing = async () => { 
       try {
-        const following: boolean | undefined = await user?.isFollowing({
+        const following= await user?.isFollowing({
           userId: account.id
         })
 
-        setIsFollowing(following ?? false)
+        setIsFollowing(following?.value ?? false)
       } catch (error) {
         console.error('Error fetching account:', error)
       }

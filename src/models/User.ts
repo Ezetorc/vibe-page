@@ -1,11 +1,11 @@
 import { format } from '@formkit/tempo'
-import { Like } from './Like'
 import { Post } from './Post'
-import { api } from '../constants/SETTINGS'
 import { FollowerService } from '../services/FollowerService'
 import { PostService } from '../services/PostService'
 import { LikeService } from '../services/LikeService'
 import { UserService } from '../services/UserService'
+import { Data } from './Data'
+import { fetchAPI } from '../utilities/fetchAPI'
 
 export class User {
   public id: number
@@ -46,50 +46,59 @@ export class User {
     return this.id === post.userId
   }
 
-  public async follow ({ userId }: { userId: number }): Promise<void> {
-    try {
-      await FollowerService.create({ followerId: this.id, followingId: userId })
-    } catch (error) {
-      console.error('Error following user:', error)
-    }
+  public async follow ({ userId }: { userId: number }): Promise<Data<boolean>> {
+    const response = await FollowerService.create({
+      followerId: this.id,
+      followingId: userId
+    })
+
+    return response
   }
 
-  public async unfollow ({ userId }: { userId: number }): Promise<void> {
-    try {
-      await FollowerService.delete({ followerId: this.id, followingId: userId })
-    } catch (error) {
-      console.error('Error unfollowing user:', error)
-    }
+  public async unfollow ({
+    userId
+  }: {
+    userId: number
+  }): Promise<Data<boolean>> {
+    const response = await FollowerService.delete({
+      followerId: this.id,
+      followingId: userId
+    })
+
+    return response
   }
 
-  public async isFollowing ({ userId }: { userId: number }): Promise<boolean> {
-    try {
-      const following: boolean = await FollowerService.exists({
-        followerId: this.id,
-        followingId: userId
-      })
-      return following
-    } catch (error) {
-      console.error('Error checking follow status:', error)
-      return false
-    }
+  public async isFollowing ({
+    userId
+  }: {
+    userId: number
+  }): Promise<Data<boolean>> {
+    const following = await FollowerService.exists({
+      followerId: this.id,
+      followingId: userId
+    })
+
+    return following
   }
 
-  public async hasLikedPost ({ postId }: { postId: number }): Promise<boolean> {
-    try {
-      const post: Post | null = await PostService.getById({ postId })
-      if (!post) return false
+  public async hasLikedPost ({
+    postId
+  }: {
+    postId: number
+  }): Promise<Data<boolean>> {
+    const post = await PostService.getById({ postId })
 
-      const postLikes: Like[] = await post.getLikes()
-      const userLike: Like | undefined = postLikes.find(
-        like => like.userId === this.id
-      )
+    if (!post.value) return Data.failure()
 
-      return Boolean(userLike)
-    } catch (error) {
-      console.error('Error checking if user has liked post:', error)
-      return false
-    }
+    const postLikes = await post.value.getLikes()
+
+    if (!postLikes.value) return Data.failure()
+
+    const hasLiked: boolean = postLikes.value.some(
+      like => like.userId === this.id
+    )
+
+    return Data.success(hasLiked)
   }
 
   public getDate (): string {
@@ -99,154 +108,129 @@ export class User {
     return formattedDate
   }
 
-  public async changeName ({ newName }: { newName: string }): Promise<boolean> {
-    try {
-      const url: string = `${api}/users/id/${this.id}`
-      const body = { name: newName }
+  public async changeName ({
+    newName
+  }: {
+    newName: string
+  }): Promise<Data<boolean>> {
+    const response = await fetchAPI({
+      url: `/users/id/${this.id}`,
+      method: 'PATCH',
+      credentials: 'include',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ name: newName })
+    })
 
-      const response: Response = await fetch(url, {
-        method: 'PATCH',
-        credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(body)
-      })
+    if (!response.value) return Data.failure()
 
-      if (!response.ok) {
-        return false
-      }
-
-      this.name = newName
-      return true
-    } catch (error) {
-      console.error('Error changing name:', error)
-      return false
-    }
+    this.name = newName
+    return Data.success(true)
   }
 
   public async changeDescription ({
     newDescription
   }: {
     newDescription: string
-  }): Promise<boolean> {
-    try {
-      const url: string = `${api}/users/id/${this.id}`
-      const body = { description: newDescription }
+  }): Promise<Data<boolean>> {
+    const response = await fetchAPI({
+      url: `/users/id/${this.id}`,
+      method: 'PATCH',
+      credentials: 'include',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ description: newDescription })
+    })
 
-      const response: Response = await fetch(url, {
-        method: 'PATCH',
-        credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(body)
-      })
+    if (!response.value) return Data.failure()
 
-      if (!response.ok) {
-        return false
-      }
-
-      this.description = newDescription
-      return true
-    } catch (error) {
-      console.error('Error changing description:', error)
-      return false
-    }
+    this.description = newDescription
+    return Data.success(true)
   }
 
-  public async getPosts (): Promise<Post[]> {
-    try {
-      const posts: Post[] = await PostService.getAll()
-      const userPosts: Post[] = posts.filter(post => post.userId === this.id)
+  public async getPosts (): Promise<Data<Post[]>> {
+    const posts = await PostService.getAll()
 
-      return userPosts
-    } catch (error) {
-      console.error('Error fetching posts:', error)
-      return []
-    }
+    if (!posts.value) return Data.failure()
+
+    const userPosts: Post[] = posts.value.filter(
+      post => post.userId === this.id
+    )
+
+    return Data.success(userPosts)
   }
 
   public async changeEmail ({
     newEmail
   }: {
     newEmail: string
-  }): Promise<boolean> {
-    try {
-      const url: string = `${api}/users/id/${this.id}`
-      const body = { email: newEmail }
+  }): Promise<Data<boolean>> {
+    const response = await fetchAPI({
+      url: `/users/id/${this.id}`,
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ email: newEmail })
+    })
 
-      const response: Response = await fetch(url, {
-        method: 'PATCH',
-        credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(body)
-      })
+    if (!response.value) return Data.failure()
 
-      if (!response.ok) {
-        return false
-      }
-
-      this.email = newEmail
-      return true
-    } catch (error) {
-      console.error('Error changing email:', error)
-      return false
-    }
+    this.email = newEmail
+    return Data.success(true)
   }
 
-  public async likePost ({ postId }: { postId: number }): Promise<boolean> {
-    try {
-      await LikeService.create({ userId: this.id, postId })
-      return true
-    } catch (error) {
-      console.error('Error liking post:', error)
-      return false
-    }
+  public async likePost ({
+    postId
+  }: {
+    postId: number
+  }): Promise<Data<boolean>> {
+    const response = await LikeService.create({ userId: this.id, postId })
+
+    return response
   }
 
-  public async getFollowers (): Promise<(User | null)[]> {
-    try {
-      const followersIds: number[] = await FollowerService.getIdsOfUser({
-        userId: this.id
-      })
-      const followers: (User | null)[] = await Promise.all(
-        followersIds.map(followerId =>
-          UserService.getById({ userId: followerId })
+  public async getFollowers (): Promise<Data<(User | null)[]>> {
+    const followersIds = await FollowerService.getIdsOfUser({
+      userId: this.id
+    })
+
+    if (!followersIds.value) return Data.failure()
+
+    const followers = await Promise.all(
+      followersIds.value.map(followerId =>
+        UserService.getById({ userId: followerId }).then(
+          response => response.value
         )
       )
+    )
 
-      return followers
-    } catch (error) {
-      console.error('Error fetching followers:', error)
-      return []
-    }
+    return Data.success(followers)
   }
 
-  public async unlikePost ({ postId }: { postId: number }): Promise<boolean> {
-    try {
-      const post: Post | null = await PostService.getById({ postId })
-      if (!post) return false
+  public async unlikePost ({
+    postId
+  }: {
+    postId: number
+  }): Promise<Data<boolean>> {
+    const post = await PostService.getById({ postId })
 
-      const postLikes: Like[] = await post.getLikes()
-      const likeToDelete: Like | undefined = postLikes.find(
-        like => like.userId === this.id
-      )
+    if (!post.value) return Data.failure()
 
-      if (!likeToDelete) {
-        return false
-      }
+    const postLikes = await post.value.getLikes()
 
-      const deleteSuccessful: boolean = await LikeService.delete({
-        likeId: likeToDelete.id
-      })
+    if (!postLikes.value) return Data.failure()
 
-      return deleteSuccessful
-    } catch (error) {
-      console.error('Error unliking post:', error)
-      return false
-    }
+    const likeToDelete = postLikes.value.find(like => like.userId === this.id)
+
+    if (!likeToDelete) return Data.failure()
+
+    const deleteSuccessful = await LikeService.delete({
+      likeId: likeToDelete.id
+    })
+
+    return deleteSuccessful
   }
 }

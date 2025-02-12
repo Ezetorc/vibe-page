@@ -41,13 +41,13 @@ export default function Register () {
       validateAgreeWithTerms({agreeWithTerms})
 
     if (isFormValid && name && email && password) {
-      const registerSuccessful: boolean = await UserService.register({
+      const registerSuccessful = await UserService.register({
         name,
         email,
         password
       })
 
-      if (registerSuccessful) {
+      if (registerSuccessful.value) {
         await handleSession()
         navigate('/')
       } else {

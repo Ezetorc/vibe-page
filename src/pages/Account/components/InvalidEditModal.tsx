@@ -2,7 +2,7 @@ import { CloseModalButton } from '../../../components/CloseModalButton'
 import { Modal } from '../../../components/Modal'
 import { useSettings } from '../../../hooks/useSettings'
 
-export function InvalidEditModal ({ errorMessage }: { errorMessage: string }) {
+export function InvalidEditModal ({ errorMessage }: { errorMessage: string | undefined }) {
   const { setVisibleModal, dictionary } = useSettings()
 
   const handleClose = () => {
