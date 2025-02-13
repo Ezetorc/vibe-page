@@ -86,18 +86,21 @@ export function useValidation () {
     password: string | undefined
     confirmedPassword: string | undefined
   }) => {
-    if (!password) {
-      setErrorMessage(dictionary.emptyPasswordError)
+    const validPassword = validatePassword({ password })
+    const validConfirmedPassword = validatePassword({
+      password: confirmedPassword
+    })
+
+    if (!validPassword) {
+      return false
+    }
+
+    if (!validConfirmedPassword) {
       return false
     }
 
     if (!confirmedPassword) {
       setErrorMessage(dictionary.confirmPassword)
-      return false
-    }
-
-    if (password.length < 6 || password.length > 30) {
-      setErrorMessage(dictionary.passwordLengthError)
       return false
     }
 

@@ -4,7 +4,7 @@ import { Language } from '../models/Language'
 import { getDictionaries } from '../utilities/getDictionaries'
 import { Dictionaries } from '../models/Dictionaries'
 import { getLanguage } from '../utilities/getLanguage'
-import { ModalName } from '../models/VisibleModal'
+import { ModalName } from '../models/ModalName'
 
 export const getSettingsStore = create<SettingsStore>(set => ({
   dictionaries: null,

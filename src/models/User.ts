@@ -129,6 +129,23 @@ export class User {
     return Data.success(true)
   }
 
+  public async changePassword ({ newPassword}: { newPassword: string }): Promise<Data<boolean>> {
+    const response = await fetchAPI({
+      url: `/users/id/${this.id}`,
+      method: 'PATCH',
+      credentials: 'include',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ password: newPassword })
+    })
+
+    if (!response.value) return Data.failure()
+
+    this.password = newPassword
+    return Data.success(true)
+  }
+
   public async changeDescription ({
     newDescription
   }: {

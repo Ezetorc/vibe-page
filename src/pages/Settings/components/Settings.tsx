@@ -18,7 +18,9 @@ export default function Settings () {
     setVisibleModal({ name: 'email' })
   }
 
-  const handleChangePassword = () => {}
+  const handleChangePassword = () => {
+    setVisibleModal({ name: 'password' })
+  }
 
   const handleChangeLanguage = () => {
     setVisibleModal({ name: 'language' })

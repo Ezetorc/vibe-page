@@ -1,6 +1,6 @@
 import { Dictionaries } from './Dictionaries'
 import { Language } from './Language'
-import { ModalName } from './VisibleModal'
+import { ModalName } from './ModalName'
 
 export interface SettingsStore {
   dictionaries: Dictionaries | null

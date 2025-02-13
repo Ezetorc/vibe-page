@@ -8,6 +8,7 @@ import { ChangeEmailModal } from './pages/Settings/components/ChangeEmailModal.t
 import { ChangeLanguageModal } from './pages/Settings/components/ChangeLanguageModal.tsx'
 import { ConnectionModal } from './components/ConnectionModal.tsx'
 import { Loading } from './components/Loading.tsx'
+import { ChangePasswordModal } from './pages/Settings/components/ChangePasswordModal.tsx'
 
 const LazyHome = lazy(() => import('./pages/Home/components/Home.tsx'))
 const LazyLogin = lazy(() => import('./pages/Login/components/Login.tsx'))
@@ -24,6 +25,14 @@ const LazyRegister = lazy(
 export default function App () {
   const { visibleModal } = useSettings()
   const { handleSession } = useUser()
+  const modals = {
+    session: <SessionModal />,
+    language: <ChangeLanguageModal />,
+    email: <ChangeEmailModal />,
+    edit: <InvalidEditModal errorMessage={visibleModal.message} />,
+    connection: <ConnectionModal />,
+    password: <ChangePasswordModal />
+  }
 
   useEffect(() => {
     handleSession()
@@ -33,13 +42,7 @@ export default function App () {
     <>
       <Suspense fallback={<Loading />}>
         <Router>
-          {visibleModal.name === 'session' && <SessionModal />}
-          {visibleModal.name === 'language' && <ChangeLanguageModal />}
-          {visibleModal.name === 'email' && <ChangeEmailModal />}
-          {visibleModal.name === 'edit' && (
-            <InvalidEditModal errorMessage={visibleModal.message} />
-          )}
-          {visibleModal.name === 'connection' && <ConnectionModal />}
+          {visibleModal.name && modals[visibleModal.name]}
 
           <Routes>
             <Route path='/' element={<LazyHome />} />

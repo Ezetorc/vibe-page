@@ -7,26 +7,30 @@ import { useUser } from '../../../hooks/useUser'
 import { useValidation } from '../../../hooks/useValidation'
 import { CloseModalButton } from '../../../components/CloseModalButton'
 
-export function ChangeEmailModal () {
+export function ChangePasswordModal () {
   const { user } = useUser()
-  const { validateEmail, errorMessage } = useValidation()
+  const { validatePasswords, errorMessage } = useValidation()
   const { setVisibleModal, dictionary } = useSettings()
-
-  const newEmailRef = useRef<HTMLInputElement>(null)
+  const newPasswordRef = useRef<HTMLInputElement>(null)
+  const confirmedNewPasswordRef = useRef<HTMLInputElement>(null)
 
   const handleClose = () => {
     setVisibleModal({ name: null })
   }
 
-  const handleChangeEmail = async () => {
-    const newEmail: string | undefined = newEmailRef.current?.value
-    const isNewEmailValid: boolean = await validateEmail({ email: newEmail })
+  const handleChangePassword = async () => {
+    const newPassword = newPasswordRef.current?.value
+    const confirmedNewPassword = confirmedNewPasswordRef.current?.value
+    const isNewPasswordValid = validatePasswords({
+      password: newPassword,
+      confirmedPassword: confirmedNewPassword
+    })
 
-    if (newEmail === undefined || !user || !isNewEmailValid) return
+    if (!isNewPasswordValid || !user || !newPassword) return
 
-    const emailChange = await user.changeEmail({ newEmail })
+    const passwordChange = await user.changePassword({ newPassword })
 
-    if (emailChange.success) {
+    if (passwordChange.success) {
       handleClose()
     } else {
       setVisibleModal({ name: 'connection' })
@@ -39,21 +43,29 @@ export function ChangeEmailModal () {
         <CloseModalButton onClose={handleClose} />
 
         <h2 className='text-center font-poppins-semibold text-[clamp(20px,7vw,60px)] bg-clip-text text-transparent bg-orange-gradient'>
-          {dictionary.change} {dictionary.email}
+          {dictionary.change} {dictionary.password}
         </h2>
 
         <FormInput
-          type='email'
-          reference={newEmailRef}
-          min={1}
-          max={31}
-          placeholder={dictionary.emailPlaceholder}
+          min={6}
+          max={30}
+          reference={newPasswordRef}
+          type='password'
+          placeholder={dictionary.password}
+          className='placeholder:text-verdigris p-[5px]'
+        />
+        <FormInput
+          min={6}
+          max={30}
+          reference={confirmedNewPasswordRef}
+          type='password'
+          placeholder={dictionary.confirmPassword}
           className='placeholder:text-verdigris p-[5px]'
         />
 
         {errorMessage && <p className='text-red-500'>{errorMessage}</p>}
 
-        <Button text={dictionary.change} onClick={handleChangeEmail} />
+        <Button text={dictionary.change} onClick={handleChangePassword} />
       </article>
     </Modal>
   )
