@@ -1,4 +1,4 @@
-import { languages } from "../../../constants/SETTINGS";
+import { languages } from "../../../constants/settings";
 
 export function Languages () {
   return (

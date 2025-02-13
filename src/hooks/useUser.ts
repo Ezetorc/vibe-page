@@ -12,7 +12,7 @@ export function useUser () {
 
   const updateUser = useCallback(
     async (userId: number) => {
-      const newUser = await UserService.getById({userId})
+      const newUser = await UserService.getById({ userId })
 
       if (!newUser.value) return
 

@@ -1,1 +1,1 @@
-export type ModalName = 'session' | 'language' | 'email' | 'edit'
+export type ModalName = 'session' | 'language' | 'email' | 'edit' | 'connection'

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { LikeIcon } from './Icons'
 import { Like } from '../models/Like'
 import { User } from '../models/User'
@@ -20,8 +20,11 @@ export function PostDisplay ({ post, onDelete }: PostDisplayProps) {
   const postDate: string = post.getDate()
 
   const handleDelete = async () => {
-    await post.delete()
-    onDelete(post.id)
+    const deleted = await post.delete()
+
+    if (deleted.success) {
+      onDelete(post.id)
+    }
   }
 
   const handleLike = async () => {
@@ -43,6 +46,10 @@ export function PostDisplay ({ post, onDelete }: PostDisplayProps) {
       await postUser.likePost({ postId: post.id })
     }
 
+    handleUpdatedLikes()
+  }
+
+  const handleUpdatedLikes = async () => {
     const updatedLikes = await post.getLikes()
 
     if (!updatedLikes.value) return
@@ -52,33 +59,40 @@ export function PostDisplay ({ post, onDelete }: PostDisplayProps) {
     setIsProcessing(false)
   }
 
-  useEffect(() => {
-    const fetchData = async () => {
-      const newPostUser = await UserService.getById({
-        userId: post.userId
+  const handlePostUser = useCallback(async () => {
+    const newPostUser = await UserService.getById({
+      userId: post.userId
+    })
+
+    if (newPostUser.value) {
+      setPostUser(newPostUser.value)
+
+      const newHasUserLikedPost = await newPostUser.value.hasLikedPost({
+        postId: post.id
       })
 
-      if (newPostUser.value) {
-        setPostUser(newPostUser.value)
-
-        const newHasUserLikedPost = await newPostUser.value.hasLikedPost({
-          postId: post.id
-        })
-
-        if (newHasUserLikedPost.value) {
-          setHasUserLikedPost(newHasUserLikedPost.value)
-        }
-      }
-
-      const newLikes = await post.getLikes()
-
-      if (newLikes.value) {
-        setLikes(newLikes.value)
+      if (newHasUserLikedPost.value) {
+        setHasUserLikedPost(newHasUserLikedPost.value)
       }
     }
+  }, [post.id, post.userId])
 
-    fetchData()
+  const handleNewLikes = useCallback(async () => {
+    const newLikes = await post.getLikes()
+
+    if (newLikes.value) {
+      setLikes(newLikes.value)
+    }
   }, [post])
+
+  const fetchData = useCallback(async () => {
+    handlePostUser()
+    handleNewLikes()
+  }, [handlePostUser, handleNewLikes])
+
+  useEffect(() => {
+    fetchData()
+  }, [fetchData])
 
   return (
     <article className='w-[clamp(300px,100%,700px)] py-[10px] px-[20px] rounded-vibe border-vibe border-caribbean-current overflow-hidden'>

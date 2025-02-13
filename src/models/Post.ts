@@ -30,22 +30,17 @@ export class Post {
   public async delete (): Promise<Data<boolean>> {
     const response = await fetchAPI<boolean>({
       url: `/posts/id/${this.id}`,
-      method: 'DELETE',
-      credentials: 'include'
+      method: 'DELETE'
     })
 
     return response
   }
 
   public getDate (): string {
-    try {
-      const parsedDate: Date = new Date(this.createdAt.replace(' ', 'T'))
-      const formattedDate: string = format(parsedDate, 'DD/MM/YYYY')
-      return formattedDate
-    } catch (error) {
-      console.error('Error formatting date:', error)
-      return ''
-    }
+    const parsedDate: Date = new Date(this.createdAt.replace(' ', 'T'))
+    const formattedDate: string = format(parsedDate, 'DD/MM/YYYY')
+    
+    return formattedDate
   }
 
   public async getLikes (): Promise<Data<Like[]>> {

@@ -5,7 +5,7 @@ import { Loading } from './Loading'
 
 export function UserDisplay ({ user }: { user: User }) {
   const { dictionary } = useSettings()
-  const userDate: string = user.getDate()
+  const userDate = user.getDate()
 
   return (
     <article className='flex flex-col w-[clamp(300px,100%,700px)] h-[clamp(300px,auto,400px)] p-[20px] rounded-vibe border-vibe border-caribbean-current overflow-hidden'>

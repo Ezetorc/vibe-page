@@ -1,5 +1,5 @@
 import { getAdaptedFollower } from '../adapters/getAdaptedFollower'
-import { api } from '../constants/SETTINGS'
+import { api } from '../constants/settings'
 import { Data } from '../models/Data'
 import { Follower } from '../models/Follower'
 import { FollowerEndpoint } from '../models/FollowerEndpoint'

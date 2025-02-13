@@ -13,31 +13,71 @@ import { UserService } from '../../../services/UserService'
 import { getInMinus } from '../../../utilities/getInMinus'
 
 export default function Search () {
-  const { dictionary } = useSettings()
+  const { dictionary, setVisibleModal } = useSettings()
   const [toSearch, setToSearch] = useState<'users' | 'posts'>('posts')
   const [posts, setPosts] = useState<Post[]>([])
   const [users, setUsers] = useState<User[]>([])
 
+  const showAllPosts = async () => {
+    const allPosts = await PostService.getAll()
+
+    if (!allPosts.value) {
+      setVisibleModal({
+        name: 'connection'
+      })
+    } else {
+      setPosts(allPosts.value)
+    }
+  }
+
+  const showAllUsers = async () => {
+    const allUsers = await UserService.getAll()
+
+    if (!allUsers.value) {
+      setVisibleModal({
+        name: 'connection'
+      })
+    } else {
+      setUsers(allUsers.value)
+    }
+  }
+
+  const showSearchedPosts = async (query: string) => {
+    const searchedPosts = await PostService.search({ query })
+
+    if (!searchedPosts.value) {
+      setVisibleModal({
+        name: 'connection'
+      })
+    } else {
+      setPosts(searchedPosts.value)
+    }
+  }
+
+  const showSearchedUsers = async (query: string) => {
+    const searchedUsers = await UserService.search({ query })
+
+    if (!searchedUsers.value) {
+      setVisibleModal({
+        name: 'connection'
+      })
+    } else {
+      setUsers(searchedUsers.value)
+    }
+  }
+
   const handleSearch = async (query: string) => {
     if (query.trim() === '') {
-      const allPosts = await PostService.getAll()
+      showAllPosts()
+      showAllUsers()
 
-      setPosts(allPosts.value ?? [])
-
-      const allUsers = await UserService.getAll()
-
-      setUsers(allUsers.value ?? [])
       return
     }
 
     if (toSearch === 'posts') {
-      const newPosts = await PostService.search({ query })
-
-      setPosts(newPosts.value ?? [])
+      showSearchedPosts(query)
     } else {
-      const newUsers = await UserService.search({ query })
-
-      setUsers(newUsers.value ?? [])
+      showSearchedUsers(query)
     }
   }
 
