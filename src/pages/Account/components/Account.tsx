@@ -5,7 +5,6 @@ import { Loading } from '../../../components/Loading'
 import { Nav } from '../../../components/Nav'
 import { FollowButton } from './FollowButton'
 import { useAccount } from '../hooks/useAccount'
-import { Post } from '../../../models/Post'
 import { useSettings } from '../../../hooks/useSettings'
 import { AccountName } from './AccountName'
 import { AccountDescription } from './AccountDescription'
@@ -18,7 +17,7 @@ export default function Account () {
   if (!account) return <Loading />
 
   const handlePostDelete = (postId: number) => {
-    const newPosts: Post[] = posts.filter(post => post.id !== postId)
+    const newPosts= posts.filter(post => post.id !== postId)
 
     setPosts(newPosts)
   }

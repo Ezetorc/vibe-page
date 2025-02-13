@@ -10,16 +10,16 @@ export function SessionModal () {
 
   const handleLogin = () => {
     navigate('/login')
-    setVisibleModal({ name: null, message: '' })
+    setVisibleModal({ name: null })
   }
 
   const handleRegister = () => {
     navigate('/register')
-    setVisibleModal({ name: null, message: '' })
+    setVisibleModal({ name: null })
   }
 
   const handleClose = () => {
-    setVisibleModal({ name: null, message: '' })
+    setVisibleModal({ name: null })
   }
 
   return (

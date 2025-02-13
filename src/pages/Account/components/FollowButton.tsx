@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { Button } from '../../../components/Button'
 import { useSettings } from '../../../hooks/useSettings'
 import { FollowButtonProps } from '../models/FollowButtonProps'
@@ -9,27 +9,27 @@ export function FollowButton ({ account }: FollowButtonProps) {
   const { user } = useUser()
   const [isFollowing, setIsFollowing] = useState<boolean>(false)
 
-  useEffect(() => {
-    const fetchFollowing = async () => { 
-      try {
-        const following= await user?.isFollowing({
-          userId: account.id
-        })
-
-        setIsFollowing(following?.value ?? false)
-      } catch (error) {
-        console.error('Error fetching account:', error)
-      }
+  const fetchFollowing = useCallback(async () => {
+    if (!user) {
+      setVisibleModal({ name: 'session' })
+      return
     }
 
-    fetchFollowing()
-  }, [account.id, user])
+    const following = await user.isFollowing({
+      userId: account.id
+    })
+
+    if (!following.value) {
+      setVisibleModal({ name: 'connection' })
+      return
+    }
+
+    setIsFollowing(following.value)
+  }, [account.id, user, setVisibleModal])
 
   const handleFollow = async () => {
-    if (!account) return
-
     if (!user) {
-      setVisibleModal({ name: 'session', message: '' })
+      setVisibleModal({ name: 'session' })
       return
     }
 
@@ -41,6 +41,10 @@ export function FollowButton ({ account }: FollowButtonProps) {
       setIsFollowing(false)
     }
   }
+
+  useEffect(() => {
+    fetchFollowing()
+  }, [fetchFollowing])
 
   return (
     <Button

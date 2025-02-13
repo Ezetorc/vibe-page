@@ -11,29 +11,34 @@ export function useUser () {
   const { user, setUser } = userStore
 
   const updateUser = useCallback(
-    async (userId: number) => {
+    async (userId: number): Promise<boolean> => {
       const newUser = await UserService.getById({ userId })
 
-      if (!newUser.value) return
+      if (!newUser.value) return false
 
       setUser(newUser.value)
+      return true
     },
     [setUser]
   )
 
-  const handleSession = useCallback(async (): Promise<void> => {
-    const accessToken: string | undefined = getAccessToken()
+  const handleSession = useCallback(async (): Promise<boolean> => {
+    const accessToken = getAccessToken()
 
-    if (!accessToken) return
+    if (!accessToken) return false
 
     try {
       const session: AccessToken = jwtDecode(accessToken)
 
       if ('id' in session.user) {
         updateUser(session.user.id)
+        return true
       }
+
+      return false
     } catch (error) {
       console.error('Error decoding token:', error)
+      return false
     }
   }, [updateUser])
 

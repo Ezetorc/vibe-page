@@ -39,7 +39,7 @@ export class Post {
   public getDate (): string {
     const parsedDate: Date = new Date(this.createdAt.replace(' ', 'T'))
     const formattedDate: string = format(parsedDate, 'DD/MM/YYYY')
-    
+
     return formattedDate
   }
 

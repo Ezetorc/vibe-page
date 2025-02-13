@@ -10,7 +10,7 @@ import { Section } from '../../../components/Section'
 import { UserService } from '../../../services/UserService'
 
 export default function Login () {
-  const { dictionary } = useSettings()
+  const { dictionary, setVisibleModal } = useSettings()
   const { errorMessage, validateName, validatePassword, setErrorMessage } =
     useValidation()
   const { handleSession } = useUser()
@@ -29,8 +29,13 @@ export default function Login () {
       const logSuccesfull = await UserService.login({ name, password })
 
       if (logSuccesfull.value) {
-        await handleSession()
-        navigate('/')
+        const sessionSuccess = await handleSession()
+
+        if (sessionSuccess) {
+          navigate('/')
+        } else {
+          setVisibleModal({ name: 'connection' })
+        }
       } else {
         setErrorMessage(dictionary.nameOrPasswordWrong)
       }

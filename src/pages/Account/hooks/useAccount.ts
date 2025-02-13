@@ -26,14 +26,11 @@ export function useAccount () {
     if (username === 'me') {
       setAccount(user)
     } else if (username) {
-      try {
-        const newAccount = await UserService.getByUsername({ username })
-        setAccount(newAccount.value)
-        setEditState({ field: null, value: '' })
-        setPosts([])
-      } catch (error) {
-        console.error('Error fetching account:', error)
-      }
+      const newAccount = await UserService.getByUsername({ username })
+
+      setAccount(newAccount.value)
+      setEditState({ field: null, value: '' })
+      setPosts([])
     }
   }, [user, username])
 

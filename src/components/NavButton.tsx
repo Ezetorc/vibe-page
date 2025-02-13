@@ -14,8 +14,7 @@ export function NavButton ({ icon, to, needsSession = false }: NavButtonProps) {
     if (!isSessionActive()) {
       event.preventDefault()
       setVisibleModal({
-        name: 'session',
-        message: ''
+        name: 'session'
       })
     }
   }

@@ -32,8 +32,7 @@ export function PostDisplay ({ post, onDelete }: PostDisplayProps) {
 
     if (!isSessionActive()) {
       setVisibleModal({
-        name: 'session',
-        message: ''
+        name: 'session'
       })
       return
     }

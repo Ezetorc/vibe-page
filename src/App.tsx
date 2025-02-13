@@ -7,6 +7,7 @@ import { InvalidEditModal } from './pages/Account/components/InvalidEditModal.ts
 import { ChangeEmailModal } from './pages/Settings/components/ChangeEmailModal.tsx'
 import { ChangeLanguageModal } from './pages/Settings/components/ChangeLanguageModal.tsx'
 import { ConnectionModal } from './components/ConnectionModal.tsx'
+import { Loading } from './components/Loading.tsx'
 
 const LazyHome = lazy(() => import('./pages/Home/components/Home.tsx'))
 const LazyLogin = lazy(() => import('./pages/Login/components/Login.tsx'))
@@ -30,7 +31,7 @@ export default function App () {
 
   return (
     <>
-      <Suspense fallback={<div>Loading...</div>}>
+      <Suspense fallback={<Loading />}>
         <Router>
           {visibleModal.name === 'session' && <SessionModal />}
           {visibleModal.name === 'language' && <ChangeLanguageModal />}
@@ -38,7 +39,7 @@ export default function App () {
           {visibleModal.name === 'edit' && (
             <InvalidEditModal errorMessage={visibleModal.message} />
           )}
-          {visibleModal.name === "connection" && <ConnectionModal />}
+          {visibleModal.name === 'connection' && <ConnectionModal />}
 
           <Routes>
             <Route path='/' element={<LazyHome />} />
