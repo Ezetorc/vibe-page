@@ -14,7 +14,7 @@ export function AccountDescription () {
   return (
     <div
       className={`gap-x-[10px] justify-center w-full h-full grid ${
-        accountIsUser ? 'grid-cols-[auto,1fr]' : 'grid-cols-[1fr]'
+        accountIsUser ? 'grid-cols-[auto_1fr]' : 'grid-cols-[1fr]'
       }`}
     >
       {editState.field === 'description' ? (
@@ -25,7 +25,7 @@ export function AccountDescription () {
           <textarea
             minLength={0}
             maxLength={200}
-            className='w-[90%] bg-transparent h-[160px] placeholder:text-caribbean-current resize-none outline-none break-words text-white text-[clamp(5px,6vw,20px)] font-poppins-regular'
+            className='w-[90%] bg-transparent h-[160px] placeholder:text-caribbean-current resize-none outline-hidden break-words text-white text-[clamp(5px,6vw,20px)] font-poppins-regular'
             onChange={event =>
               setEditState({
                 field: 'description',

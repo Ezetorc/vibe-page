@@ -19,7 +19,7 @@ export function SearchBar ({ onSearch, placeholder }: SearchBarProps) {
     <input
       onInput={onInput}
       placeholder={placeholder}
-      className='bg-transparent font-poppins-regular outline-none placeholder:text-caribbean-current w-full h-[45px] border-vibe border-caribbean-current rounded-vibe px-[2%]'
+      className='bg-transparent font-poppins-regular outline-hidden placeholder:text-caribbean-current w-full h-[45px] border-vibe border-caribbean-current rounded-vibe px-[2%]'
     />
   )
 }

@@ -101,7 +101,7 @@ export function CommentDisplay ({ comment, onDelete }: CommentDisplayProps) {
 
   return (
     <article className='w-[clamp(300px,100%,700px)] py-[10px] px-[20px] rounded-vibe border-vibe border-caribbean-current overflow-hidden'>
-      <header className='w-full h-[70px] grid grid-cols-[10fr,10fr,1fr] items-center'>
+      <header className='w-full h-[70px] grid grid-cols-[10fr_10fr_1fr] items-center'>
         <div className='flex items-center gap-x-[10px]'>
           <img className='rounded-full w-[50px] aspect-square bg-orange-crayola' />
           {commentData.user ? (

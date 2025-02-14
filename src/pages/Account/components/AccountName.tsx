@@ -21,7 +21,7 @@ export function AccountName () {
           <input
             minLength={3}
             maxLength={20}
-            className='text-orange-crayola bg-transparent outline-none font-poppins-regular text-[clamp(20px,7vw,25px)]'
+            className='text-orange-crayola bg-transparent outline-hidden font-poppins-regular text-[clamp(20px,7vw,25px)]'
             onChange={event =>
               setEditState({
                 field: 'name',

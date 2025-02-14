@@ -9,7 +9,7 @@ export function UserDisplay ({ user }: { user: User }) {
 
   return (
     <article className='flex flex-col w-[clamp(300px,100%,700px)] h-[clamp(300px,auto,400px)] p-[20px] rounded-vibe border-vibe border-caribbean-current overflow-hidden'>
-      <div className='gap-x-[20px] grid h-full grid-cols-[1fr,2fr] grid-rows-[1fr,1fr]'>
+      <div className='gap-x-[20px] grid h-full grid-cols-[1fr_2fr] grid-rows-[1fr_1fr]'>
         <img className='self-center mb-[10px] justify-self-end row-[span_2] rounded-full w-[clamp(70px,50%,90px)] aspect-square bg-orange-crayola' />
 
         {user ? <Username username={user.name} /> : <Loading />}

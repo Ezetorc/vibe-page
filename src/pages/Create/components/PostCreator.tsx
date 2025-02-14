@@ -54,7 +54,7 @@ export function PostCreator () {
         onInput={handleWrite}
         maxLength={200}
         placeholder={placeholder}
-        className='p-[10px] text-[clamp(25px,7vw,30px)] outline-none resize-none w-full h-full bg-transparent font-poppins-regular'
+        className='p-[10px] text-[clamp(25px,7vw,30px)] outline-hidden resize-none w-full h-full bg-transparent font-poppins-regular'
       ></textarea>
       <span
         ref={spanRef}
