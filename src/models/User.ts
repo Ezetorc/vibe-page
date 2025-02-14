@@ -6,6 +6,8 @@ import { LikeService } from '../services/LikeService'
 import { UserService } from '../services/UserService'
 import { Data } from './Data'
 import { fetchAPI } from '../utilities/fetchAPI'
+import { CommentService } from '../services/CommentService'
+import { Comment } from './Comment'
 
 export class User {
   public id: number
@@ -42,8 +44,12 @@ export class User {
     this.createdAt = createdAt
   }
 
-  public isOwnerOf ({ post }: { post: Post }) {
+  public isOwnerOfPost({ post }: { post: Post }) {
     return this.id === post.userId
+  }
+
+  public isOwnerOfComment ({ comment }: { comment: Comment }) {
+    return this.id === comment.userId
   }
 
   public async follow ({ userId }: { userId: number }): Promise<Data<boolean>> {
@@ -81,6 +87,8 @@ export class User {
     return following
   }
 
+  
+
   public async hasLikedPost ({
     postId
   }: {
@@ -95,6 +103,26 @@ export class User {
     if (!postLikes.value) return Data.failure()
 
     const hasLiked: boolean = postLikes.value.some(
+      like => like.userId === this.id
+    )
+
+    return Data.success(hasLiked)
+  }
+
+  public async hasLikedComment ({
+    commentId
+  }: {
+    commentId: number
+  }): Promise<Data<boolean>> {
+    const comment = await CommentService.getById({ commentId })
+
+    if (!comment.value) return Data.failure()
+
+    const commentLikes = await comment.value.getLikes()
+
+    if (!commentLikes.value) return Data.failure()
+
+    const hasLiked: boolean = commentLikes.value.some(
       like => like.userId === this.id
     )
 
@@ -129,7 +157,11 @@ export class User {
     return Data.success(true)
   }
 
-  public async changePassword ({ newPassword}: { newPassword: string }): Promise<Data<boolean>> {
+  public async changePassword ({
+    newPassword
+  }: {
+    newPassword: string
+  }): Promise<Data<boolean>> {
     const response = await fetchAPI({
       url: `/users/id/${this.id}`,
       method: 'PATCH',
@@ -204,7 +236,11 @@ export class User {
   }: {
     postId: number
   }): Promise<Data<boolean>> {
-    const response = await LikeService.create({ userId: this.id, postId })
+    const response = await LikeService.create({
+      userId: this.id,
+      targetId: postId,
+      type: 'post'
+    })
 
     return response
   }
@@ -233,6 +269,44 @@ export class User {
     postId: number
   }): Promise<Data<boolean>> {
     const post = await PostService.getById({ postId })
+
+    if (!post.value) return Data.failure()
+
+    const postLikes = await post.value.getLikes()
+
+    if (!postLikes.value) return Data.failure()
+
+    const likeToDelete = postLikes.value.find(like => like.userId === this.id)
+
+    if (!likeToDelete) return Data.failure()
+
+    const deleteSuccessful = await LikeService.delete({
+      likeId: likeToDelete.id
+    })
+
+    return deleteSuccessful
+  }
+
+  public async likeComment ({
+    commentId
+  }: {
+    commentId: number
+  }): Promise<Data<boolean>> {
+    const response = await LikeService.create({
+      userId: this.id,
+      targetId: commentId,
+      type: 'comment'
+    })
+
+    return response
+  }
+
+  public async unlikeComment ({
+    commentId
+  }: {
+    commentId: number
+  }): Promise<Data<boolean>> {
+    const post = await CommentService.getById({ commentId })
 
     if (!post.value) return Data.failure()
 

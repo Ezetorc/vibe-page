@@ -1,19 +1,23 @@
 export class Like {
   public id: number
-  public postId: number
+  public targetId: number
   public userId: number
+  public type: 'post' | 'comment'
 
   constructor ({
     id,
-    postId,
+    targetId,
+    type,
     userId
   }: {
     id: number
-    postId: number
+    targetId: number
     userId: number
+    type: 'post' | 'comment'
   }) {
     this.id = id
-    this.postId = postId
+    this.type = type
+    this.targetId = targetId
     this.userId = userId
   }
 }

@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
-import { LikeIcon } from './Icons'
+import { CommentIcon, LikeIcon } from './Icons'
 import { Like } from '../models/Like'
 import { User } from '../models/User'
 import { useUser } from '../hooks/useUser'
@@ -9,15 +9,26 @@ import { Username } from './Username'
 import { Loading } from './Loading'
 import { PostMenu } from './PostMenu'
 import { UserService } from '../services/UserService'
+import { Comment } from '../models/Comment'
+import { CommentDisplay } from './CommentDisplay'
 
 export function PostDisplay ({ post, onDelete }: PostDisplayProps) {
   const { isSessionActive, user } = useUser()
   const { setVisibleModal, dictionary } = useSettings()
-  const [likes, setLikes] = useState<Like[]>([])
-  const [postUser, setPostUser] = useState<User>()
   const [hasUserLikedPost, setHasUserLikedPost] = useState<boolean>(false)
+  const [commentsOpened, setCommentsOpened] = useState<boolean>(true)
   const [isProcessing, setIsProcessing] = useState<boolean>(false)
-  const postDate: string = post.getDate()
+  const [postData, setPostData] = useState<{
+    user: User | null
+    likes: Like[] | null
+    comments: Comment[] | null
+    date: string | null
+  }>({
+    user: null,
+    likes: [],
+    comments: null,
+    date: post.getDate()
+  })
 
   const handleDelete = async () => {
     const deleted = await post.delete()
@@ -27,45 +38,66 @@ export function PostDisplay ({ post, onDelete }: PostDisplayProps) {
     }
   }
 
-  const handleLike = async () => {
-    if (isProcessing || !postUser) return
+  const handleCommentDelete = (commentId: number) => {
+    console.log(commentId)
+  }
+
+  const handleUpdatedLikes = useCallback(async () => {
+    const updatedLikes = await post.getLikes()
+
+    if (!updatedLikes.value) return
+
+    setPostData({ ...postData, likes: updatedLikes.value })
+    setHasUserLikedPost(!hasUserLikedPost)
+    setIsProcessing(false)
+  }, [hasUserLikedPost, post, postData])
+
+  const handleLike = useCallback(async () => {
+    if (isProcessing || !postData.user) return
 
     if (!isSessionActive()) {
-      setVisibleModal({
-        name: 'session'
-      })
+      setVisibleModal({ name: 'session' })
       return
     }
 
     setIsProcessing(true)
 
     if (hasUserLikedPost) {
-      await postUser.unlikePost({ postId: post.id })
+      await postData.user.unlikePost({ postId: post.id })
     } else {
-      await postUser.likePost({ postId: post.id })
+      await postData.user.likePost({ postId: post.id })
     }
 
     handleUpdatedLikes()
+  }, [
+    handleUpdatedLikes,
+    hasUserLikedPost,
+    isProcessing,
+    isSessionActive,
+    post.id,
+    postData.user,
+    setVisibleModal
+  ])
+
+  const handleOpenComments = () => {
+    setCommentsOpened(prevCommentsOpened => !prevCommentsOpened)
   }
 
-  const handleUpdatedLikes = async () => {
-    const updatedLikes = await post.getLikes()
+  const fetchPostData = useCallback(async () => {
+    const [newPostUser, newLikes, newComments] = await Promise.all([
+      UserService.getById({ userId: post.userId }),
+      post.getLikes(),
+      post.getComments()
+    ])
 
-    if (!updatedLikes.value) return
-
-    setLikes(updatedLikes.value)
-    setHasUserLikedPost(!hasUserLikedPost)
-    setIsProcessing(false)
-  }
-
-  const handlePostUser = useCallback(async () => {
-    const newPostUser = await UserService.getById({
-      userId: post.userId
-    })
+    setPostData(prev => ({
+      ...prev,
+      user: newPostUser.value ?? prev.user,
+      likes: newLikes.value ?? prev.likes,
+      comments: newComments.value ?? prev.comments
+    }))
 
     if (newPostUser.value) {
-      setPostUser(newPostUser.value)
-
       const newHasUserLikedPost = await newPostUser.value.hasLikedPost({
         postId: post.id
       })
@@ -74,59 +106,77 @@ export function PostDisplay ({ post, onDelete }: PostDisplayProps) {
         setHasUserLikedPost(newHasUserLikedPost.value)
       }
     }
-  }, [post.id, post.userId])
-
-  const handleNewLikes = useCallback(async () => {
-    const newLikes = await post.getLikes()
-
-    if (newLikes.value) {
-      setLikes(newLikes.value)
-    }
   }, [post])
 
-  const fetchData = useCallback(async () => {
-    handlePostUser()
-    handleNewLikes()
-  }, [handlePostUser, handleNewLikes])
-
   useEffect(() => {
-    fetchData()
-  }, [fetchData])
+    fetchPostData()
+  }, [fetchPostData])
 
   return (
-    <article className='w-[clamp(300px,100%,700px)] py-[10px] px-[20px] rounded-vibe border-vibe border-caribbean-current overflow-hidden'>
-      <header className='w-full h-[70px] grid grid-cols-[10fr,10fr,1fr] items-center'>
-        <div className='flex items-center gap-x-[10px]'>
-          <img className='rounded-full w-[50px] aspect-square bg-orange-crayola' />
-          {postUser ? <Username username={postUser.name} /> : <Loading />}
-        </div>
-        <span className='text-caribbean-current text-right font-poppins-light text-[clamp(5px,6vw,20px)]'>
-          {postDate}
-        </span>
-
-        {user?.isOwnerOf({ post }) && (
-          <div className='flex justify-end items-center'>
-            <PostMenu onDelete={handleDelete} />
+    <>
+      <article className='w-[clamp(300px,100%,700px)] py-[10px] px-[20px] rounded-vibe border-vibe border-caribbean-current overflow-hidden'>
+        <header className='w-full h-[70px] grid grid-cols-[10fr,10fr,1fr] items-center'>
+          <div className='flex items-center gap-x-[10px]'>
+            <img className='rounded-full w-[50px] aspect-square bg-orange-crayola' />
+            {postData.user ? (
+              <Username username={postData.user.name} />
+            ) : (
+              <Loading />
+            )}
           </div>
-        )}
-      </header>
-
-      <main className='w-full flex flex-col'>
-        <p className='break-words text-white text-[clamp(5px,6vw,20px)] font-poppins-regular'>
-          {post.content}
-        </p>
-      </main>
-
-      <footer>
-        <div className='flex items-center gap-x-[1%]'>
-          <button onClick={handleLike} disabled={isProcessing}>
-            <LikeIcon filled={hasUserLikedPost} />
-          </button>
-          <span className='text-verdigris font-poppins-semibold'>
-            {likes === null ? dictionary.loading : likes.length}
+          <span className='text-caribbean-current text-right font-poppins-light text-[clamp(5px,6vw,20px)]'>
+            {postData.date}
           </span>
-        </div>
-      </footer>
-    </article>
+
+          {user?.isOwnerOfPost({ post }) && (
+            <div className='flex justify-end items-center'>
+              <PostMenu onDelete={handleDelete} />
+            </div>
+          )}
+        </header>
+
+        <main className='w-full flex flex-col'>
+          <p className='break-words text-white text-[clamp(5px,6vw,20px)] font-poppins-regular'>
+            {post.content}
+          </p>
+        </main>
+
+        <footer className='flex items-center gap-x-[3%]'>
+          <div className='flex items-center gap-x-[5px]'>
+            <button onClick={handleLike} disabled={isProcessing}>
+              <LikeIcon filled={hasUserLikedPost} />
+            </button>
+            <span className='text-verdigris font-poppins-semibold'>
+              {postData.likes === null
+                ? dictionary.loading
+                : postData.likes.length}
+            </span>
+          </div>
+
+          <div className='flex items-center gap-x-[5px]'>
+            <button onClick={handleOpenComments} disabled={isProcessing}>
+              <CommentIcon filled={commentsOpened} />
+            </button>
+            <span className='text-verdigris font-poppins-semibold'>
+              {postData.comments === null
+                ? dictionary.loading
+                : postData.comments.length}
+            </span>
+          </div>
+        </footer>
+      </article>
+
+      {commentsOpened && (
+        <section className='w-[clamp(300px,100%,700px)] flex justify-center mt-[-15px]'>
+          {postData.comments?.map((comment, index) => (
+            <CommentDisplay
+              key={index}
+              onDelete={handleCommentDelete}
+              comment={comment}
+            />
+          ))}
+        </section>
+      )}
+    </>
   )
 }

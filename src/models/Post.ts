@@ -3,6 +3,9 @@ import { Like } from './Like'
 import { LikeService } from '../services/LikeService'
 import { Data } from './Data'
 import { fetchAPI } from '../utilities/fetchAPI'
+import { CommentEndpoint } from './CommentEndpoint'
+import { getAdaptedComment } from '../adapters/getAdaptedComment'
+import { Comment } from './Comment'
 
 export class Post {
   public id: number
@@ -43,12 +46,25 @@ export class Post {
     return formattedDate
   }
 
+  public async getComments (): Promise<Data<Comment[]>> {
+    const response = await fetchAPI<CommentEndpoint[]>({
+      url: `/comments/post/${this.id}`
+    })
+
+    if (!response.value) return Data.failure()
+
+    const comments = response.value.map(commentEndpoint =>
+      getAdaptedComment({ commentEndpoint })
+    )
+    return Data.success(comments)
+  }
+
   public async getLikes (): Promise<Data<Like[]>> {
-    const likes = await LikeService.getAll()
+    const likes = await LikeService.getAllOfPost({ postId: this.id })
 
     if (!likes.value) return Data.failure()
 
-    const postLikes = likes.value.filter(like => like.postId === this.id)
+    const postLikes = likes.value.filter(like => like.targetId === this.id)
 
     return Data.success(postLikes)
   }

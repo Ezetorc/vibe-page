@@ -8,7 +8,8 @@ export function getAdaptedLike ({
 }): Like {
   return new Like({
     id: likeEndpoint.id,
-    postId: likeEndpoint.post_id,
+    type: likeEndpoint.type as 'post' | 'comment',
+    targetId: likeEndpoint.target_id,
     userId: likeEndpoint.user_id
   })
 }

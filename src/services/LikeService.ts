@@ -5,10 +5,9 @@ import { LikeEndpoint } from '../models/LikeEndpoint'
 import { fetchAPI } from '../utilities/fetchAPI'
 
 export class LikeService {
-  static async getAll (): Promise<Data<Like[]>> {
+  static async getAllOfPost ({ postId }: { postId: number }): Promise<Data<Like[]>> {
     const response = await fetchAPI<LikeEndpoint[]>({
-      url: `/likes`,
-      credentials: 'include'
+      url: `/likes/posts/id/${postId}`
     })
 
     if (!response.value) return Data.failure()
@@ -23,11 +22,7 @@ export class LikeService {
   static async delete ({ likeId }: { likeId: number }): Promise<Data<boolean>> {
     const response = await fetchAPI({
       url: `/likes/id/${likeId}`,
-      method: 'DELETE',
-      credentials: 'include',
-      headers: {
-        'Content-Type': 'application/json'
-      }
+      method: 'DELETE'
     })
 
     if (!response.value) return Data.failure()
@@ -37,20 +32,19 @@ export class LikeService {
 
   static async create ({
     userId,
-    postId
+    targetId,
+    type
   }: {
     userId: number
-    postId: number
+    targetId: number
+    type: 'post' | 'comment'
   }): Promise<Data<boolean>> {
-    const response = await fetchAPI({
+    const response = await fetchAPI<boolean>({
       url: `/likes`,
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      credentials: 'include',
       body: JSON.stringify({
-        post_id: postId,
+        target_id: targetId,
+        type: type,
         user_id: userId
       })
     })
