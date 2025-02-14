@@ -1,8 +1,8 @@
+import { Data } from 'api-responser'
 import { getAdaptedUser } from '../adapters/getAdaptedUser'
-import { Data } from '../models/Data'
 import { User } from '../models/User'
 import { UserEndpoint } from '../models/UserEndpoint'
-import { fetchAPI } from '../utilities/fetchAPI'
+import { api } from '../constants/SETTINGS'
 
 export class UserService {
   static async getByUsername ({
@@ -10,8 +10,8 @@ export class UserService {
   }: {
     username: string
   }): Promise<Data<User>> {
-    const response = await fetchAPI<UserEndpoint>({
-      url: `/users/username/${username}`
+    const response = await api.get<UserEndpoint>({
+      endpoint: `users/username/${username}`
     })
 
     if (!response.value) return Data.failure()
@@ -22,8 +22,8 @@ export class UserService {
   }
 
   static async getById ({ userId }: { userId: number }): Promise<Data<User>> {
-    const response = await fetchAPI<UserEndpoint>({
-      url: `/users/id/${userId}`
+    const response = await api.get<UserEndpoint>({
+      endpoint: `users/id/${userId}`
     })
 
     if (!response.value) return Data.failure()
@@ -42,12 +42,9 @@ export class UserService {
     email: string
     password: string
   }): Promise<Data<boolean>> {
-    const response = await fetchAPI<boolean>({
-      url: `/users/register`,
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name, email, password }),
-      credentials: 'include'
+    const response = await api.post<boolean>({
+      endpoint: `users/register`,
+      body: JSON.stringify({ name, email, password })
     })
 
     if (!response.value) return Data.failure()
@@ -62,12 +59,9 @@ export class UserService {
     name: string
     password: string
   }): Promise<Data<boolean>> {
-    const response = await fetchAPI<boolean>({
-      url: `/users/login`,
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name, password }),
-      credentials: 'include'
+    const response = await api.post<boolean>({
+      endpoint: `users/login`,
+      body: JSON.stringify({ name, password })
     })
 
     if (!response.value) return Data.failure()
@@ -76,11 +70,7 @@ export class UserService {
   }
 
   static async logout (): Promise<Data<boolean>> {
-    const response = await fetchAPI<boolean>({
-      url: `/logout`,
-      method: 'POST',
-      credentials: 'include'
-    })
+    const response = await api.post<boolean>({ endpoint: `logout` })
 
     if (!response.value) return Data.failure()
 
@@ -88,10 +78,7 @@ export class UserService {
   }
 
   static async getAll (): Promise<Data<User[]>> {
-    const response = await fetchAPI<UserEndpoint[]>({
-      url: `/users`,
-      credentials: 'include'
-    })
+    const response = await api.get<UserEndpoint[]>({ endpoint: `users` })
 
     if (!response.value) return Data.failure()
 
@@ -107,9 +94,8 @@ export class UserService {
   }: {
     email: string
   }): Promise<Data<boolean>> {
-    const response = await fetchAPI({
-      url: `/users/emailExists/${encodeURIComponent(email)}`,
-      credentials: 'include'
+    const response = await api.get({
+      endpoint: `users/emailExists/${encodeURIComponent(email)}`
     })
 
     if (!response.value) return Data.failure()
@@ -118,9 +104,8 @@ export class UserService {
   }
 
   static async search ({ query }: { query: string }): Promise<Data<User[]>> {
-    const response = await fetchAPI<UserEndpoint[]>({
-      url: `/users/search/${encodeURIComponent(query)}`,
-      credentials: 'include'
+    const response = await api.get<UserEndpoint[]>({
+      endpoint: `users/search/${encodeURIComponent(query)}`
     })
 
     if (!response.value) return Data.failure()

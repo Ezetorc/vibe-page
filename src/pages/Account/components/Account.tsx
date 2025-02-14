@@ -17,7 +17,7 @@ export default function Account () {
   if (!account) return <Loading />
 
   const handlePostDelete = (postId: number) => {
-    const newPosts= posts.filter(post => post.id !== postId)
+    const newPosts = posts.filter(post => post.id !== postId)
 
     setPosts(newPosts)
   }

@@ -1,8 +1,8 @@
+import { API } from 'api-responser'
 import { Language } from './Language'
 
 export interface Settings {
-  api: string
+  api: API
   languages: { [key in Language]: string }
-  apiAbortSeconds: number
   defaultLanguage: Language
 }

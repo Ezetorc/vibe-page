@@ -16,7 +16,7 @@ export function PostDisplay ({ post, onDelete }: PostDisplayProps) {
   const { isSessionActive, user } = useUser()
   const { setVisibleModal, dictionary } = useSettings()
   const [hasUserLikedPost, setHasUserLikedPost] = useState<boolean>(false)
-  const [commentsOpened, setCommentsOpened] = useState<boolean>(true)
+  const [commentsOpened, setCommentsOpened] = useState<boolean>(false)
   const [isProcessing, setIsProcessing] = useState<boolean>(false)
   const [postData, setPostData] = useState<{
     user: User | null
@@ -38,8 +38,27 @@ export function PostDisplay ({ post, onDelete }: PostDisplayProps) {
     }
   }
 
-  const handleCommentDelete = (commentId: number) => {
-    console.log(commentId)
+  const handleCommentDelete = async (commentId: number) => {
+    if (!postData.comments) return
+
+    const commentToDelete = postData.comments.find(
+      comment => comment.id === commentId
+    )
+
+    if (!commentToDelete) return
+
+    const deleted = await commentToDelete.delete()
+
+    if (deleted.success) {
+      const newPostComments = postData.comments.filter(
+        comment => comment.id !== commentToDelete.id
+      )
+
+      setPostData(prevPostData => ({
+        ...prevPostData,
+        comments: newPostComments
+      }))
+    }
   }
 
   const handleUpdatedLikes = useCallback(async () => {
@@ -80,7 +99,9 @@ export function PostDisplay ({ post, onDelete }: PostDisplayProps) {
   ])
 
   const handleOpenComments = () => {
-    setCommentsOpened(prevCommentsOpened => !prevCommentsOpened)
+    if (postData.comments!.length > 0) {
+      setCommentsOpened(prevCommentsOpened => !prevCommentsOpened)
+    }
   }
 
   const fetchPostData = useCallback(async () => {
@@ -143,7 +164,11 @@ export function PostDisplay ({ post, onDelete }: PostDisplayProps) {
 
         <footer className='flex items-center gap-x-[3%]'>
           <div className='flex items-center gap-x-[5px]'>
-            <button onClick={handleLike} disabled={isProcessing}>
+            <button
+              className='cursor-pointer'
+              onClick={handleLike}
+              disabled={isProcessing}
+            >
               <LikeIcon filled={hasUserLikedPost} />
             </button>
             <span className='text-verdigris font-poppins-semibold'>
@@ -154,7 +179,11 @@ export function PostDisplay ({ post, onDelete }: PostDisplayProps) {
           </div>
 
           <div className='flex items-center gap-x-[5px]'>
-            <button onClick={handleOpenComments} disabled={isProcessing}>
+            <button
+              className='cursor-pointer'
+              onClick={handleOpenComments}
+              disabled={isProcessing}
+            >
               <CommentIcon filled={commentsOpened} />
             </button>
             <span className='text-verdigris font-poppins-semibold'>

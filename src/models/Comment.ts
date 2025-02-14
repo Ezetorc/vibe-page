@@ -1,9 +1,10 @@
 import { format } from '@formkit/tempo'
 import { Like } from './Like'
-import { Data } from './Data'
-import { fetchAPI } from '../utilities/fetchAPI'
 import { LikeEndpoint } from './LikeEndpoint'
 import { getAdaptedLike } from '../adapters/getAdaptedLike'
+import { api } from '../constants/settings'
+import { Data } from 'api-responser'
+import { LikeService } from '../services/LikeService'
 
 export class Comment {
   constructor ({
@@ -38,19 +39,30 @@ export class Comment {
 
     return formattedDate
   }
-
+  
   public async delete (): Promise<Data<boolean>> {
-    const response = await fetchAPI<boolean>({
-      url: `/comments/id/${this.id}`,
-      method: 'DELETE'
+    const response = await api.delete<boolean>({
+      endpoint: `comments/id/${this.id}`
     })
+
+    if (!response.success) return Data.failure()
+
+    const commentLikes = await LikeService.getAllOfComment({
+      commentId: this.id
+    })
+
+    if (!commentLikes.value) return Data.failure()
+
+    const likesIds = commentLikes.value.map(commentLike => commentLike.id)
+
+    await Promise.all(likesIds.map(likeId => LikeService.delete({ likeId })))
 
     return response
   }
 
   public async getLikes (): Promise<Data<Like[]>> {
-    const response = await fetchAPI<LikeEndpoint[]>({
-      url: `/likes/comments/id/${this.id}`
+    const response = await api.get<LikeEndpoint[]>({
+      endpoint: `likes/comments/id/${this.id}`
     })
 
     if (!response.value) return Data.failure()

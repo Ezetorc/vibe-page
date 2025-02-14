@@ -4,10 +4,10 @@ import { FollowerService } from '../services/FollowerService'
 import { PostService } from '../services/PostService'
 import { LikeService } from '../services/LikeService'
 import { UserService } from '../services/UserService'
-import { Data } from './Data'
-import { fetchAPI } from '../utilities/fetchAPI'
 import { CommentService } from '../services/CommentService'
 import { Comment } from './Comment'
+import { Data } from 'api-responser'
+import { api } from '../constants/SETTINGS'
 
 export class User {
   public id: number
@@ -44,7 +44,7 @@ export class User {
     this.createdAt = createdAt
   }
 
-  public isOwnerOfPost({ post }: { post: Post }) {
+  public isOwnerOfPost ({ post }: { post: Post }) {
     return this.id === post.userId
   }
 
@@ -86,8 +86,6 @@ export class User {
 
     return following
   }
-
-  
 
   public async hasLikedPost ({
     postId
@@ -141,13 +139,8 @@ export class User {
   }: {
     newName: string
   }): Promise<Data<boolean>> {
-    const response = await fetchAPI({
-      url: `/users/id/${this.id}`,
-      method: 'PATCH',
-      credentials: 'include',
-      headers: {
-        'Content-Type': 'application/json'
-      },
+    const response = await api.patch({
+      endpoint: `users/id/${this.id}`,
       body: JSON.stringify({ name: newName })
     })
 
@@ -162,13 +155,8 @@ export class User {
   }: {
     newPassword: string
   }): Promise<Data<boolean>> {
-    const response = await fetchAPI({
-      url: `/users/id/${this.id}`,
-      method: 'PATCH',
-      credentials: 'include',
-      headers: {
-        'Content-Type': 'application/json'
-      },
+    const response = await api.patch({
+      endpoint: `users/id/${this.id}`,
       body: JSON.stringify({ password: newPassword })
     })
 
@@ -183,13 +171,8 @@ export class User {
   }: {
     newDescription: string
   }): Promise<Data<boolean>> {
-    const response = await fetchAPI({
-      url: `/users/id/${this.id}`,
-      method: 'PATCH',
-      credentials: 'include',
-      headers: {
-        'Content-Type': 'application/json'
-      },
+    const response = await api.patch({
+      endpoint: `users/id/${this.id}`,
       body: JSON.stringify({ description: newDescription })
     })
 
@@ -216,12 +199,8 @@ export class User {
   }: {
     newEmail: string
   }): Promise<Data<boolean>> {
-    const response = await fetchAPI({
-      url: `/users/id/${this.id}`,
-      method: 'PATCH',
-      headers: {
-        'Content-Type': 'application/json'
-      },
+    const response = await api.patch({
+      endpoint: `users/id/${this.id}`,
       body: JSON.stringify({ email: newEmail })
     })
 

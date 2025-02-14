@@ -1,11 +1,11 @@
 import { format } from '@formkit/tempo'
 import { Like } from './Like'
 import { LikeService } from '../services/LikeService'
-import { Data } from './Data'
-import { fetchAPI } from '../utilities/fetchAPI'
 import { CommentEndpoint } from './CommentEndpoint'
 import { getAdaptedComment } from '../adapters/getAdaptedComment'
 import { Comment } from './Comment'
+import { Data } from 'api-responser'
+import { api } from '../constants/settings'
 
 export class Post {
   public id: number
@@ -31,10 +31,21 @@ export class Post {
   }
 
   public async delete (): Promise<Data<boolean>> {
-    const response = await fetchAPI<boolean>({
-      url: `/posts/id/${this.id}`,
-      method: 'DELETE'
+    const response = await api.delete<boolean>({
+      endpoint: `posts/id/${this.id}`
     })
+
+    if (!response.success) return Data.failure()
+
+    const postLikes = await LikeService.getAllOfPost({
+      postId: this.id
+    })
+
+    if (!postLikes.value) return Data.failure()
+
+    const likesIds = postLikes.value.map(postLike => postLike.id)
+
+    await Promise.all(likesIds.map(likeId => LikeService.delete({ likeId })))
 
     return response
   }
@@ -47,8 +58,8 @@ export class Post {
   }
 
   public async getComments (): Promise<Data<Comment[]>> {
-    const response = await fetchAPI<CommentEndpoint[]>({
-      url: `/comments/post/${this.id}`
+    const response = await api.get<CommentEndpoint[]>({
+      endpoint: `comments/post/${this.id}`
     })
 
     if (!response.value) return Data.failure()

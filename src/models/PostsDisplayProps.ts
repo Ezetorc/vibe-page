@@ -1,6 +1,6 @@
-import { Post } from "./Post"
+import { Post } from './Post'
 
 export interface PostsDisplayProps {
-    posts: Post[] | null
-    onPostDelete: (postId: number) => void
+  posts: Post[] | null
+  onPostDelete: (postId: number) => void
 }

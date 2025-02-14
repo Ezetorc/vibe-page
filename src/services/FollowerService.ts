@@ -1,9 +1,8 @@
+import { Data } from 'api-responser'
 import { getAdaptedFollower } from '../adapters/getAdaptedFollower'
-import { api } from '../constants/settings'
-import { Data } from '../models/Data'
 import { Follower } from '../models/Follower'
 import { FollowerEndpoint } from '../models/FollowerEndpoint'
-import { fetchAPI } from '../utilities/fetchAPI'
+import { api } from '../constants/SETTINGS'
 
 export class FollowerService {
   static async create ({
@@ -13,10 +12,8 @@ export class FollowerService {
     followerId: number
     followingId: number
   }): Promise<Data<boolean>> {
-    const response = await fetchAPI({
-      url: `/followers`,
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+    const response = await api.post({
+      endpoint: `followers`,
       body: JSON.stringify({
         follower_id: followerId,
         following_id: followingId
@@ -35,10 +32,8 @@ export class FollowerService {
     followerId: number
     followingId: number
   }): Promise<Data<boolean>> {
-    const response = await fetchAPI({
-      url: `${api}/followers`,
-      method: 'DELETE',
-      headers: { 'Content-Type': 'application/json' },
+    const response = await api.delete({
+      endpoint: `followers`,
       body: JSON.stringify({
         follower_id: followerId,
         following_id: followingId
@@ -57,9 +52,7 @@ export class FollowerService {
     followerId: number
     followingId: number
   }): Promise<Data<boolean>> {
-    const response = await fetchAPI<FollowerEndpoint[]>({
-      url: `/followers`
-    })
+    const response = await api.get<FollowerEndpoint[]>({ endpoint: `followers` })
 
     if (!response.value) return Data.failure()
 
@@ -81,9 +74,7 @@ export class FollowerService {
   }: {
     userId: number
   }): Promise<Data<number[]>> {
-    const response = await fetchAPI<number[]>({
-      url: `/followers/user/${userId}`
-    })
+    const response = await api.get<number[]>({ endpoint: `followers/user/${userId}` })
 
     if (!response.value) return Data.failure()
 
