@@ -10,7 +10,7 @@ export function PostOwner () {
       {user ? (
         <header className='w-full h-full flex items-center gap-x-[10px] my-[20px]'>
           <img className='rounded-full w-[50px] aspect-square bg-orange-crayola' />
-          <Username username={user.name} />
+          <Username>{user.name}</Username>
         </header>
       ) : (
         <Loading />

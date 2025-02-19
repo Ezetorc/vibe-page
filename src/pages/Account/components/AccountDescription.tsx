@@ -1,4 +1,4 @@
-import { EditButton } from '../../../components/EditButton'
+import { EditButton } from './EditButton'
 import { CheckIcon, PencilIcon } from '../../../components/Icons'
 import { Loading } from '../../../components/Loading'
 import { useSettings } from '../../../hooks/useSettings'
@@ -50,7 +50,7 @@ export function AccountDescription () {
               <PencilIcon />
             </EditButton>
           )}
-          <p className='h-[160px] w-[90%] text-white text-[clamp(5px,6vw,20px)] font-poppins-regular break-words whitespace-pre-wrap overflow-hidden overflow-wrap-anywhere'>
+          <p className='h-[clamp(160px,auto,320px)] w-[90%] text-white text-[clamp(5px,6vw,20px)] font-poppins-regular break-words whitespace-pre-wrap overflow-hidden overflow-wrap-anywhere'>
             {account.description || (
               <span className='text-caribbean-current'>
                 {accountIsUser

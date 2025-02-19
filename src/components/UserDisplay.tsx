@@ -1,34 +1,44 @@
-import { User } from '../models/User'
+import { useMemo } from 'react'
 import { useSettings } from '../hooks/useSettings'
+import { useUser } from '../hooks/useUser'
+import { FollowButton } from '../pages/Account/components/FollowButton'
 import { Username } from './Username'
-import { Loading } from './Loading'
+import { UserDisplayProps } from '../models/Props/UserDisplayProps'
 
-export function UserDisplay ({ user }: { user: User }) {
+export function UserDisplay (props: UserDisplayProps) {
   const { dictionary } = useSettings()
-  const userDate = user.getDate()
+  const { user } = useUser()
+  const accountIsUser = useMemo(
+    () => user?.id === props.user.id,
+    [user, props.user]
+  )
 
   return (
-    <article className='flex flex-col w-[clamp(300px,100%,700px)] h-[clamp(300px,auto,400px)] p-[20px] rounded-vibe border-vibe border-caribbean-current overflow-hidden'>
-      <div className='gap-x-[20px] grid h-full grid-cols-[1fr_2fr] grid-rows-[1fr_1fr]'>
+    <article className='gap-y-[10px] flex flex-col justify-center w-[clamp(300px,100%,700px)] h-[clamp(300px,auto,400px)] p-[20px] rounded-vibe border-vibe border-caribbean-current overflow-hidden'>
+      <div className='gap-x-[20px] justify-center grid grid-cols-[1fr_2fr] grid-rows-[1fr_1fr]'>
         <img className='self-center mb-[10px] justify-self-end row-[span_2] rounded-full w-[clamp(70px,50%,90px)] aspect-square bg-orange-crayola' />
 
-        {user ? <Username username={user.name} /> : <Loading />}
+        <div className='flex items-end'>
+          <Username>{props.user.name}</Username>
+        </div>
 
-        <span className='text-caribbean-current font-poppins-light content-start text-[clamp(10px,4vw,20px)]'>
-          {`${dictionary.joined} ${userDate}`}
+        <span className='text-caribbean-current font-poppins-light text-[clamp(10px,4vw,20px)]'>
+          {`${dictionary.joined} ${props.user.getDate()}`}
         </span>
       </div>
 
-      <div className='flex h-full flex-col'>
-        {user.description ? (
-          <p className='break-words text-white text-[clamp(5px,6vw,20px)] font-poppins-regular'>
-            {user.description}
-          </p>
-        ) : (
-          <p className='break-words text-verdigris text-[clamp(5px,6vw,20px)] font-poppins-regular'>
-            {dictionary.thisUserHasnotDescription}
-          </p>
+      <p className='h-[clamp(50px,auto,160px)] w-full text-white text-[clamp(5px,6vw,20px)] font-poppins-regular break-words whitespace-pre-wrap overflow-hidden overflow-wrap-anywhere'>
+        {props.user.description || (
+          <span className='text-caribbean-current'>
+            {accountIsUser
+              ? dictionary.youDontHaveDescription
+              : dictionary.thisUserHasnotDescription}
+          </span>
         )}
+      </p>
+
+      <div className='flex gap-x-[20px]'>
+        {!accountIsUser && <FollowButton user={props.user} />}
       </div>
     </article>
   )

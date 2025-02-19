@@ -8,7 +8,12 @@
 
   --border-width-vibe: 2px;
 
-  --padding-nav: 80px;
+  --padding-nav: 100px;
+  
+
+  --breakpoint-*: initial;
+  --breakpoint-mobile: 320px;
+  --breakpoint-desktop: 720px;
 
   --radius-vibe: 5px;
 

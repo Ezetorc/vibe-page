@@ -14,10 +14,6 @@ export function ChangeEmailModal () {
 
   const newEmailRef = useRef<HTMLInputElement>(null)
 
-  const handleClose = () => {
-    setVisibleModal({ name: null })
-  }
-
   const handleChangeEmail = async () => {
     const newEmail: string | undefined = newEmailRef.current?.value
     const isNewEmailValid: boolean = await validateEmail({ email: newEmail })
@@ -27,7 +23,7 @@ export function ChangeEmailModal () {
     const emailChange = await user.changeEmail({ newEmail })
 
     if (emailChange.success) {
-      handleClose()
+      setVisibleModal({ name: null })
     } else {
       setVisibleModal({ name: 'connection' })
     }
@@ -36,7 +32,7 @@ export function ChangeEmailModal () {
   return (
     <Modal>
       <article className='items-center p-[clamp(10px,5%,20px)] relative gap-y-[clamp(20px,50%,40px)] flex flex-col rounded-vibe bg-caribbean-current w-[clamp(300px,70%,1000px)] h-[clamp(200px,auto,600px)]'>
-        <CloseModalButton onClose={handleClose} />
+        <CloseModalButton />
 
         <h2 className='text-center font-poppins-semibold text-[clamp(20px,7vw,60px)] bg-clip-text text-transparent bg-orange-gradient'>
           {dictionary.change} {dictionary.email}

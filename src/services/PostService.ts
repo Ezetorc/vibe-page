@@ -1,8 +1,8 @@
 import { Data } from 'api-responser'
 import { getAdaptedPost } from '../adapters/getAdaptedPost'
-import { api } from '../constants/SETTINGS'
 import { Post } from '../models/Post'
 import { PostEndpoint } from '../models/PostEndpoint'
+import { api } from '../constants/settings'
 
 export class PostService {
   static async create ({

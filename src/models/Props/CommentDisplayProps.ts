@@ -1,4 +1,4 @@
-import { Comment } from './Comment'
+import { Comment } from '../Comment'
 
 export interface CommentDisplayProps {
   comment: Comment

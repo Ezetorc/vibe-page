@@ -4,7 +4,7 @@ import { useSettings } from '../../../hooks/useSettings'
 import { FollowButtonProps } from '../models/FollowButtonProps'
 import { useUser } from '../../../hooks/useUser'
 
-export function FollowButton ({ account }: FollowButtonProps) {
+export function FollowButton (props: FollowButtonProps) {
   const { dictionary, setVisibleModal } = useSettings()
   const { user } = useUser()
   const [isFollowing, setIsFollowing] = useState<boolean>(false)
@@ -16,16 +16,16 @@ export function FollowButton ({ account }: FollowButtonProps) {
     }
 
     const following = await user.isFollowing({
-      userId: account.id
+      userId: props.user.id
     })
 
-    if (!following.value) {
+    if (!following.success) {
       setVisibleModal({ name: 'connection' })
       return
     }
 
-    setIsFollowing(following.value)
-  }, [account.id, user, setVisibleModal])
+    setIsFollowing(following.value as boolean)
+  }, [props.user.id, user, setVisibleModal])
 
   const handleFollow = async () => {
     if (!user) {
@@ -34,10 +34,10 @@ export function FollowButton ({ account }: FollowButtonProps) {
     }
 
     if (!isFollowing) {
-      await user.follow({ userId: account.id })
+      await user.follow({ userId: props.user.id })
       setIsFollowing(true)
     } else {
-      await user.unfollow({ userId: account.id })
+      await user.unfollow({ userId: props.user.id })
       setIsFollowing(false)
     }
   }

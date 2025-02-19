@@ -1,12 +1,18 @@
 import { UserService } from './../services/UserService'
 import { useState } from 'react'
 import { useSettings } from './useSettings'
+import { useUser } from './useUser'
 
 export function useValidation () {
   const { dictionary } = useSettings()
+  const { user } = useUser()
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
 
-  const validateName = ({ name }: { name: string | undefined | null }) => {
+  const validateName = async ({
+    name
+  }: {
+    name: string | undefined | null
+  }) => {
     if (!name) {
       setErrorMessage(dictionary.emptyNameError)
       return false
@@ -14,6 +20,13 @@ export function useValidation () {
 
     if (name.length > 20 || name.length < 3) {
       setErrorMessage(dictionary.nameLengthError)
+      return false
+    }
+
+    const nameExists = await UserService.nameAlreadyExists({ name })
+
+    if (nameExists.value === true && user?.name !== name) {
+      setErrorMessage(dictionary.nameInUse)
       return false
     }
 
@@ -142,6 +155,21 @@ export function useValidation () {
     return true
   }
 
+  const validateComment = ({ comment }: { comment: string }) => {
+    if (comment.length === 0) {
+      setErrorMessage(dictionary.emptyPostError)
+      return false
+    }
+
+    if (comment.length > 200) {
+      setErrorMessage(dictionary.commentLengthError)
+      return false
+    }
+
+    setErrorMessage(null)
+    return true
+  }
+
   return {
     errorMessage,
     setErrorMessage,
@@ -151,6 +179,7 @@ export function useValidation () {
     validateAgreeWithTerms,
     validatePassword,
     validatePost,
-    validateDescription
+    validateDescription,
+    validateComment
   }
 }

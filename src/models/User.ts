@@ -7,7 +7,7 @@ import { UserService } from '../services/UserService'
 import { CommentService } from '../services/CommentService'
 import { Comment } from './Comment'
 import { Data } from 'api-responser'
-import { api } from '../constants/SETTINGS'
+import { api } from '../constants/settings'
 
 export class User {
   public id: number
@@ -132,6 +132,20 @@ export class User {
     const formattedDate: string = format(parsedDate, 'DD/MM/YYYY')
 
     return formattedDate
+  }
+
+  public async share ({
+    title,
+    text
+  }: {
+    title: string
+    text: string
+  }): Promise<void> {
+    await navigator.share({
+      title,
+      text,
+      url: `http://localhost:8888/#/account/${this.name}`
+    })
   }
 
   public async changeName ({

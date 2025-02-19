@@ -1,4 +1,4 @@
-import { EditButton } from '../../../components/EditButton'
+import { EditButton } from './EditButton'
 import { CheckIcon, PencilIcon } from '../../../components/Icons'
 import { Loading } from '../../../components/Loading'
 import { useSettings } from '../../../hooks/useSettings'
@@ -7,12 +7,12 @@ import { useAccount } from '../hooks/useAccount'
 export function AccountName () {
   const { dictionary } = useSettings()
   const { account, editState, setEditState, handleEdit, accountIsUser } =
-    useAccount()
+    useAccount() 
 
   if (!account) return <Loading />
 
   return (
-    <div className='flex items-end'>
+    <div className='flex w-full justify-center'>
       {editState.field === 'name' ? (
         <>
           <EditButton onEdit={handleEdit}>
@@ -21,7 +21,7 @@ export function AccountName () {
           <input
             minLength={3}
             maxLength={20}
-            className='text-orange-crayola bg-transparent outline-hidden font-poppins-regular text-[clamp(20px,7vw,25px)]'
+            className='text-orange-crayola text-center w-full bg-transparent outline-hidden font-poppins-regular text-[clamp(15px,5.5vw,35px)]'
             onChange={event =>
               setEditState({
                 field: 'name',
@@ -42,7 +42,7 @@ export function AccountName () {
               <PencilIcon />
             </EditButton>
           )}
-          <h2 className='text-orange-crayola bg-transparent font-poppins-regular text-[clamp(20px,7vw,25px)]'>
+          <h2 className='text-orange-crayola w-full text-center bg-transparent font-poppins-regular text-[clamp(15px,5.5vw,35px)]'>
             {account.name || dictionary.loading}
           </h2>
         </>

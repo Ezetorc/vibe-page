@@ -1,8 +1,10 @@
+import { LikeType } from "./LikeType"
+
 export class Like {
   public id: number
   public targetId: number
   public userId: number
-  public type: 'post' | 'comment'
+  public type: LikeType
 
   constructor ({
     id,
@@ -13,7 +15,7 @@ export class Like {
     id: number
     targetId: number
     userId: number
-    type: 'post' | 'comment'
+    type: LikeType
   }) {
     this.id = id
     this.type = type

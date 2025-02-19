@@ -2,7 +2,7 @@ import { Data } from 'api-responser'
 import { getAdaptedUser } from '../adapters/getAdaptedUser'
 import { User } from '../models/User'
 import { UserEndpoint } from '../models/UserEndpoint'
-import { api } from '../constants/SETTINGS'
+import { api } from '../constants/settings'
 
 export class UserService {
   static async getByUsername ({
@@ -96,6 +96,20 @@ export class UserService {
   }): Promise<Data<boolean>> {
     const response = await api.get({
       endpoint: `users/emailExists/${encodeURIComponent(email)}`
+    })
+
+    if (!response.value) return Data.failure()
+
+    return Data.success(true)
+  }
+
+  static async nameAlreadyExists ({
+    name
+  }: {
+    name: string
+  }): Promise<Data<boolean>> {
+    const response = await api.get<boolean>({
+      endpoint: `users/nameExists/${name}`
     })
 
     if (!response.value) return Data.failure()

@@ -5,3 +5,4 @@ export type ModalName =
   | 'edit'
   | 'connection'
   | 'password'
+  | 'comment'

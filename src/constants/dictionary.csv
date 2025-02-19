@@ -5,11 +5,16 @@ search,Buscar,Search
 posts,Publicaciones,Posts
 users,Usuarios,Users
 post,Publicar,Post
+comment,Comentar,Comment
 searchMyPosts,Buscar mis publicaciones...,Search my posts...
 account,Cuenta,Account
 display,Visualización,Display
+youJoined,Te uniste el,You joined
 password,Contraseña,Password
+nameInUse,"Nombre de usuario en uso, elige otro","Name in use, try other"
 language,Idioma,Language
+followMe,Seguime en Vibe,Follow me on Vibe
+findMeInVibe,Encontráme en Vibe haciendo click en el link!,Find me in Vibe by clicking the link!
 email,Email,Email
 errorDuringAccountEditing,Error mientras se editaba la cuenta,Error during account editing
 loading,Cargando,Loading
@@ -32,6 +37,8 @@ confirmPassword,Confirmá tu contraseña,Confirm password
 passwordsDontMatch,Tus contraseñas no coinciden,Passwords don't match
 youMustAgreeWithTerms,Debes estar de acuerdo con los términos,You must agree with the terms
 emptyPostError,Tu publicación está vacía,Post is empty
+emptyCommentError,Tu comentario está vacío,Comment is empty
+commentLengthError,Tu comentario no puede tener más de 200 caracteres,Comment can't have more than 200 characters
 postLengthError,Tu publicación no puede tener más de 200 caracteres,Post can't have more than 200 characters
 youDontHaveDescription,No tienes descripción,You don't have description
 myNewDescription,Mi nueva descripción...,My new description...

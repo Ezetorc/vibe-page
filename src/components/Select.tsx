@@ -1,13 +1,13 @@
-import { SelectProps } from '../models/SelectProps'
+import { SelectProps } from '../models/Props/SelectProps'
 
-export function Select ({ onInput, children, defaultValue }: SelectProps) {
+export function Select (props: SelectProps) {
   return (
     <select
-      onInput={onInput}
-      defaultValue={defaultValue}
+      onInput={props.onInput}
+      defaultValue={props.defaultValue}
       className='cursor-pointer text-center hover:bg-white hover:text-orange-crayola w-full h-[50px] bg-orange-crayola font-poppins-regular rounded-vibe'
     >
-      {children}
+      {props.children}
     </select>
   )
 }

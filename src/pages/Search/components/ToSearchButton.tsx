@@ -1,22 +1,22 @@
 import clsx from "clsx";
 import { ToSearchButtonProps } from "../models/ToSearchButtonProps";
 
-export function ToSearchButton ({ text, toSearch, type, onClick}: ToSearchButtonProps) {
+export function ToSearchButton (props: ToSearchButtonProps) {
 
 
   return (
     <button
       className={`${clsx([
         {
-          'border-b-orange-crayola text-orange-crayola': toSearch === type
+          'border-b-orange-crayola text-orange-crayola': props.toSearch === props.type
         },
         {
-          'border-b-caribbean-current text-verdigris': toSearch !== type
+          'border-b-caribbean-current text-verdigris': props.toSearch !== props.type
         }
-      ])} font-poppins-semibold border-b-vibe `}
-      onClick={onClick}
+      ])} font-poppins-semibold border-b-vibe cursor-pointer`}
+      onClick={props.onClick}
     >
-      {text}
+      {props.text}
     </button>
   )
 }

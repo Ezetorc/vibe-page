@@ -23,7 +23,7 @@ export default function Login () {
     const password = passwordInputRef.current?.value
 
     const isFormValid: boolean =
-      validateName({ name }) && validatePassword({ password })
+      (await validateName({ name })) && validatePassword({ password })
 
     if (isFormValid && name && password) {
       const logSuccesfull = await UserService.login({ name, password })

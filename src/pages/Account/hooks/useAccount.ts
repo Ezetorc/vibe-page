@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { useParams } from 'react-router'
+import { useNavigate, useParams } from 'react-router'
 import { useUser } from '../../../hooks/useUser'
 import { useValidation } from '../../../hooks/useValidation'
 import { User } from '../../../models/User'
@@ -11,6 +11,7 @@ import { useSettings } from '../../../hooks/useSettings'
 export function useAccount () {
   const { username } = useParams<{ username: string }>()
   const { setVisibleModal, dictionary } = useSettings()
+  const navigate = useNavigate()
   const { errorMessage, validateName, validateDescription } = useValidation()
   const { updateUser, user } = useUser()
   const [account, setAccount] = useState<User | null>(null)
@@ -34,33 +35,71 @@ export function useAccount () {
     }
   }, [user, username])
 
-  const handleEdit = async () => {
-    if (!account || !editState.field) return
+  const handleChangeName = async () => {
+    if (!account) return
 
-    const isValid =
-      editState.field === 'name'
-        ? validateName({ name: editState.value })
-        : validateDescription({ description: editState.value })
+    const isNewNameValid = await validateName({ name: editState.value })
 
-    if (!isValid) {
-      return setVisibleModal({
+    if (!isNewNameValid) {
+      setVisibleModal({
         name: 'edit',
-        message:
-          errorMessage ||
-          dictionary[
-            `errorDuring${
-              editState.field === 'name' ? 'Name' : 'Description'
-            }Change`
-          ]
+        message: errorMessage || dictionary[`errorDuringNameChange`]
       })
+      return
     }
 
-    await (editState.field === 'name'
-      ? account.changeName({ newName: editState.value })
-      : account.changeDescription({ newDescription: editState.value }))
+    const nameChange = await account.changeName({ newName: editState.value })
 
-    await updateUser(account.id)
-    setEditState({ field: null, value: '' })
+    if (nameChange.success) {
+      await updateUser(account.id)
+      navigate(`/account/${editState.value}`)
+      setEditState({ field: null, value: '' })
+    } else {
+      setEditState({ field: null, value: '' })
+      setVisibleModal({
+        name: 'edit',
+        message: errorMessage || dictionary.errorDuringNameChange
+      })
+    }
+  }
+
+  const handleChangeDescription = async () => {
+    if (!account) return
+
+    const isNewDescriptionValid = validateDescription({
+      description: editState.value
+    })
+
+    if (!isNewDescriptionValid) {
+      setVisibleModal({
+        name: 'edit',
+        message: errorMessage || dictionary.errorDuringDescriptionChange
+      })
+      return
+    }
+
+    const descriptionChange = await account.changeDescription({
+      newDescription: editState.value
+    })
+
+    if (descriptionChange.success) {
+      await updateUser(account.id)
+      setEditState({ field: null, value: '' })
+    } else {
+      setEditState({ field: null, value: '' })
+      setVisibleModal({
+        name: 'edit',
+        message: errorMessage || dictionary.errorDuringDescriptionChange
+      })
+    }
+  }
+
+  const handleEdit = async () => {
+    if (editState.field === 'name') {
+      handleChangeName()
+    } else if (editState.field === 'description') {
+      handleChangeDescription()
+    }
   }
 
   const handleSearch = async (query: string) => {
@@ -76,7 +115,8 @@ export function useAccount () {
 
   useEffect(() => {
     fetchAccount()
-  }, [fetchAccount])
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   return {
     account,

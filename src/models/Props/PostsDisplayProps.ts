@@ -1,4 +1,4 @@
-import { Post } from './Post'
+import { Post } from '../Post'
 
 export interface PostsDisplayProps {
   posts: Post[] | null

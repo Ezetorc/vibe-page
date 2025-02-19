@@ -1,11 +1,29 @@
-interface IconProps {
-  filled?: boolean
+import { IconProps } from '../models/Props/IconProps'
+
+export function ShareIcon () {
+  return (
+    <svg
+      className='w-6 h-6'
+      aria-hidden='true'
+      width='24'
+      height='24'
+      fill='none'
+      viewBox='0 0 24 24'
+    >
+      <path
+        stroke='#63B5B1'
+        strokeLinecap='round'
+        strokeWidth='2'
+        d='M7.926 10.898 15 7.727m-7.074 5.39L15 16.29M8 12a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0Zm12 5.5a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0Zm0-11a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0Z'
+      />
+    </svg>
+  )
 }
 
-export function CommentIcon ({ filled }: IconProps) {
-  return filled ? (
+export function CommentIcon (props: IconProps) {
+  return props.filled ? (
     <svg
-    className='w-[48px] h-[48px]'
+      className='w-[48px] h-[48px]'
       aria-hidden='true'
       width='24'
       height='24'
@@ -38,8 +56,8 @@ export function CommentIcon ({ filled }: IconProps) {
   )
 }
 
-export function HomeIcon ({ filled }: IconProps) {
-  return filled ? (
+export function HomeIcon (props: IconProps) {
+  return props.filled ? (
     <svg width='55' height='55' viewBox='0 0 35 35' fill='none'>
       <path
         fillRule='evenodd'
@@ -61,8 +79,8 @@ export function HomeIcon ({ filled }: IconProps) {
   )
 }
 
-export function SearchIcon ({ filled }: IconProps) {
-  return filled ? (
+export function SearchIcon (props: IconProps) {
+  return props.filled ? (
     <svg width='55' height='55' viewBox='0 0 29 29' fill='none'>
       <path
         d='M12.0833 2.41669C9.51957 2.41669 7.06082 3.43514 5.24797 5.24799C3.43511 7.06084 2.41666 9.51959 2.41666 12.0834C2.41666 14.6471 3.43511 17.1059 5.24797 18.9187C7.06082 20.7316 9.51957 21.75 12.0833 21.75C14.6471 21.75 17.1058 20.7316 18.9187 18.9187C20.7315 17.1059 21.75 14.6471 21.75 12.0834C21.75 9.51959 20.7315 7.06084 18.9187 5.24799C17.1058 3.43514 14.6471 2.41669 12.0833 2.41669Z'
@@ -107,8 +125,8 @@ export function DotsIcon () {
   )
 }
 
-export function UserIcon ({ filled }: IconProps) {
-  return filled ? (
+export function UserIcon (props: IconProps) {
+  return props.filled ? (
     <svg width='55' height='55' viewBox='0 0 35 35' fill='none'>
       <path
         fillRule='evenodd'
@@ -130,8 +148,8 @@ export function UserIcon ({ filled }: IconProps) {
   )
 }
 
-export function PlusIcon ({ filled }: IconProps) {
-  return filled ? (
+export function PlusIcon (props: IconProps) {
+  return props.filled ? (
     <svg width='50' height='50' viewBox='0 0 30 30' fill='none'>
       <path
         fillRule='evenodd'
@@ -153,8 +171,8 @@ export function PlusIcon ({ filled }: IconProps) {
   )
 }
 
-export function SettingsIcon ({ filled }: IconProps) {
-  return filled ? (
+export function SettingsIcon (props: IconProps) {
+  return props.filled ? (
     <svg width='55' height='55' viewBox='0 0 33 33' fill='none'>
       <path
         fillRule='evenodd'
@@ -186,7 +204,7 @@ export function SettingsIcon ({ filled }: IconProps) {
 export function PencilIcon () {
   return (
     <svg
-      className='w-6 h-6 text-[#2C6B6C]'
+      className='w-6 h-6 text-[#2C6B6C] scale-110'
       aria-hidden='true'
       width='24'
       height='24'
@@ -207,7 +225,7 @@ export function PencilIcon () {
 export function CheckIcon () {
   return (
     <svg
-      className='w-6 h-6 text-[#2C6B6C]'
+      className='w-6 h-6 text-[#2C6B6C] scale-110'
       aria-hidden='true'
       width='24'
       height='24'
@@ -225,8 +243,8 @@ export function CheckIcon () {
   )
 }
 
-export function LikeIcon ({ filled }: IconProps) {
-  return filled ? (
+export function LikeIcon (props: IconProps) {
+  return props.filled ? (
     <svg width='44' height='44' viewBox='0 0 24 24' fill='none'>
       <path
         fillRule='evenodd'

@@ -35,10 +35,10 @@ export default function Register () {
     const agreeWithTerms = agreeWithTermsInputRef.current?.checked
 
     const isFormValid: boolean =
-      validateName({name}) &&
-      (await validateEmail({email})) &&
-      validatePasswords({password, confirmedPassword}) &&
-      validateAgreeWithTerms({agreeWithTerms})
+      (await validateName({ name })) &&
+      (await validateEmail({ email })) &&
+      validatePasswords({ password, confirmedPassword }) &&
+      validateAgreeWithTerms({ agreeWithTerms })
 
     if (isFormValid && name && email && password) {
       const registerSuccessful = await UserService.register({
@@ -122,8 +122,9 @@ export default function Register () {
         />
       </form>
 
-      <Link to="/login" className='text-verdigris underline'>{dictionary.iHaveAnAccount}</Link>
-
+      <Link to='/login' className='text-verdigris underline'>
+        {dictionary.iHaveAnAccount}
+      </Link>
     </Section>
   )
 }

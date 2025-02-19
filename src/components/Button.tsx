@@ -1,12 +1,12 @@
-import { ButtonProps } from '../models/ButtonProps'
+import { ButtonProps } from '../models/Props/ButtonProps'
 
-export function Button ({ onClick, text }: ButtonProps) {
+export function Button (props: ButtonProps) {
   return (
     <button
-      onClick={onClick}
+      onClick={props.onClick}
       className='cursor-pointer hover:bg-white hover:text-orange-crayola w-full h-[50px] bg-orange-crayola font-poppins-regular rounded-vibe'
     >
-      {text}
+      {props.text}
     </button>
   )
 }

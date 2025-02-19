@@ -3,6 +3,7 @@ import { getAdaptedLike } from '../adapters/getAdaptedLike'
 import { Like } from '../models/Like'
 import { LikeEndpoint } from '../models/LikeEndpoint'
 import { api } from '../constants/settings'
+import { LikeType } from '../models/LikeType'
 
 export class LikeService {
   static async getAllOfPost ({
@@ -56,7 +57,7 @@ export class LikeService {
   }: {
     userId: number
     targetId: number
-    type: 'post' | 'comment'
+    type: LikeType
   }): Promise<Data<boolean>> {
     const response = await api.post<boolean>({
       endpoint: `likes`,

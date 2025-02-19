@@ -9,6 +9,7 @@ import { ChangeLanguageModal } from './pages/Settings/components/ChangeLanguageM
 import { ConnectionModal } from './components/ConnectionModal.tsx'
 import { Loading } from './components/Loading.tsx'
 import { ChangePasswordModal } from './pages/Settings/components/ChangePasswordModal.tsx'
+import { CommentModal } from './components/Comments/CommentModal.tsx'
 
 const LazyHome = lazy(() => import('./pages/Home/components/Home.tsx'))
 const LazyLogin = lazy(() => import('./pages/Login/components/Login.tsx'))
@@ -29,9 +30,10 @@ export default function App () {
     session: <SessionModal />,
     language: <ChangeLanguageModal />,
     email: <ChangeEmailModal />,
-    edit: <InvalidEditModal errorMessage={visibleModal.message} />,
+    edit: <InvalidEditModal />,
     connection: <ConnectionModal />,
-    password: <ChangePasswordModal />
+    password: <ChangePasswordModal />,
+    comment: <CommentModal />
   }
 
   useEffect(() => {

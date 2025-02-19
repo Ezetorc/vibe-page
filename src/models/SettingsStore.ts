@@ -12,9 +12,11 @@ export interface SettingsStore {
   visibleModal: {
     name: ModalName | null
     message?: string | undefined
+    data?: object | undefined
   }
   setVisibleModal: (newVisibleModal: {
     name: ModalName | null
     message?: string | undefined
+    data?: object | undefined
   }) => void
 }

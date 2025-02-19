@@ -1,16 +1,16 @@
-import { CommentDisplayProps } from '../models/CommentDisplayProps'
-import { useCallback, useEffect, useState } from 'react'
-import { LikeIcon } from './Icons'
-import { Like } from '../models/Like'
-import { User } from '../models/User'
-import { useUser } from '../hooks/useUser'
-import { useSettings } from '../hooks/useSettings'
-import { Username } from './Username'
-import { Loading } from './Loading'
-import { PostMenu } from './PostMenu'
-import { UserService } from '../services/UserService'
+import { useState, useCallback, useEffect } from 'react'
+import { useSettings } from '../../hooks/useSettings'
+import { useUser } from '../../hooks/useUser'
+import { CommentDisplayProps } from '../../models/Props/CommentDisplayProps'
+import { Like } from '../../models/Like'
+import { User } from '../../models/User'
+import { UserService } from '../../services/UserService'
+import { LikeIcon } from '../Icons'
+import { Loading } from '../Loading'
+import { PostMenu } from '../Posts/PostMenu'
+import { Username } from '../Username'
 
-export function CommentDisplay ({ comment, onDelete }: CommentDisplayProps) {
+export function CommentDisplay (props: CommentDisplayProps) {
   const { isSessionActive, user } = useUser()
   const { setVisibleModal, dictionary } = useSettings()
   const [hasUserLikedComment, setHasUserLikedComment] = useState<boolean>(false)
@@ -22,26 +22,26 @@ export function CommentDisplay ({ comment, onDelete }: CommentDisplayProps) {
   }>({
     user: null,
     likes: [],
-    date: comment.getDate()
+    date: props.comment.getDate()
   })
 
   const handleDelete = async () => {
-    const deleted = await comment.delete()
+    const deleted = await props.comment.delete()
 
     if (deleted.success) {
-      onDelete(comment.id)
+      props.onDelete(props.comment.id)
     }
   }
 
   const handleUpdatedLikes = useCallback(async () => {
-    const updatedLikes = await comment.getLikes()
+    const updatedLikes = await props.comment.getLikes()
 
     if (!updatedLikes.value) return
 
     setCommentData({ ...commentData, likes: updatedLikes.value })
     setHasUserLikedComment(!hasUserLikedComment)
     setIsProcessing(false)
-  }, [hasUserLikedComment, comment, commentData])
+  }, [hasUserLikedComment, props.comment, commentData])
 
   const handleLike = useCallback(async () => {
     if (isProcessing || !commentData.user) return
@@ -54,14 +54,14 @@ export function CommentDisplay ({ comment, onDelete }: CommentDisplayProps) {
     setIsProcessing(true)
 
     if (hasUserLikedComment) {
-      await commentData.user.unlikeComment({ commentId: comment.id })
+      await commentData.user.unlikeComment({ commentId: props.comment.id })
     } else {
-      await commentData.user.likeComment({ commentId: comment.id })
+      await commentData.user.likeComment({ commentId: props.comment.id })
     }
 
     handleUpdatedLikes()
   }, [
-    comment.id,
+    props.comment.id,
     commentData.user,
     handleUpdatedLikes,
     hasUserLikedComment,
@@ -72,8 +72,8 @@ export function CommentDisplay ({ comment, onDelete }: CommentDisplayProps) {
 
   const fetchCommentData = useCallback(async () => {
     const [newCommentUser, newLikes] = await Promise.all([
-      UserService.getById({ userId: comment.userId }),
-      comment.getLikes()
+      UserService.getById({ userId: props.comment.userId }),
+      props.comment.getLikes()
     ])
 
     setCommentData(prev => ({
@@ -85,7 +85,7 @@ export function CommentDisplay ({ comment, onDelete }: CommentDisplayProps) {
     if (newCommentUser.value) {
       const newHasUserLikedComment = await newCommentUser.value.hasLikedComment(
         {
-          commentId: comment.id
+          commentId: props.comment.id
         }
       )
 
@@ -93,7 +93,7 @@ export function CommentDisplay ({ comment, onDelete }: CommentDisplayProps) {
         setHasUserLikedComment(newHasUserLikedComment.value)
       }
     }
-  }, [comment])
+  }, [props.comment])
 
   useEffect(() => {
     fetchCommentData()
@@ -105,7 +105,7 @@ export function CommentDisplay ({ comment, onDelete }: CommentDisplayProps) {
         <div className='flex items-center gap-x-[10px]'>
           <img className='rounded-full w-[50px] aspect-square bg-orange-crayola' />
           {commentData.user ? (
-            <Username username={commentData.user.name} />
+            <Username>{commentData.user.name}</Username>
           ) : (
             <Loading />
           )}
@@ -114,7 +114,7 @@ export function CommentDisplay ({ comment, onDelete }: CommentDisplayProps) {
           {commentData.date}
         </span>
 
-        {user?.isOwnerOfComment({ comment }) && (
+        {user?.isOwnerOfComment({ comment: props.comment }) && (
           <div className='flex justify-end items-center'>
             <PostMenu onDelete={handleDelete} />
           </div>
@@ -123,21 +123,23 @@ export function CommentDisplay ({ comment, onDelete }: CommentDisplayProps) {
 
       <main className='w-full flex flex-col'>
         <p className='break-words text-white text-[clamp(5px,6vw,20px)] font-poppins-regular'>
-          {comment.content}
+          {props.comment.content}
         </p>
       </main>
 
-      <footer className='flex items-center gap-x-[3%]'>
-        <div className='flex items-center gap-x-[5px]'>
-          <button onClick={handleLike} disabled={isProcessing}>
-            <LikeIcon filled={hasUserLikedComment} />
-          </button>
-          <span className='text-verdigris font-poppins-semibold'>
-            {commentData.likes === null
-              ? dictionary.loading
-              : commentData.likes.length}
-          </span>
-        </div>
+      <footer className='flex items-center gap-x-[1%]'>
+        <button
+          className='cursor-pointer'
+          onClick={handleLike}
+          disabled={isProcessing}
+        >
+          <LikeIcon filled={hasUserLikedComment} />
+        </button>
+        <span className='text-verdigris font-poppins-semibold'>
+          {commentData.likes === null
+            ? dictionary.loading
+            : commentData.likes.length}
+        </span>
       </footer>
     </article>
   )

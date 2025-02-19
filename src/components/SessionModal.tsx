@@ -18,14 +18,10 @@ export function SessionModal () {
     setVisibleModal({ name: null })
   }
 
-  const handleClose = () => {
-    setVisibleModal({ name: null })
-  }
-
   return (
     <Modal>
       <article className='p-[clamp(10px,5%,20px)] relative gap-y-[clamp(20px,50%,40px)] flex flex-col rounded-vibe bg-caribbean-current w-[clamp(300px,70%,1000px)] h-[clamp(400px,80%,600px)]'>
-        <CloseModalButton onClose={handleClose} />
+        <CloseModalButton />
 
         <h2 className='text-center font-poppins-semibold text-[clamp(20px,7vw,60px)] bg-clip-text text-transparent bg-orange-gradient'>
           {dictionary.youAreNotLogged}

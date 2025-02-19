@@ -1,8 +1,11 @@
-import { useSettings } from '../hooks/useSettings'
-import { PostsDisplayProps } from '../models/PostsDisplayProps'
+import { useSettings } from '../../hooks/useSettings'
+import { PostsDisplayProps } from '../../models/Props/PostsDisplayProps'
 import { PostDisplay } from './PostDisplay'
 
-export function PostsDisplay ({ posts, onPostDelete }: PostsDisplayProps) {
+export function PostsDisplay ({
+  posts,
+  onPostDelete
+}: PostsDisplayProps) {
   const { dictionary } = useSettings()
 
   return (

@@ -1,15 +1,15 @@
-import { FormInputProps } from '../models/FormInputProps'
+import { FormInputProps } from '../models/Props/FormInputProps'
 
-export function FormInput ({ min, className, max, reference, placeholder, type = 'text' }: FormInputProps) {
+export function FormInput (props: FormInputProps) {
   return (
     <input
-      ref={reference}
-      type={type}
-      minLength={min}
-      maxLength={max}
+      ref={props.reference}
+      type={props.type}
+      minLength={props.min}
+      maxLength={props.max}
       required
-      placeholder={placeholder}
-      className={`${className} outline-hidden text-[clamp(20px,3vw,25px)] focus:border-b-orange-crayola placeholder:font-poppins-regular placeholder:text-caribbean-current border-b-verdigris bg-transparent border-b-2 w-full h-[clamp(40px,30%,60px)]`}
+      placeholder={props.placeholder}
+      className={`${props.className} outline-hidden text-[clamp(20px,3vw,25px)] focus:border-b-orange-crayola placeholder:font-poppins-regular placeholder:text-caribbean-current border-b-verdigris bg-transparent border-b-2 w-full h-[clamp(40px,30%,60px)]`}
     ></input>
   )
 }
