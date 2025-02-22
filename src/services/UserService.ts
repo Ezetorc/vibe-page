@@ -77,8 +77,16 @@ export class UserService {
     return Data.success(true)
   }
 
-  static async getAll (): Promise<Data<User[]>> {
-    const response = await api.get<UserEndpoint[]>({ endpoint: `users` })
+  static async getAll ({
+    amount = 10,
+    page = 1
+  }: {
+    amount?: number
+    page?: number
+  }): Promise<Data<User[]>> {
+    const response = await api.get<UserEndpoint[]>({
+      endpoint: `users?amount=${amount}&page=${page}`
+    })
 
     if (!response.value) return Data.failure()
 

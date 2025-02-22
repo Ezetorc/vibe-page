@@ -5,8 +5,16 @@ import { CommentEndpoint } from '../models/CommentEndpoint'
 import { api } from '../constants/settings'
 
 export class CommentService {
-  static async getAll (): Promise<Data<Comment[]>> {
-    const response = await api.get<CommentEndpoint[]>({ endpoint: `comments` })
+  static async getAll ({
+    amount = 10,
+    page = 1
+  }: {
+    amount?: number
+    page?: number
+  }): Promise<Data<Comment[]>> {
+    const response = await api.get<CommentEndpoint[]>({
+      endpoint: `comments?amount=${amount}&page=${page}`
+    })
 
     if (!response.value) return Data.failure()
 

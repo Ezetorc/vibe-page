@@ -20,8 +20,14 @@ export class PostService {
     return response
   }
 
-  static async getAll (): Promise<Data<Post[]>> {
-    const response = await api.get<PostEndpoint[]>({ endpoint: 'posts' })
+  static async getAll ({
+    amount = 10,
+    page = 1
+  }: {
+    amount?: number
+    page?: number
+  }): Promise<Data<Post[]>> {
+    const response = await api.get<PostEndpoint[]>({ endpoint: `posts?amount=${amount}&page=${page}` })
 
     if (!response.value) return Data.failure()
 

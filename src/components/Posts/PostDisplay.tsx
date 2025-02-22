@@ -1,7 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { CommentIcon, LikeIcon } from '../Icons'
-import { Like } from '../../models/Like'
-import { User } from '../../models/User'
 import { useUser } from '../../hooks/useUser'
 import { useSettings } from '../../hooks/useSettings'
 import { PostDisplayProps } from '../../models/Props/PostDisplayProps'
@@ -9,8 +7,10 @@ import { UserService } from '../../services/UserService'
 import { Comment } from '../../models/Comment'
 import { Button } from '../Button'
 import { CommentDisplay } from '../Comments/CommentDisplay'
-import { PostHeader } from './PostHeader'
-import { usePost } from '../../hooks/usePost'
+import { Username } from '../Username'
+import { PostMenu } from './PostMenu'
+import { Like } from '../../models/Like'
+import { User } from '../../models/User'
 
 export function PostDisplay (props: PostDisplayProps) {
   const { isSessionActive, user } = useUser()
@@ -19,7 +19,17 @@ export function PostDisplay (props: PostDisplayProps) {
   const expectCommentCreation = useRef<boolean>(false)
   const [commentsOpened, setCommentsOpened] = useState<boolean>(false)
   const [isProcessing, setIsProcessing] = useState<boolean>(false)
-  const {postData, setPostData} = usePost()
+  const [postData, setPostData] = useState<{
+    user: User | null
+    likes: Like[] | null
+    comments: Comment[] | null
+    date: string | null
+  }>({
+    user: null,
+    likes: null,
+    comments: null,
+    date: null
+  })
 
   const handleCommentDelete = async (commentId: number) => {
     if (!postData.comments) return
@@ -148,6 +158,14 @@ export function PostDisplay (props: PostDisplayProps) {
     user
   ])
 
+  const handleDelete = async () => {
+    const deleted = await props.post.delete()
+
+    if (deleted.success) {
+      props.onDelete(props.post.id)
+    }
+  }
+
   useEffect(() => {
     fetchPostData()
   }, [fetchPostData])
@@ -155,7 +173,21 @@ export function PostDisplay (props: PostDisplayProps) {
   return (
     <>
       <article className='w-[clamp(300px,100%,700px)] py-[10px] px-[20px] rounded-vibe border-vibe border-caribbean-current overflow-hidden'>
-        <PostHeader />
+        <header className='w-full h-[70px] grid grid-cols-[15fr_5fr_1fr] items-center'>
+          <img className='rounded-full w-[50px] aspect-square bg-orange-crayola' />
+
+          <Username>{postData.user?.name}</Username>
+
+          <span className='text-caribbean-current h-full flex justify-end items-center text-right font-poppins-light text-[clamp(5px,6vw,20px)]'>
+            {postData.date}
+          </span>
+
+          {user?.isOwnerOfPost({ post: props.post }) && (
+            <div className='flex justify-end items-center'>
+              <PostMenu onDelete={handleDelete} />
+            </div>
+          )}
+        </header>
 
         <main className='w-full flex flex-col'>
           <p className='break-words text-white text-[clamp(5px,6vw,20px)] font-poppins-regular'>
