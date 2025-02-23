@@ -1,17 +1,15 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { useNavigate, useParams } from 'react-router'
+import { useParams } from 'react-router'
 import { useUser } from '../../../hooks/useUser'
 import { useValidation } from '../../../hooks/useValidation'
 import { User } from '../../../models/User'
 import { Post } from '../../../models/Post'
 import { UserService } from '../../../services/UserService'
-import { PostService } from '../../../services/PostService'
 import { useSettings } from '../../../hooks/useSettings'
 
 export function useAccount () {
   const { username } = useParams<{ username: string }>()
   const { setVisibleModal, dictionary } = useSettings()
-  const navigate = useNavigate()
   const { errorMessage, validateName, validateDescription } = useValidation()
   const { updateUser, user } = useUser()
   const [account, setAccount] = useState<User | null>(null)
@@ -20,7 +18,6 @@ export function useAccount () {
     field: 'name' | 'description' | null
     value: string
   }>({ field: null, value: '' })
-
   const accountIsUser = useMemo(() => user?.id === account?.id, [user, account])
 
   const fetchAccount = useCallback(async () => {
@@ -52,7 +49,6 @@ export function useAccount () {
 
     if (nameChange.success) {
       await updateUser(account.id)
-      navigate(`/account/${editState.value}`)
       setEditState({ field: null, value: '' })
     } else {
       setEditState({ field: null, value: '' })
@@ -102,17 +98,6 @@ export function useAccount () {
     }
   }
 
-  const handleSearch = async (query: string) => {
-    if (!account) return
-
-    const result =
-      query.trim() === ''
-        ? await account.getPosts()
-        : await PostService.search({ query })
-
-    if (result.value) setPosts(result.value)
-  }
-
   useEffect(() => {
     fetchAccount()
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -124,7 +109,6 @@ export function useAccount () {
     editState,
     setEditState,
     handleEdit,
-    handleSearch,
     accountIsUser,
     setPosts
   }

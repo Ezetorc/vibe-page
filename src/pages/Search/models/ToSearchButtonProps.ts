@@ -1,6 +1,7 @@
+import { MouseEventHandler } from 'react'
+
 export interface ToSearchButtonProps {
-  text: string
-  onClick: () => void
-  type: "posts" | "users"
+  onClick: MouseEventHandler<HTMLButtonElement>
+  type: 'posts' | 'users'
   toSearch: 'posts' | 'users'
 }

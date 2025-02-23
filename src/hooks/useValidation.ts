@@ -1,17 +1,17 @@
 import { UserService } from './../services/UserService'
 import { useState } from 'react'
 import { useSettings } from './useSettings'
-import { useUser } from './useUser'
 
 export function useValidation () {
   const { dictionary } = useSettings()
-  const { user } = useUser()
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
 
   const validateName = async ({
-    name
+    name,
+    unique = false
   }: {
     name: string | undefined | null
+    unique?: boolean
   }) => {
     if (!name) {
       setErrorMessage(dictionary.emptyNameError)
@@ -25,7 +25,7 @@ export function useValidation () {
 
     const nameExists = await UserService.nameAlreadyExists({ name })
 
-    if (nameExists.value === true && user?.name !== name) {
+    if (nameExists.value === true && unique) {
       setErrorMessage(dictionary.nameInUse)
       return false
     }

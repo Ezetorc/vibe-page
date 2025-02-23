@@ -1,7 +1,6 @@
 import { Section } from '../../../components/Section'
 import { SearchBar } from '../../../components/SearchBar'
 import { PostsDisplay } from '../../../components/Posts/PostsDisplay'
-import { Loading } from '../../../components/Loading'
 import { Nav } from '../../../components/Nav'
 import { useAccount } from '../hooks/useAccount'
 import { useSettings } from '../../../hooks/useSettings'
@@ -9,26 +8,30 @@ import { AccountName } from './AccountName'
 import { AccountDescription } from './AccountDescription'
 import { AccountDate } from './AccountDate'
 import { AccountInteractions } from './AccountInteractions'
-// import { ShareIcon } from '../../../components/Icons'
+import { useState } from 'react'
+import { useUserPosts } from '../hooks/useUserPosts'
+import { LoadSpinner } from '../../../components/LoadSpinner'
 
 export default function Account () {
   const { dictionary } = useSettings()
-  const { account, posts, setPosts, handleSearch } = useAccount()
+  const { account } = useAccount()
+  const [searchQuery, setSearchQuery] = useState<string | undefined>(undefined)
+  const posts = useUserPosts(account, searchQuery)
 
-  if (!account) return <Loading />
+  if (!account)
+    return (
+      <h3 className='text-[clamp(20px,3rem,60px)] w-screen h-screen flex justify-center items-center'>
+        {dictionary.userNotFound}
+      </h3>
+    )
 
   const handlePostDelete = (postId: number) => {
-    const newPosts = posts.filter(post => post.id !== postId)
-
-    setPosts(newPosts)
+    posts.delete(postId)
   }
 
-  // const handleShare = async () => {
-  //   await account?.share({
-  //     title: dictionary.followMe,
-  //     text: dictionary.findMeInVibe
-  //   })
-  // }
+  const handleSearch = (query: string) => {
+    setSearchQuery(query)
+  }
 
   return (
     <Section>
@@ -37,14 +40,7 @@ export default function Account () {
           <img className='rounded-full w-[clamp(70px,50%,90px)] aspect-square bg-orange-crayola' />
           <AccountName />
           <AccountDate />
-          
         </div>
-
-        {/* <div>
-          <button className='cursor-pointer scale-130' onClick={handleShare}>
-            <ShareIcon />
-          </button>
-        </div> */}
 
         <AccountDescription />
         <AccountInteractions />
@@ -55,7 +51,8 @@ export default function Account () {
         placeholder={dictionary.searchMyPosts}
       />
 
-      <PostsDisplay onPostDelete={handlePostDelete} posts={posts} />
+      <PostsDisplay onPostDelete={handlePostDelete} posts={posts.data} />
+      {posts?.hasNextPage && <LoadSpinner reference={posts.ref} />}
 
       <Nav />
     </Section>

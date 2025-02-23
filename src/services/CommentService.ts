@@ -11,7 +11,7 @@ export class CommentService {
   }: {
     amount?: number
     page?: number
-  }): Promise<Data<Comment[]>> {
+  } = {}): Promise<Data<Comment[]>> {
     const response = await api.get<CommentEndpoint[]>({
       endpoint: `comments?amount=${amount}&page=${page}`
     })

@@ -8,6 +8,8 @@ import { CommentService } from '../services/CommentService'
 import { Comment } from './Comment'
 import { Data } from 'api-responser'
 import { api } from '../constants/settings'
+import { PostEndpoint } from './PostEndpoint'
+import { getAdaptedPost } from '../adapters/getAdaptedPost'
 
 export class User {
   public id: number
@@ -196,8 +198,8 @@ export class User {
     return Data.success(true)
   }
 
-  public async getPosts (): Promise<Data<Post[]>> {
-    const posts = await PostService.getAll()
+  public async getPosts ({ page = 1 }: { page?: number } = {}): Promise<Data<Post[]>> {
+    const posts = await PostService.getAll({ page })
 
     if (!posts.value) return Data.failure()
 
@@ -316,5 +318,24 @@ export class User {
     })
 
     return deleteSuccessful
+  }
+
+  public async searchPosts ({
+    query
+  }: {
+    query: string
+  }): Promise<Data<Post[]>> {
+    const response = await api.get<PostEndpoint[]>({
+      endpoint: `posts/search/${encodeURIComponent(query)}&userId=${this.id}`
+    })
+    console.log(`posts/search/${encodeURIComponent(query)}&userId=${this.id}`)
+
+    if (!response.value) return Data.failure()
+
+    const posts = response.value.map(postEndpoint =>
+      getAdaptedPost({ postEndpoint })
+    )
+
+    return Data.success(posts)
   }
 }

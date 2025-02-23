@@ -21,6 +21,16 @@ export class UserService {
     return Data.success(user)
   }
 
+  static async delete ({ userId }: { userId: number }): Promise<Data<number>> {
+    const response = await api.delete<boolean>({
+      endpoint: `users/id/${userId}`
+    })
+
+    if (!response.success) return Data.failure()
+
+    return Data.success(userId)
+  }
+  
   static async getById ({ userId }: { userId: number }): Promise<Data<User>> {
     const response = await api.get<UserEndpoint>({
       endpoint: `users/id/${userId}`
@@ -83,7 +93,7 @@ export class UserService {
   }: {
     amount?: number
     page?: number
-  }): Promise<Data<User[]>> {
+  } = {}): Promise<Data<User[]>> {
     const response = await api.get<UserEndpoint[]>({
       endpoint: `users?amount=${amount}&page=${page}`
     })

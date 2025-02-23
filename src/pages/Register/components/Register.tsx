@@ -35,7 +35,7 @@ export default function Register () {
     const agreeWithTerms = agreeWithTermsInputRef.current?.checked
 
     const isFormValid: boolean =
-      (await validateName({ name })) &&
+      (await validateName({ name, unique: true })) &&
       (await validateEmail({ email })) &&
       validatePasswords({ password, confirmedPassword }) &&
       validateAgreeWithTerms({ agreeWithTerms })

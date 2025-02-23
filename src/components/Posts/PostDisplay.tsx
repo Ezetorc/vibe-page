@@ -124,6 +124,10 @@ export function PostDisplay (props: PostDisplayProps) {
     }
   }, [props.post])
 
+  const handleDelete = async () => {
+    props.onDelete(props.post.id)
+  }
+
   useEffect(() => {
     if (visibleModal.name === 'comment') {
       expectCommentCreation.current = true
@@ -157,14 +161,6 @@ export function PostDisplay (props: PostDisplayProps) {
     visibleModal.data,
     user
   ])
-
-  const handleDelete = async () => {
-    const deleted = await props.post.delete()
-
-    if (deleted.success) {
-      props.onDelete(props.post.id)
-    }
-  }
 
   useEffect(() => {
     fetchPostData()
