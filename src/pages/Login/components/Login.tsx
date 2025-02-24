@@ -21,13 +21,12 @@ export default function Login () {
   const handleLogin = async (): Promise<void> => {
     const name = nameInputRef.current?.value
     const password = passwordInputRef.current?.value
+    const isNameValid = await validateName({ name })
+    const isPasswordValid = validatePassword({ password })
 
-    const isFormValid: boolean =
-      (await validateName({ name })) &&
-      validatePassword({ password })
-
-    if (isFormValid && name && password) {
-      const logSuccesfull = await UserService.login({ name, password })
+    if (isNameValid && isPasswordValid) {
+      const logSuccesfull = await UserService.login({ name: name!, password: password! })
+      console.log(logSuccesfull)
 
       if (logSuccesfull.value) {
         const sessionSuccess = await handleSession()

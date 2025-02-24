@@ -24,6 +24,7 @@ const LazyRegister = lazy(
 )
 
 export default function App () {
+  console.log("En la API, hacer que los controllers devuelvan siempre un JSON con el mismo formato.")
   const { visibleModal } = useSettings()
   const { handleSession } = useUser()
   const modals = {

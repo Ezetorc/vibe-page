@@ -4,14 +4,14 @@ import { useAccount } from '../hooks/useAccount'
 
 export function AccountDate () {
   const { dictionary } = useSettings()
-  const { account, accountIsUser } = useAccount()
+  const account = useAccount()
 
-  if (!account) return <Loading />
+  if (!account.user) return <Loading />
 
   return (
     <span className='text-caribbean-current text-center w-full font-poppins-light text-[clamp(10px,4rem,20px)]'>
-      {accountIsUser ? dictionary.youJoined : dictionary.joined}{' '}
-      {account.getDate()}
+      {account.isUser ? dictionary.youJoined : dictionary.joined}
+      {account.user.getDate()}
     </span>
   )
 }

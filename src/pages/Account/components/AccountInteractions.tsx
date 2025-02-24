@@ -3,15 +3,15 @@ import { useAccount } from '../hooks/useAccount'
 import { FollowButton } from './FollowButton'
 
 export function AccountInteractions () {
-  const { account, accountIsUser } = useAccount()
+  const account = useAccount()
 
-  if (!account) return <Loading />
+  if (!account.user) return <Loading />
 
   return (
     <div className='flex gap-x-[20px]'>
-      {!accountIsUser && (
+      {!account.isUser && (
         <>
-          <FollowButton user={account} />
+          <FollowButton user={account.user} />
         </>
       )}
     </div>

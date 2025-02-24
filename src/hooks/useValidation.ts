@@ -23,9 +23,11 @@ export function useValidation () {
       return false
     }
 
-    const nameExists = await UserService.nameAlreadyExists({ name })
+    if (unique) {
+      const nameExists = await UserService.nameAlreadyExists({ name })
 
-    if (nameExists.value === true && unique) {
+      if (!nameExists.value) return
+      
       setErrorMessage(dictionary.nameInUse)
       return false
     }

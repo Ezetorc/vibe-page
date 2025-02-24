@@ -14,11 +14,11 @@ import { LoadSpinner } from '../../../components/LoadSpinner'
 
 export default function Account () {
   const { dictionary } = useSettings()
-  const { account } = useAccount()
   const [searchQuery, setSearchQuery] = useState<string | undefined>(undefined)
-  const posts = useUserPosts(account, searchQuery)
+  const account = useAccount()
+  const posts = useUserPosts(account.user, searchQuery)
 
-  if (!account)
+  if (!account.user)
     return (
       <h3 className='text-[clamp(20px,3rem,60px)] w-screen h-screen flex justify-center items-center'>
         {dictionary.userNotFound}

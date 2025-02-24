@@ -30,7 +30,7 @@ export class UserService {
 
     return Data.success(userId)
   }
-  
+
   static async getById ({ userId }: { userId: number }): Promise<Data<User>> {
     const response = await api.get<UserEndpoint>({
       endpoint: `users/id/${userId}`
@@ -69,12 +69,12 @@ export class UserService {
     name: string
     password: string
   }): Promise<Data<boolean>> {
-    const response = await api.post<boolean>({
+    const response = await api.post<{ success: boolean }>({
       endpoint: `users/login`,
       body: JSON.stringify({ name, password })
     })
 
-    if (!response.value) return Data.failure()
+    if (!response.value!.success) return Data.failure()
 
     return Data.success(true)
   }

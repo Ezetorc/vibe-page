@@ -36,12 +36,10 @@ export function useAccount () {
     if (!account) return
 
     const isNewNameValid = await validateName({ name: editState.value })
+    const message = errorMessage || dictionary.errorDuringNameChange
 
     if (!isNewNameValid) {
-      setVisibleModal({
-        name: 'edit',
-        message: errorMessage || dictionary[`errorDuringNameChange`]
-      })
+      setVisibleModal({ name: 'edit', message })
       return
     }
 
@@ -49,14 +47,11 @@ export function useAccount () {
 
     if (nameChange.success) {
       await updateUser(account.id)
-      setEditState({ field: null, value: '' })
     } else {
-      setEditState({ field: null, value: '' })
-      setVisibleModal({
-        name: 'edit',
-        message: errorMessage || dictionary.errorDuringNameChange
-      })
+      setVisibleModal({ name: 'edit', message })
     }
+
+    setEditState({ field: null, value: '' })
   }
 
   const handleChangeDescription = async () => {
@@ -65,12 +60,10 @@ export function useAccount () {
     const isNewDescriptionValid = validateDescription({
       description: editState.value
     })
+    const message = errorMessage || dictionary.errorDuringDescriptionChange
 
     if (!isNewDescriptionValid) {
-      setVisibleModal({
-        name: 'edit',
-        message: errorMessage || dictionary.errorDuringDescriptionChange
-      })
+      setVisibleModal({ name: 'edit', message })
       return
     }
 
@@ -80,14 +73,11 @@ export function useAccount () {
 
     if (descriptionChange.success) {
       await updateUser(account.id)
-      setEditState({ field: null, value: '' })
     } else {
-      setEditState({ field: null, value: '' })
-      setVisibleModal({
-        name: 'edit',
-        message: errorMessage || dictionary.errorDuringDescriptionChange
-      })
+      setVisibleModal({ name: 'edit', message })
     }
+
+    setEditState({ field: null, value: '' })
   }
 
   const handleEdit = async () => {
@@ -100,16 +90,16 @@ export function useAccount () {
 
   useEffect(() => {
     fetchAccount()
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   return {
-    account,
+    user: account,
     posts,
     editState,
     setEditState,
     handleEdit,
-    accountIsUser,
+    isUser: accountIsUser,
     setPosts
   }
 }

@@ -46,8 +46,8 @@ export class User {
     this.createdAt = createdAt
   }
 
-  public isOwnerOfPost ({ post }: { post: Post }) {
-    return this.id === post.userId
+  public isOwnerOfPost ({ postUserId }: { postUserId: number }) {
+    return this.id === postUserId
   }
 
   public isOwnerOfComment ({ comment }: { comment: Comment }) {
