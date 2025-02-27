@@ -12,7 +12,7 @@ export function useValidation () {
   }: {
     name: string | undefined | null
     unique?: boolean
-  }) => {
+  }): Promise<boolean> => {
     if (!name) {
       setErrorMessage(dictionary.emptyNameError)
       return false
@@ -26,7 +26,7 @@ export function useValidation () {
     if (unique) {
       const nameExists = await UserService.nameAlreadyExists({ name })
 
-      if (!nameExists.value) return
+      if (!nameExists.value) return true
       
       setErrorMessage(dictionary.nameInUse)
       return false

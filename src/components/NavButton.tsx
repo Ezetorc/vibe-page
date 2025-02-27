@@ -23,6 +23,7 @@ export function NavButton (props: NavButtonProps) {
     <Link
       className='grid place-items-center aspect-square w-[60px] relative'
       onClick={handleClick}
+      title={`${props.to} Button`}
       to={props.to}
     >
       {<props.icon.type filled={location.pathname === props.to} />}

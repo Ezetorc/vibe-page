@@ -10,8 +10,9 @@ export function AccountDate () {
 
   return (
     <span className='text-caribbean-current text-center w-full font-poppins-light text-[clamp(10px,4rem,20px)]'>
-      {account.isUser ? dictionary.youJoined : dictionary.joined}
-      {account.user.getDate()}
+      {`${
+        account.isUser ? dictionary.youJoined : dictionary.joined
+      } ${account.user.getDate()}`}
     </span>
   )
 }

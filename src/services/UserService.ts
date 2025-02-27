@@ -69,14 +69,12 @@ export class UserService {
     name: string
     password: string
   }): Promise<Data<boolean>> {
-    const response = await api.post<{ success: boolean }>({
+    const response = await api.post<boolean>({
       endpoint: `users/login`,
       body: JSON.stringify({ name, password })
     })
 
-    if (!response.value!.success) return Data.failure()
-
-    return Data.success(true)
+    return response
   }
 
   static async logout (): Promise<Data<boolean>> {

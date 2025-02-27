@@ -4,5 +4,6 @@ export interface FormInputProps {
   reference?: React.LegacyRef<HTMLInputElement> | undefined
   min?: number
   max?: number
+  name?: string
   className?: string
 }

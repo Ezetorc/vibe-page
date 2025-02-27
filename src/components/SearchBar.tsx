@@ -18,6 +18,7 @@ export function SearchBar (props: SearchBarProps) {
   return (
     <input
       onInput={onInput}
+      name='Search Bar'
       placeholder={props.placeholder}
       className='bg-transparent font-poppins-regular outline-hidden placeholder:text-caribbean-current w-full h-[45px] border-vibe border-caribbean-current rounded-vibe px-[2%]'
     />

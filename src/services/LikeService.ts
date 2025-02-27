@@ -58,8 +58,8 @@ export class LikeService {
     userId: number
     targetId: number
     type: LikeType
-  }): Promise<Data<boolean>> {
-    const response = await api.post<boolean>({
+  }): Promise<Data<Like>> {
+    const response = await api.post<Like>({
       endpoint: `likes`,
       body: JSON.stringify({
         target_id: targetId,
@@ -68,8 +68,6 @@ export class LikeService {
       })
     })
 
-    if (!response.value) return Data.failure()
-
-    return Data.success(true)
+    return response
   }
 }

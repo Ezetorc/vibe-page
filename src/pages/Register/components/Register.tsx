@@ -34,11 +34,13 @@ export default function Register () {
     const confirmedPassword = confirmPasswordInputRef.current?.value
     const agreeWithTerms = agreeWithTermsInputRef.current?.checked
 
+    const isNameValid = await validateName({ name, unique: true })
+    const isPasswordValid = validatePasswords({ password, confirmedPassword })
+    const isEmailValid = await validateEmail({ email })
+    const hasAgreedWithTerms = validateAgreeWithTerms({ agreeWithTerms })
+
     const isFormValid: boolean =
-      (await validateName({ name, unique: true })) &&
-      (await validateEmail({ email })) &&
-      validatePasswords({ password, confirmedPassword }) &&
-      validateAgreeWithTerms({ agreeWithTerms })
+      isNameValid && isPasswordValid && isEmailValid && hasAgreedWithTerms
 
     if (isFormValid && name && email && password) {
       const registerSuccessful = await UserService.register({

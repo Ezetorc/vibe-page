@@ -11,6 +11,7 @@ import { AccountInteractions } from './AccountInteractions'
 import { useState } from 'react'
 import { useUserPosts } from '../hooks/useUserPosts'
 import { LoadSpinner } from '../../../components/LoadSpinner'
+import { AccountPicture } from '../../../components/AccountPicture'
 
 export default function Account () {
   const { dictionary } = useSettings()
@@ -37,7 +38,7 @@ export default function Account () {
     <Section>
       <article className='flex flex-col justify-center w-[clamp(300px,100%,700px)] h-[clamp(400px,auto,600px)] p-[20px] rounded-vibe border-vibe border-caribbean-current overflow-hidden'>
         <div className='flex flex-col justify-center items-center gap-x-[20px] gap-y-[10px] mb-[25px]'>
-          <img className='rounded-full w-[clamp(70px,50%,90px)] aspect-square bg-orange-crayola' />
+          <AccountPicture username={account.user.name} />
           <AccountName />
           <AccountDate />
         </div>

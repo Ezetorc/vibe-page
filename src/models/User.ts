@@ -10,6 +10,7 @@ import { Data } from 'api-responser'
 import { api } from '../constants/settings'
 import { PostEndpoint } from './PostEndpoint'
 import { getAdaptedPost } from '../adapters/getAdaptedPost'
+import { Like } from './Like'
 
 export class User {
   public id: number
@@ -230,7 +231,7 @@ export class User {
     postId
   }: {
     postId: number
-  }): Promise<Data<boolean>> {
+  }): Promise<Data<Like>> {
     const response = await LikeService.create({
       userId: this.id,
       targetId: postId,
@@ -286,7 +287,7 @@ export class User {
     commentId
   }: {
     commentId: number
-  }): Promise<Data<boolean>> {
+  }): Promise<Data<Like>> {
     const response = await LikeService.create({
       userId: this.id,
       targetId: commentId,
@@ -328,7 +329,6 @@ export class User {
     const response = await api.get<PostEndpoint[]>({
       endpoint: `posts/search/${encodeURIComponent(query)}&userId=${this.id}`
     })
-    console.log(`posts/search/${encodeURIComponent(query)}&userId=${this.id}`)
 
     if (!response.value) return Data.failure()
 

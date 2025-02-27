@@ -26,7 +26,6 @@ export default function Login () {
 
     if (isNameValid && isPasswordValid) {
       const logSuccesfull = await UserService.login({ name: name!, password: password! })
-      console.log(logSuccesfull)
 
       if (logSuccesfull.value) {
         const sessionSuccess = await handleSession()

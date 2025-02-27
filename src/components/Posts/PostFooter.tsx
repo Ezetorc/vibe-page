@@ -11,43 +11,68 @@ export function PostFooter (props: {
   setPostData: Dispatch<React.SetStateAction<PostData>>
 }) {
   const { dictionary, setVisibleModal } = useSettings()
-  const [isLoading, setIsLoading] = useState<boolean>(false)
+  const [loading, setLoading] = useState<boolean>(false)
   const { isSessionActive, user } = useUser()
 
   const handleLike = async () => {
-    if (isLoading || !props.postData.user) return
-
     if (!isSessionActive()) {
       setVisibleModal({ name: 'session' })
       return
     }
 
-    setIsLoading(true)
+    setLoading(true)
 
+    try {
+      if (props.postData.userLiked === true) {
+        unlikePost()
+      } else if (props.postData.userLiked === false) {
+        likePost()
+      }
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const likePost = async () => {
     if (!props.postData.id) return
 
-    if (props.postData.userLiked) {
-      await props.postData.user.unlikePost({ postId: props.postData.id })
+    const newLike = await user!.likePost({ postId: props.postData.id })
 
-      props.setPostData(prevPostData => ({
+    if (!newLike || !newLike.value) return
+
+    props.setPostData(prevPostData => {
+      if (prevPostData.likes === null) return prevPostData
+
+      const newLikes = [...prevPostData.likes, newLike.value!]
+
+      return {
         ...prevPostData,
-        userLiked: false,
-        likes:
-          prevPostData.likes?.filter(like => like.userId !== user?.id) ?? []
-      }))
-    } else {
-      await props.postData.user.likePost({ postId: props.postData.id })
+        userLiked: true,
+        likes: newLikes
+      }
+    })
+  }
 
-      props.setPostData(prevPostData => ({
-        ...prevPostData,
-        userLiked: true
-      }))
+  const unlikePost = async () => {
+    if (!props.postData.id) return
 
-      // AÑADIR LIKE DEL USUARIO A postData.likes
-      console.log("ACA")
+    const postUnliked = await user!.unlikePost({ postId: props.postData.id })
+
+    if (postUnliked.success) {
+      props.setPostData(prevPostData => {
+        if (prevPostData.likes === null) return prevPostData
+
+        const newLikes = prevPostData.likes.filter(
+          like => like.userId === user!.id
+        )
+
+        return {
+          ...prevPostData,
+          userLiked: false,
+          likes: newLikes
+        }
+      })
     }
-
-    setIsLoading(false)
   }
 
   const handleOpenComments = () => {
@@ -60,7 +85,8 @@ export function PostFooter (props: {
         <button
           className='cursor-pointer'
           onClick={handleLike}
-          disabled={isLoading}
+          disabled={loading}
+          title='Like'
         >
           <LikeIcon filled={props.postData.userLiked ?? false} />
         </button>
@@ -75,7 +101,8 @@ export function PostFooter (props: {
         <button
           className='cursor-pointer'
           onClick={handleOpenComments}
-          disabled={isLoading}
+          disabled={loading}
+          title='Comments'
         >
           <CommentIcon filled={props.commentsOpened} />
         </button>

@@ -8,7 +8,7 @@ export function PostMenu (props: PostMenuProps) {
 
   return (
     <Root>
-      <Trigger className='p-2 m-[5px] cursor-pointer rounded-vibe hover:bg-gray-700'>
+      <Trigger title='Post Menu' className='p-2 m-[5px] cursor-pointer rounded-vibe hover:bg-gray-700'>
         <DotsIcon />
       </Trigger>
 
