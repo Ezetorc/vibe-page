@@ -1,7 +1,7 @@
-import { Data } from 'api-responser'
 import { getAdaptedFollower } from '../adapters/getAdaptedFollower'
 import { Follower } from '../models/Follower'
 import { FollowerEndpoint } from '../models/FollowerEndpoint'
+import { Data } from '../models/Data'
 import { api } from '../constants/settings'
 
 export class FollowerService {

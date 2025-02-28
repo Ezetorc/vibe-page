@@ -4,7 +4,7 @@ import { LikeService } from '../services/LikeService'
 import { CommentEndpoint } from './CommentEndpoint'
 import { getAdaptedComment } from '../adapters/getAdaptedComment'
 import { Comment } from './Comment'
-import { Data } from 'api-responser'
+import { Data } from '../models/Data'
 import { api } from '../constants/settings'
 
 export class Post {

@@ -42,10 +42,10 @@ export default function App () {
 
   return (
     <>
+    
       <Suspense fallback={<Loading />}>
         <Router>
           {visibleModal.name && modals[visibleModal.name]}
-
           <Routes>
             <Route path='/' element={<LazyHome />} />
             <Route path='/register' element={<LazyRegister />} />

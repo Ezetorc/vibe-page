@@ -1,8 +1,8 @@
-import { Data } from 'api-responser'
 import { getAdaptedPost } from '../adapters/getAdaptedPost'
 import { Post } from '../models/Post'
 import { PostEndpoint } from '../models/PostEndpoint'
 import { api } from '../constants/settings'
+import { Data } from '../models/Data'
 import { LikeService } from './LikeService'
 
 export class PostService {

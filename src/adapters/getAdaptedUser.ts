@@ -11,7 +11,8 @@ export function getAdaptedUser ({
     name: userEndpoint.name,
     email: userEndpoint.email,
     password: userEndpoint.password,
-    profileImageId: userEndpoint.profile_image_id,
+    imageId: userEndpoint.image_id,
+    imageUrl: userEndpoint.image_url,
     description: userEndpoint.description,
     createdAt: userEndpoint.created_at
   })

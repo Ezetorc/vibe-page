@@ -3,7 +3,7 @@ import { Like } from './Like'
 import { LikeEndpoint } from './LikeEndpoint'
 import { getAdaptedLike } from '../adapters/getAdaptedLike'
 import { api } from '../constants/settings'
-import { Data } from 'api-responser'
+import { Data } from '../models/Data'
 import { LikeService } from '../services/LikeService'
 
 export class Comment {

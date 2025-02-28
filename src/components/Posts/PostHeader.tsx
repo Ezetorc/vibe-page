@@ -1,6 +1,5 @@
 import { useUser } from '../../hooks/useUser'
 import { PostData } from '../../models/PostData'
-import { AccountPicture } from '../AccountPicture'
 import { Username } from '../Username'
 import { PostMenu } from './PostMenu'
 
@@ -24,7 +23,10 @@ export function PostHeader (props: {
     grid mobile:grid-cols-[1fr_1fr] desktop:grid-cols-[2fr_7fr_4fr_1fr] 
     mobile:grid-rows-[auto_auto_auto] desktop:grid-rows-1'
     >
-      <AccountPicture username={props.postData.user.name} />
+      <img
+      title={`${props.postData.user.name} Profile Picture`}
+      className='mobile:col-[1] mobile:row-[1] desktop:col-auto desktop:justify-self-center mobile:justify-self-end desktop:row-auto rounded-full desktop:w-[clamp(40px,3vw,80px)] mobile:w-[clamp(40px,20vw,60px)] aspect-square bg-orange-crayola'
+    />
 
       <Username className='mobile:text-[clamp(18px,1rem,30px)] desktop:text-[clamp(20px,1.8rem,40px)] desktop:col-auto desktop:row-auto mobile:col-span-2 mobile:row-[2] text-center'>
         {props.postData.user.name}

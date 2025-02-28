@@ -1,7 +1,7 @@
-import { Data } from 'api-responser'
 import { getAdaptedComment } from '../adapters/getAdaptedComment'
 import { Comment } from '../models/Comment'
 import { CommentEndpoint } from '../models/CommentEndpoint'
+import { Data } from '../models/Data'
 import { api } from '../constants/settings'
 
 export class CommentService {

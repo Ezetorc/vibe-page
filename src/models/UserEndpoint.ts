@@ -3,7 +3,8 @@ export interface UserEndpoint {
   name: string
   email: string
   password: string
-  profile_image_id: string | null
+  image_id: string | null
+  image_url: string | null
   description: string
   created_at: string
 }

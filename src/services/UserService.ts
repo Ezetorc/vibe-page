@@ -1,8 +1,8 @@
-import { Data } from 'api-responser'
 import { getAdaptedUser } from '../adapters/getAdaptedUser'
 import { User } from '../models/User'
 import { UserEndpoint } from '../models/UserEndpoint'
 import { api } from '../constants/settings'
+import { Data } from '../models/Data'
 
 export class UserService {
   static async getByUsername ({
@@ -75,6 +75,23 @@ export class UserService {
     })
 
     return response
+  }
+
+  static async deleteImage (publicId: string): Promise<boolean> {
+    try {
+      const response = await api.delete<{ success: boolean; error?: string }>({
+        endpoint: 'image',
+        body: JSON.stringify({ public_id: publicId })
+      })
+
+      if (!response.success) {
+        return false
+      }
+
+      return true
+    } catch {
+      return false
+    }
   }
 
   static async logout (): Promise<Data<boolean>> {

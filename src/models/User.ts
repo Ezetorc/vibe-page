@@ -6,7 +6,7 @@ import { LikeService } from '../services/LikeService'
 import { UserService } from '../services/UserService'
 import { CommentService } from '../services/CommentService'
 import { Comment } from './Comment'
-import { Data } from 'api-responser'
+import { Data } from '../models/Data'
 import { api } from '../constants/settings'
 import { PostEndpoint } from './PostEndpoint'
 import { getAdaptedPost } from '../adapters/getAdaptedPost'
@@ -17,7 +17,8 @@ export class User {
   public name: string
   public email: string
   public password: string
-  public profileImageId: string | null
+  public imageId: string | null
+  public imageUrl: string | null
   public description: string
   public createdAt: string
 
@@ -26,7 +27,8 @@ export class User {
     name,
     email,
     password,
-    profileImageId,
+    imageUrl,
+    imageId,
     description,
     createdAt
   }: {
@@ -34,7 +36,8 @@ export class User {
     name: string
     email: string
     password: string
-    profileImageId: string | null
+    imageId: string | null
+    imageUrl: string | null
     description: string
     createdAt: string
   }) {
@@ -42,7 +45,8 @@ export class User {
     this.name = name
     this.email = email
     this.password = password
-    this.profileImageId = profileImageId
+    this.imageId = imageId
+    this.imageUrl = imageUrl
     this.description = description
     this.createdAt = createdAt
   }
@@ -167,6 +171,38 @@ export class User {
     return Data.success(true)
   }
 
+  public async changeImageUrl ({
+    newImageUrl
+  }: {
+    newImageUrl: string
+  }): Promise<Data<boolean>> {
+    const response = await api.patch({
+      endpoint: `users/id/${this.id}`,
+      body: JSON.stringify({ image_url: newImageUrl })
+    })
+
+    if (!response.value) return Data.failure()
+
+    this.imageUrl = newImageUrl
+    return Data.success(true)
+  }
+
+  public async changeImageId ({
+    newImageId
+  }: {
+    newImageId: string
+  }): Promise<Data<boolean>> {
+    const response = await api.patch({
+      endpoint: `users/id/${this.id}`,
+      body: JSON.stringify({ image_id: newImageId })
+    })
+
+    if (!response.value) return Data.failure()
+
+    this.imageId = newImageId
+    return Data.success(true)
+  }
+
   public async changePassword ({
     newPassword
   }: {
@@ -199,7 +235,9 @@ export class User {
     return Data.success(true)
   }
 
-  public async getPosts ({ page = 1 }: { page?: number } = {}): Promise<Data<Post[]>> {
+  public async getPosts ({ page = 1 }: { page?: number } = {}): Promise<
+    Data<Post[]>
+  > {
     const posts = await PostService.getAll({ page })
 
     if (!posts.value) return Data.failure()
@@ -227,11 +265,7 @@ export class User {
     return Data.success(true)
   }
 
-  public async likePost ({
-    postId
-  }: {
-    postId: number
-  }): Promise<Data<Like>> {
+  public async likePost ({ postId }: { postId: number }): Promise<Data<Like>> {
     const response = await LikeService.create({
       userId: this.id,
       targetId: postId,

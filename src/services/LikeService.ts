@@ -1,8 +1,8 @@
-import { Data } from 'api-responser'
 import { getAdaptedLike } from '../adapters/getAdaptedLike'
 import { Like } from '../models/Like'
 import { LikeEndpoint } from '../models/LikeEndpoint'
 import { api } from '../constants/settings'
+import { Data } from '../models/Data'
 import { LikeType } from '../models/LikeType'
 
 export class LikeService {

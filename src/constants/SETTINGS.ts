@@ -1,5 +1,6 @@
-import { API } from 'api-responser'
 import { Settings } from '../models/Settings'
+import { Cloud } from '../models/Cloud'
+import { API } from '../models/API'
 
 const settings: Settings = {
   api: new API({
@@ -12,7 +13,8 @@ const settings: Settings = {
   languages: {
     en: 'English',
     es: 'Español'
-  }
+  },
+  cloudinary: new Cloud({ cloud: { cloudName: 'ddugvrea9' } })
 }
 
-export const { api, languages, defaultLanguage } = settings
+export const { api, languages, defaultLanguage, cloudinary } = settings
