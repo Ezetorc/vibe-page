@@ -1,6 +1,4 @@
 import { Section } from '../../../components/Section'
-import { SearchBar } from '../../../components/SearchBar'
-import { PostsDisplay } from '../../../components/Posts/PostsDisplay'
 import { Nav } from '../../../components/Nav'
 import { useAccount } from '../hooks/useAccount'
 import { useSettings } from '../../../hooks/useSettings'
@@ -8,16 +6,11 @@ import { AccountName } from './AccountName'
 import { AccountDescription } from './AccountDescription'
 import { AccountDate } from './AccountDate'
 import { AccountInteractions } from './AccountInteractions'
-import { useState } from 'react'
-import { useUserPosts } from '../hooks/useUserPosts'
-import { LoadSpinner } from '../../../components/LoadSpinner'
 import { AccountPicture } from './AccountPicture'
 
 export default function Account () {
   const { dictionary } = useSettings()
-  const [searchQuery, setSearchQuery] = useState<string | undefined>(undefined)
   const account = useAccount()
-  const posts = useUserPosts(account.user, searchQuery)
 
   if (!account.user)
     return (
@@ -26,13 +19,7 @@ export default function Account () {
       </h3>
     )
 
-  const handlePostDelete = (postId: number) => {
-    posts.delete(postId)
-  }
-
-  const handleSearch = (query: string) => {
-    setSearchQuery(query)
-  }
+  
 
   return (
     <Section>
@@ -47,13 +34,7 @@ export default function Account () {
         <AccountInteractions />
       </article>
 
-      <SearchBar
-        onSearch={handleSearch}
-        placeholder={dictionary.searchMyPosts}
-      />
-
-      <PostsDisplay onPostDelete={handlePostDelete} posts={posts.data} />
-      {posts?.hasNextPage && <LoadSpinner reference={posts.ref} />}
+      
 
       <Nav />
     </Section>

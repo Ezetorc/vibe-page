@@ -26,11 +26,9 @@ export class Cloud extends Cloudinary {
   }
 
   public async deleteImage (args: { publicId: string }): Promise<Data<boolean>> {
-    const response = await api.delete<boolean>({
+    const response = await api.post<boolean>({
       endpoint: `users/image/${args.publicId}`
     })
-
-    console.log(api)
 
     return response
   }

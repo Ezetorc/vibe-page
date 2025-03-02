@@ -19,19 +19,22 @@ export function useSettings () {
     updateDictionary()
   }, [updateDictionary])
 
-  const openModal = (
-    modalName: ModalName,
-    data: object | undefined = {}
-  ) => {
-    setVisibleModal({
-      name: modalName,
-      data
-    })
-  }
+  const openModal = useCallback(
+    (modalName: ModalName, data: object | undefined = {}) => {
+      setVisibleModal({
+        name: modalName,
+        data
+      })
+    },
+    [setVisibleModal]
+  )
 
-  const closeModal = (data: object | undefined = {}) => {
-    setVisibleModal({ name: null, data })
-  }
+  const closeModal = useCallback(
+    (data: object | undefined = {}) => {
+      setVisibleModal({ name: null, data })
+    },
+    [setVisibleModal]
+  )
 
   return { ...settingsStore, dictionary, openModal, closeModal }
 }

@@ -71,7 +71,7 @@ export function usePosts (searchQuery?: string) {
 
   useEffect(() => {
     if (isPaginationError || isSearchError) {
-      openModal("connection")
+      openModal('connection')
     } else if (
       isIntersecting &&
       hasNextPage &&

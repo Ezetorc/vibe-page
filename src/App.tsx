@@ -42,7 +42,6 @@ export default function App () {
 
   return (
     <>
-    
       <Suspense fallback={<Loading />}>
         <Router>
           {visibleModal.name && modals[visibleModal.name]}

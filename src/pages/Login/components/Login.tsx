@@ -33,7 +33,7 @@ export default function Login () {
         if (sessionSuccess) {
           navigate('/')
         } else {
-          openModal('connection')
+      openModal('connection')
         }
       } else {
         setErrorMessage(dictionary.nameOrPasswordWrong)

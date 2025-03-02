@@ -7,15 +7,17 @@ import { User } from '../../../models/User'
 
 export function AccountPicture () {
   const { openModal, dictionary } = useSettings()
-  const { user, setUser } = useUser()
+  const { setUser } = useUser()
   const account = useAccount()
-  const [imageUrl, setImageUrl] = useState<string>(account.user?.imageUrl || '')
+  const [imageUrl, setImageUrl] = useState<string | null>(
+    account.user?.imageUrl || null
+  )
   const [publicId, setPublicId] = useState<string | null>(
     account.user?.imageId || null
   )
 
   useEffect(() => {
-    setImageUrl(account.user?.imageUrl || '')
+    setImageUrl(account.user?.imageUrl || null)
     setPublicId(account.user?.imageId || null)
   }, [account.user])
 
@@ -37,33 +39,35 @@ export function AccountPicture () {
 
       if (publicId) {
         const prevImageDeleted = await cloudinary.deleteImage({ publicId })
-        console.log('prevImageDeleted: ', prevImageDeleted)
 
         if (prevImageDeleted.success) {
           await saveImageToDatabase(newSecureUrl, newPublicId)
           setImageUrl(newSecureUrl)
           setPublicId(newPublicId)
         } else {
+
           openModal('connection')
         }
       }
     } catch {
+
       openModal('connection')
     }
   }
 
   const saveImageToDatabase = async (imageUrl: string, publicId: string) => {
-    if (!user) return
+    if (!account.user) return
 
     try {
-      await user.changeImageUrl({ newImageUrl: imageUrl })
-      await user.changeImageId({ newImageId: publicId })
+      await account.user.changeImageUrl({ newImageUrl: imageUrl })
+      await account.user.changeImageId({ newImageId: publicId })
 
       const newUser = new User({
-        ...user,
+        ...account.user,
         imageId: publicId,
         imageUrl: imageUrl
       })
+
       setUser(newUser)
     } catch {
       openModal('connection')
@@ -75,7 +79,7 @@ export function AccountPicture () {
       <img
         title={`${account.user?.name} Profile Picture`}
         className='absolute w-full h-full'
-        src={imageUrl}
+        src={imageUrl ?? 'src/assets/images/guest_user.jpg'}
         alt='Profile'
       />
       <input
