@@ -4,10 +4,9 @@ import { useSettings } from '../../../hooks/useSettings'
 import { cloudinary } from '../../../constants/settings'
 import { useUser } from '../../../hooks/useUser'
 import { User } from '../../../models/User'
-import { UserService } from '../../../services/UserService'
 
 export function AccountPicture () {
-  const { setVisibleModal, dictionary } = useSettings()
+  const { openModal, dictionary } = useSettings()
   const { user, setUser } = useUser()
   const account = useAccount()
   const [imageUrl, setImageUrl] = useState<string>(account.user?.imageUrl || '')
@@ -30,24 +29,26 @@ export function AccountPicture () {
 
   const uploadImage = async (image: File) => {
     try {
-      const { secure_url, public_id } = await cloudinary.upload({
-        file: image,
-        uploadPreset: 'profile_images'
-      })
+      const { secure_url: newSecureUrl, public_id: newPublicId } =
+        await cloudinary.upload({
+          file: image,
+          uploadPreset: 'profile_images'
+        })
 
       if (publicId) {
-        const imageDeleted = await UserService.deleteImage(publicId)
+        const prevImageDeleted = await cloudinary.deleteImage({ publicId })
+        console.log('prevImageDeleted: ', prevImageDeleted)
 
-        if (!imageDeleted) {
-          setVisibleModal({ name: 'connection' })
+        if (prevImageDeleted.success) {
+          await saveImageToDatabase(newSecureUrl, newPublicId)
+          setImageUrl(newSecureUrl)
+          setPublicId(newPublicId)
+        } else {
+          openModal('connection')
         }
       }
-
-      await saveImageToDatabase(secure_url, public_id)
-      setImageUrl(secure_url)
-      setPublicId(public_id)
     } catch {
-      setVisibleModal({ name: 'connection' })
+      openModal('connection')
     }
   }
 
@@ -65,7 +66,7 @@ export function AccountPicture () {
       })
       setUser(newUser)
     } catch {
-      setVisibleModal({ name: 'connection' })
+      openModal('connection')
     }
   }
 

@@ -9,7 +9,7 @@ import { useSettings } from '../../../hooks/useSettings'
 
 export function useAccount () {
   const { username } = useParams<{ username: string }>()
-  const { setVisibleModal, dictionary } = useSettings()
+  const { openModal, dictionary } = useSettings()
   const { errorMessage, validateName, validateDescription } = useValidation()
   const { updateUser, user } = useUser()
   const [account, setAccount] = useState<User | null>(null)
@@ -39,7 +39,7 @@ export function useAccount () {
     const message = errorMessage || dictionary.errorDuringNameChange
 
     if (!isNewNameValid) {
-      setVisibleModal({ name: 'edit', message })
+      openModal('edit', { message })
       return
     }
 
@@ -48,7 +48,7 @@ export function useAccount () {
     if (nameChange.success) {
       await updateUser(account.id)
     } else {
-      setVisibleModal({ name: 'edit', message })
+      openModal('edit', { message })
     }
 
     setEditState({ field: null, value: '' })
@@ -63,7 +63,7 @@ export function useAccount () {
     const message = errorMessage || dictionary.errorDuringDescriptionChange
 
     if (!isNewDescriptionValid) {
-      setVisibleModal({ name: 'edit', message })
+      openModal('edit', { message })
       return
     }
 
@@ -74,7 +74,7 @@ export function useAccount () {
     if (descriptionChange.success) {
       await updateUser(account.id)
     } else {
-      setVisibleModal({ name: 'edit', message })
+      openModal('edit', { message })
     }
 
     setEditState({ field: null, value: '' })

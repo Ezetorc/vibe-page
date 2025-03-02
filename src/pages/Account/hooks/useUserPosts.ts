@@ -13,7 +13,7 @@ import { PostService } from '../../../services/PostService'
 
 export function useUserPosts (user: User | null, searchQuery?: string) {
   const queryClient = useQueryClient()
-  const { setVisibleModal } = useSettings()
+  const { openModal } = useSettings()
   const { isIntersecting, ref } = useIntersectionObserver({ threshold: 0.5 })
 
   const userId = user?.id
@@ -75,7 +75,7 @@ export function useUserPosts (user: User | null, searchQuery?: string) {
 
   useEffect(() => {
     if (isPaginationError || isSearchError) {
-      setVisibleModal({ name: 'connection' })
+      openModal('connection')
     } else if (
       isIntersecting &&
       hasNextPage &&
@@ -91,7 +91,7 @@ export function useUserPosts (user: User | null, searchQuery?: string) {
     isPaginationLoading,
     isPaginationError,
     isSearchError,
-    setVisibleModal,
+    openModal,
     searchQuery
   ])
 

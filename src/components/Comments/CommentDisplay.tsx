@@ -12,7 +12,7 @@ import { Username } from '../Username'
 
 export function CommentDisplay (props: CommentDisplayProps) {
   const { isSessionActive, user } = useUser()
-  const { setVisibleModal, dictionary } = useSettings()
+  const { openModal, dictionary } = useSettings()
   const [hasUserLikedComment, setHasUserLikedComment] = useState<boolean>(false)
   const [isProcessing, setIsProcessing] = useState<boolean>(false)
   const [commentData, setCommentData] = useState<{
@@ -47,7 +47,7 @@ export function CommentDisplay (props: CommentDisplayProps) {
     if (isProcessing || !commentData.user) return
 
     if (!isSessionActive()) {
-      setVisibleModal({ name: 'session' })
+      openModal("session")
       return
     }
 
@@ -67,7 +67,7 @@ export function CommentDisplay (props: CommentDisplayProps) {
     hasUserLikedComment,
     isSessionActive,
     isProcessing,
-    setVisibleModal
+    openModal
   ])
 
   const fetchCommentData = useCallback(async () => {

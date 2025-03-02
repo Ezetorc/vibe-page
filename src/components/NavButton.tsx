@@ -6,16 +6,14 @@ import { NavButtonProps } from '../models/Props/NavButtonProps'
 export function NavButton (props: NavButtonProps) {
   const location = useLocation()
   const { isSessionActive } = useUser()
-  const { setVisibleModal } = useSettings()
+  const { openModal } = useSettings()
 
   const handleClick = (event: React.MouseEvent<HTMLAnchorElement>): void => {
     if (!(props.needsSession ?? false)) return
 
     if (!isSessionActive()) {
       event.preventDefault()
-      setVisibleModal({
-        name: 'session'
-      })
+      openModal("session")
     }
   }
 

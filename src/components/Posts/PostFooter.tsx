@@ -10,13 +10,13 @@ export function PostFooter (props: {
   setCommentsOpened: Dispatch<React.SetStateAction<boolean>>
   setPostData: Dispatch<React.SetStateAction<PostData>>
 }) {
-  const { dictionary, setVisibleModal } = useSettings()
+  const { dictionary, openModal } = useSettings()
   const [loading, setLoading] = useState<boolean>(false)
   const { isSessionActive, user } = useUser()
 
   const handleLike = async () => {
     if (!isSessionActive()) {
-      setVisibleModal({ name: 'session' })
+      openModal("session")
       return
     }
 

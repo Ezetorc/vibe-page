@@ -1,10 +1,10 @@
 import { useSettings } from '../hooks/useSettings'
 
 export function CloseModalButton () {
-  const { setVisibleModal } = useSettings()
+  const { closeModal } = useSettings()
 
   const handleClose = () => {
-    setVisibleModal({ name: null, message: '' })
+    closeModal()
   }
 
   return (

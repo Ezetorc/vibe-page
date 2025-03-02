@@ -9,7 +9,7 @@ import { CommentCreatorProps } from '../../models/Props/CommentCreatorProps'
 
 export function CommentCreator (props: CommentCreatorProps) {
   const { user } = useUser()
-  const { dictionary, setVisibleModal } = useSettings()
+  const { dictionary, openModal, closeModal } = useSettings()
   const { validateComment, errorMessage, setErrorMessage } = useValidation()
   const [commentContent, setCommentContent] = useState<string>('')
   const randomPlaceholderIndex = useRef<number>(getRandomNumber(0, 10))
@@ -19,7 +19,7 @@ export function CommentCreator (props: CommentCreatorProps) {
 
   const handleCreateComment = async () => {
     if (!user) {
-      setVisibleModal({ name: 'session' })
+      openModal('session')
       return
     }
 
@@ -34,12 +34,7 @@ export function CommentCreator (props: CommentCreatorProps) {
     })
 
     if (creation.success) {
-      setVisibleModal({
-        name: null,
-        data: {
-          newCommentContent: commentContent
-        }
-      })
+      closeModal({ newCommentContent: commentContent })
     } else {
       setErrorMessage(dictionary.somethingWentWrong)
     }

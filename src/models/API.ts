@@ -29,6 +29,7 @@ export class API {
     if (error instanceof Error) {
       console.warn(`Request error: ${error.message}`)
     }
+    
     return Data.failure<T>({ message: 'Request failed', error })
   }
 

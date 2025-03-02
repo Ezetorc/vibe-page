@@ -2,10 +2,11 @@ import { useState, useEffect, useCallback } from 'react'
 import { Dictionary } from '../models/Dictionary'
 import { SettingsStore } from '../models/SettingsStore'
 import { getSettingsStore } from '../stores/getSettingsStore'
+import { ModalName } from '../models/ModalName'
 
 export function useSettings () {
   const settingsStore: SettingsStore = getSettingsStore()
-  const { language, dictionaries } = settingsStore
+  const { language, dictionaries, setVisibleModal } = settingsStore
   const [dictionary, setDictionary] = useState<Dictionary>({})
 
   const updateDictionary = useCallback(() => {
@@ -18,5 +19,19 @@ export function useSettings () {
     updateDictionary()
   }, [updateDictionary])
 
-  return { ...settingsStore, dictionary }
+  const openModal = (
+    modalName: ModalName,
+    data: object | undefined = {}
+  ) => {
+    setVisibleModal({
+      name: modalName,
+      data
+    })
+  }
+
+  const closeModal = (data: object | undefined = {}) => {
+    setVisibleModal({ name: null, data })
+  }
+
+  return { ...settingsStore, dictionary, openModal, closeModal }
 }

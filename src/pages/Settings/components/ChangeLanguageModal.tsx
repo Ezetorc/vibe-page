@@ -8,7 +8,7 @@ import { Languages } from './Languages'
 import { CloseModalButton } from '../../../components/CloseModalButton'
 
 export function ChangeLanguageModal () {
-  const { setVisibleModal, language, setLanguage, dictionary } = useSettings()
+  const { closeModal, language, setLanguage, dictionary } = useSettings()
   const [newLanguage, setNewLanguage] = useState<Language>(language)
 
   const handleChangeNewLanguage = async (
@@ -22,7 +22,7 @@ export function ChangeLanguageModal () {
     setLanguage(newLanguage)
 
     localStorage.setItem('language', newLanguage)
-    setVisibleModal({ name: null })
+    closeModal()
   }
 
   return (

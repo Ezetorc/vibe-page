@@ -8,7 +8,7 @@ export function PostComments (props: {
   postData: PostData
   setPostData: Dispatch<React.SetStateAction<PostData>>
 }) {
-  const { dictionary, setVisibleModal } = useSettings()
+  const { dictionary, openModal } = useSettings()
 
   const handleCommentDelete = async (commentId: number) => {
     if (!props.postData.comments) return
@@ -34,7 +34,7 @@ export function PostComments (props: {
   }
 
   const handleCreateComment = () => {
-    setVisibleModal({ name: 'comment', data: { postId: props.postData.id } })
+    openModal('comment', { postId: props.postData.id })
   }
 
   return (

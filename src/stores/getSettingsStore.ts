@@ -18,10 +18,10 @@ export const getSettingsStore = create<SettingsStore>(set => ({
 
   visibleModal: {
     name: null,
-    message: undefined
+    data: undefined
   },
   setVisibleModal: (newVisibleModal: {
     name: ModalName | null
-    message?: string | undefined
+    data?: object | undefined
   }) => set({ visibleModal: newVisibleModal })
 }))

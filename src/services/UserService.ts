@@ -77,23 +77,6 @@ export class UserService {
     return response
   }
 
-  static async deleteImage (publicId: string): Promise<boolean> {
-    try {
-      const response = await api.delete<{ success: boolean; error?: string }>({
-        endpoint: 'image',
-        body: JSON.stringify({ public_id: publicId })
-      })
-
-      if (!response.success) {
-        return false
-      }
-
-      return true
-    } catch {
-      return false
-    }
-  }
-
   static async logout (): Promise<Data<boolean>> {
     const response = await api.post<boolean>({ endpoint: `logout` })
 

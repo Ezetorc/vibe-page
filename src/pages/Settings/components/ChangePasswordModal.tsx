@@ -10,7 +10,7 @@ import { CloseModalButton } from '../../../components/CloseModalButton'
 export function ChangePasswordModal () {
   const { user } = useUser()
   const { validatePasswords, errorMessage } = useValidation()
-  const { setVisibleModal, dictionary } = useSettings()
+  const { openModal, closeModal, dictionary } = useSettings()
   const newPasswordRef = useRef<HTMLInputElement>(null)
   const confirmedNewPasswordRef = useRef<HTMLInputElement>(null)
 
@@ -27,9 +27,9 @@ export function ChangePasswordModal () {
     const passwordChange = await user.changePassword({ newPassword })
 
     if (passwordChange.success) {
-      setVisibleModal({ name: null })
+      closeModal()
     } else {
-      setVisibleModal({ name: 'connection' })
+      openModal("connection")
     }
   }
 

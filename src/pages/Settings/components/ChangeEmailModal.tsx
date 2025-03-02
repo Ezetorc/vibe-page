@@ -10,7 +10,7 @@ import { CloseModalButton } from '../../../components/CloseModalButton'
 export function ChangeEmailModal () {
   const { user } = useUser()
   const { validateEmail, errorMessage } = useValidation()
-  const { setVisibleModal, dictionary } = useSettings()
+  const { openModal, closeModal, dictionary } = useSettings()
 
   const newEmailRef = useRef<HTMLInputElement>(null)
 
@@ -23,9 +23,9 @@ export function ChangeEmailModal () {
     const emailChange = await user.changeEmail({ newEmail })
 
     if (emailChange.success) {
-      setVisibleModal({ name: null })
+      closeModal()
     } else {
-      setVisibleModal({ name: 'connection' })
+      openModal("connection")
     }
   }
 

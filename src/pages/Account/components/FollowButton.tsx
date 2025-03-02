@@ -5,13 +5,13 @@ import { FollowButtonProps } from '../models/FollowButtonProps'
 import { useUser } from '../../../hooks/useUser'
 
 export function FollowButton (props: FollowButtonProps) {
-  const { dictionary, setVisibleModal } = useSettings()
+  const { dictionary, openModal } = useSettings()
   const { user } = useUser()
   const [isFollowing, setIsFollowing] = useState<boolean>(false)
 
   const fetchFollowing = useCallback(async () => {
     if (!user) {
-      setVisibleModal({ name: 'session' })
+      openModal("session")
       return
     }
 
@@ -20,16 +20,16 @@ export function FollowButton (props: FollowButtonProps) {
     })
 
     if (!following.success) {
-      setVisibleModal({ name: 'connection' })
+      openModal("connection")
       return
     }
 
     setIsFollowing(following.value as boolean)
-  }, [props.user.id, user, setVisibleModal])
+  }, [props.user.id, user, openModal])
 
   const handleFollow = async () => {
     if (!user) {
-      setVisibleModal({ name: 'session' })
+      openModal('session')
       return
     }
 

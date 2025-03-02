@@ -10,7 +10,7 @@ import { PostService } from '../../../services/PostService'
 export function PostCreator () {
   const navigate = useNavigate()
   const { user } = useUser()
-  const { dictionary, setVisibleModal } = useSettings()
+  const { dictionary, openModal } = useSettings()
   const { validatePost, errorMessage, setErrorMessage } = useValidation()
   const [postContent, setPostContent] = useState<string>('')
   const randomPlaceholderIndex = useRef<number>(getRandomNumber(0, 10))
@@ -20,7 +20,7 @@ export function PostCreator () {
 
   const handleCreatePost = async () => {
     if (!user) {
-      setVisibleModal({ name: 'session' })
+      openModal("session")
       return
     }
 

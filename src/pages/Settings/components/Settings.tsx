@@ -7,23 +7,23 @@ import { SettingsSection } from './SettingsSection'
 
 export default function Settings () {
   const { isSessionActive } = useUser()
-  const { setVisibleModal, dictionary } = useSettings()
+  const { openModal, dictionary } = useSettings()
 
   const handleChangeEmail = () => {
     if (!isSessionActive()) {
-      setVisibleModal({ name: 'session' })
+      openModal('session')
       return
     }
 
-    setVisibleModal({ name: 'email' })
+    openModal('email')
   }
 
   const handleChangePassword = () => {
-    setVisibleModal({ name: 'password' })
+    openModal('password')
   }
 
   const handleChangeLanguage = () => {
-    setVisibleModal({ name: 'language' })
+    openModal('language')
   }
 
   return (

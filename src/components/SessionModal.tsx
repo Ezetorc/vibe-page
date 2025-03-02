@@ -5,17 +5,17 @@ import { useSettings } from '../hooks/useSettings'
 import { CloseModalButton } from './CloseModalButton'
 
 export function SessionModal () {
-  const { setVisibleModal, dictionary } = useSettings()
+  const { closeModal, dictionary } = useSettings()
   const navigate = useNavigate()
 
   const handleLogin = () => {
     navigate('/login')
-    setVisibleModal({ name: null })
+    closeModal()
   }
 
   const handleRegister = () => {
     navigate('/register')
-    setVisibleModal({ name: null })
+    closeModal()
   }
 
   return (
