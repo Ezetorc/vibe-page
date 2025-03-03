@@ -1,9 +1,9 @@
 import { getAdaptedLike } from '../adapters/getAdaptedLike'
 import { Like } from '../models/Like'
 import { LikeEndpoint } from '../models/LikeEndpoint'
-import { api } from '../constants/settings'
 import { Data } from '../models/Data'
 import { LikeType } from '../models/LikeType'
+import { api } from '../constants/SETTINGS'
 
 export class LikeService {
   static async getAllOfPost ({
@@ -16,7 +16,6 @@ export class LikeService {
     })
 
     if (!response.value) return Data.failure()
-
     const likes: Like[] = response.value.map(likeEndpoint =>
       getAdaptedLike({ likeEndpoint })
     )

@@ -24,11 +24,13 @@ export function PostHeader (props: {
     mobile:grid-rows-[auto_auto_auto] desktop:grid-rows-1'
     >
       <img
-      title={`${props.postData.user.name} Profile Picture`}
-      className='mobile:col-[1] mobile:row-[1] desktop:col-auto desktop:justify-self-center mobile:justify-self-end desktop:row-auto rounded-full desktop:w-[clamp(40px,3vw,80px)] mobile:w-[clamp(40px,20vw,60px)] aspect-square bg-orange-crayola'
-    />
+        title={`${props.postData.user.name} Profile Picture`}
+        className='mobile:col-[1] mobile:row-[1] desktop:col-auto desktop:justify-self-center mobile:justify-self-end desktop:row-auto rounded-full desktop:w-[clamp(40px,5vw,80px)] mobile:w-[clamp(40px,20vw,60px)] aspect-square bg-orange-crayola'
+        src={props.postData.user.imageUrl ?? 'src/assets/images/guest_user.jpg'}
+        alt='Profile'
+      />
 
-      <Username className='mobile:text-[clamp(18px,1rem,30px)] desktop:text-[clamp(20px,1.8rem,40px)] desktop:col-auto desktop:row-auto mobile:col-span-2 mobile:row-[2] text-center'>
+      <Username className='mobile:text-[clamp(18px,1rem,30px)] desktop:text-[clamp(20px,1.8rem,40px)] desktop:col-auto desktop:row-auto mobile:col-span-2 mobile:row-[2]'>
         {props.postData.user.name}
       </Username>
 

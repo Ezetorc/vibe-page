@@ -15,7 +15,11 @@ export function InvalidEditModal () {
         </h2>
 
         <span className='text-center font-poppins-regular text-[clamp(20px,7vw,40px)]  '>
-          {visibleModal.message}
+          {'data' in visibleModal &&
+          typeof visibleModal.data === 'object' &&
+          'message' in visibleModal.data
+            ? String(visibleModal.data.message)
+            : 'Error'}
         </span>
       </article>
     </Modal>

@@ -1,7 +1,7 @@
 import { getAdaptedPost } from '../adapters/getAdaptedPost'
 import { Post } from '../models/Post'
 import { PostEndpoint } from '../models/PostEndpoint'
-import { api } from '../constants/settings'
+import { api } from '../constants/SETTINGS'
 import { Data } from '../models/Data'
 import { LikeService } from './LikeService'
 

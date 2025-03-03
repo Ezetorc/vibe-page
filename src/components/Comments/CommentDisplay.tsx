@@ -47,7 +47,7 @@ export function CommentDisplay (props: CommentDisplayProps) {
     if (isProcessing || !commentData.user) return
 
     if (!isSessionActive()) {
-      openModal("session")
+      openModal('session')
       return
     }
 
@@ -99,6 +99,7 @@ export function CommentDisplay (props: CommentDisplayProps) {
     fetchCommentData()
   }, [fetchCommentData])
 
+
   return (
     <article className='w-[95%] py-[10px] px-[20px] rounded-vibe border-vibe border-caribbean-current overflow-hidden'>
       <header className='w-full h-[70px] grid grid-cols-[10fr_10fr_1fr] items-center'>
@@ -109,6 +110,15 @@ export function CommentDisplay (props: CommentDisplayProps) {
           ) : (
             <Loading />
           )}
+
+          <img
+            title={`${commentData.user.name} Profile Picture`}
+            className='mobile:col-[1] mobile:row-[1] desktop:col-auto desktop:justify-self-center mobile:justify-self-end desktop:row-auto rounded-full desktop:w-[clamp(40px,5vw,80px)] mobile:w-[clamp(40px,20vw,60px)] aspect-square bg-orange-crayola'
+            src={
+              commentData.user.imageUrl ?? 'src/assets/images/guest_user.jpg'
+            }
+            alt='Profile'
+          />
         </div>
         <span className='text-caribbean-current text-right font-poppins-light text-[clamp(5px,6vw,20px)]'>
           {commentData.date}

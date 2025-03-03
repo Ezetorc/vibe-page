@@ -1,9 +1,9 @@
 import { ChangeEvent, useState, useEffect } from 'react'
 import { useAccount } from '../hooks/useAccount'
 import { useSettings } from '../../../hooks/useSettings'
-import { cloudinary } from '../../../constants/settings'
 import { useUser } from '../../../hooks/useUser'
 import { User } from '../../../models/User'
+import { cloudinary } from '../../../constants/SETTINGS'
 
 export function AccountPicture () {
   const { openModal, dictionary } = useSettings()

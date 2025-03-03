@@ -5,7 +5,7 @@ import { CommentEndpoint } from './CommentEndpoint'
 import { getAdaptedComment } from '../adapters/getAdaptedComment'
 import { Comment } from './Comment'
 import { Data } from '../models/Data'
-import { api } from '../constants/settings'
+import { api } from '../constants/SETTINGS'
 
 export class Post {
   public id: number

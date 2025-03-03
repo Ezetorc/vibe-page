@@ -1,5 +1,5 @@
 import { Cloudinary } from '@cloudinary/url-gen'
-import { api } from '../constants/settings'
+import { api } from '../constants/SETTINGS'
 import { Data } from './Data'
 
 export class Cloud extends Cloudinary {

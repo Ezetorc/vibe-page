@@ -2,7 +2,7 @@ import { format } from '@formkit/tempo'
 import { Like } from './Like'
 import { LikeEndpoint } from './LikeEndpoint'
 import { getAdaptedLike } from '../adapters/getAdaptedLike'
-import { api } from '../constants/settings'
+import { api } from '../constants/SETTINGS'
 import { Data } from '../models/Data'
 import { LikeService } from '../services/LikeService'
 
