@@ -2,7 +2,7 @@ import { getAdaptedComment } from '../adapters/getAdaptedComment'
 import { Comment } from '../models/Comment'
 import { CommentEndpoint } from '../models/CommentEndpoint'
 import { Data } from '../models/Data'
-import { api } from '../constants/settings'
+import { api } from '../constants/SETTINGS'
 
 export class CommentService {
   static async getAll ({
@@ -33,8 +33,8 @@ export class CommentService {
     content: string
     postId: number
     userId: number
-  }): Promise<Data<boolean>> {
-    const response = await api.post<boolean>({
+  }): Promise<Data<Comment>> {
+    const response = await api.post<CommentEndpoint | null>({
       endpoint: 'comments',
       body: JSON.stringify({
         content,
@@ -43,7 +43,11 @@ export class CommentService {
       })
     })
 
-    return response
+    if (response.value == null) return Data.failure()
+
+    const comment = getAdaptedComment({ commentEndpoint: response.value })
+
+    return Data.success(comment)
   }
 
   static async getById ({

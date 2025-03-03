@@ -19,7 +19,7 @@ export function CommentModal () {
           {dictionary.comment}
         </h2>
 
-        <CommentCreator postId={visibleModal.data.postId as number} />
+        <CommentCreator />
       </article>
     </Modal>
   )

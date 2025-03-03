@@ -3,13 +3,12 @@ import { useSettings } from '../../hooks/useSettings'
 import { useUser } from '../../hooks/useUser'
 import { useValidation } from '../../hooks/useValidation'
 import { getRandomNumber } from '../../pages/Create/utilities/getRandomNumber'
-import { CommentService } from '../../services/CommentService'
 import { Button } from '../Button'
-import { CommentCreatorProps } from '../../models/Props/CommentCreatorProps'
+import eventEmitter from '../../constants/EVENT_EMITTER'
 
-export function CommentCreator (props: CommentCreatorProps) {
+export function CommentCreator () {
   const { user } = useUser()
-  const { dictionary, openModal, closeModal } = useSettings()
+  const { dictionary, openModal, visibleModal } = useSettings()
   const { validateComment, errorMessage, setErrorMessage } = useValidation()
   const [commentContent, setCommentContent] = useState<string>('')
   const randomPlaceholderIndex = useRef<number>(getRandomNumber(0, 10))
@@ -25,18 +24,13 @@ export function CommentCreator (props: CommentCreatorProps) {
 
     const isCommentValid = validateComment({ comment: commentContent })
 
-    if (!isCommentValid) return
-
-    const creation = await CommentService.create({
-      userId: user.id,
-      postId: props.postId,
-      content: commentContent
-    })
-
-    if (creation.success) {
-      closeModal({ newCommentContent: commentContent })
-    } else {
-      setErrorMessage(dictionary.somethingWentWrong)
+    if (isCommentValid && 'postId' in visibleModal.data!) {
+      const event = {
+        content: commentContent,
+        postId: visibleModal.data.postId as number
+      }
+      
+      eventEmitter.emit('commentCreated', event)
     }
   }
 

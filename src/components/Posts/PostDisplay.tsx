@@ -1,5 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
-import { useSettings } from '../../hooks/useSettings'
+import { useCallback, useEffect, useState } from 'react'
 import { PostDisplayProps } from '../../models/Props/PostDisplayProps'
 import { PostHeader } from './PostHeader'
 import { PostContent } from './PostContent'
@@ -7,14 +6,11 @@ import { PostFooter } from './PostFooter'
 import { PostData } from '../../models/PostData'
 import { useUser } from '../../hooks/useUser'
 import { UserService } from '../../services/UserService'
-import { Comment } from '../../models/Comment'
 import { PostComments } from './PostComments'
 
 export function PostDisplay (props: PostDisplayProps) {
-  const { visibleModal } = useSettings()
   const { user } = useUser()
   const [commentsOpened, setCommentsOpened] = useState<boolean>(false)
-  const expectCommentCreation = useRef<boolean>(false)
   const [postData, setPostData] = useState<PostData>({
     user: null,
     likes: null,
@@ -45,37 +41,6 @@ export function PostDisplay (props: PostDisplayProps) {
       content: props.post.content
     }))
   }, [props.post, user])
-
-  const createComment = useCallback(() => {
-    if (
-      !postData.comments ||
-      !user ||
-      typeof visibleModal.data !== 'object' ||
-      !('newCommentContent' in visibleModal.data)
-    )
-      return
-
-    const newComment: Comment = new Comment({
-      id: postData.comments?.length + 1,
-      userId: user.id,
-      postId: props.post.id,
-      content: visibleModal.data.newCommentContent as string,
-      createdAt: new Date().toISOString()
-    })
-    const newComments: Comment[] = [...postData.comments]
-    newComments.push(newComment)
-
-    setPostData(prev => ({ ...prev, comments: newComments }))
-  }, [postData.comments, props.post.id, user, visibleModal.data])
-
-  useEffect(() => {
-    if (visibleModal.name === 'comment') {
-      expectCommentCreation.current = true
-    } else if (visibleModal.name === null && expectCommentCreation.current) {
-      expectCommentCreation.current = false
-      createComment()
-    }
-  }, [createComment, visibleModal.name])
 
   useEffect(() => {
     fetchPostData()
