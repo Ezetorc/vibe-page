@@ -3,7 +3,7 @@ import { Language } from '../models/Language.ts'
 import Papa from 'papaparse'
 
 export async function getDictionaries (): Promise<Dictionaries> {
-  const response: Response = await fetch('/src/constants/dictionary.csv')
+  const response: Response = await fetch('/dictionary.csv')
   console.log('RESPONSE: ', response)
   const text: string = await response.text()
   const { data } = Papa.parse<string[]>(text, { skipEmptyLines: true })
