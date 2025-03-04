@@ -4,7 +4,6 @@ import Papa from 'papaparse'
 
 export async function getDictionaries (): Promise<Dictionaries> {
   const response: Response = await fetch('/dictionary.csv')
-  console.log('RESPONSE: ', response)
   const text: string = await response.text()
   const { data } = Papa.parse<string[]>(text, { skipEmptyLines: true })
   const languages: Language[] = data[0].slice(1) as Language[]
