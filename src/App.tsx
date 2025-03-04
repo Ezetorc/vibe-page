@@ -10,6 +10,7 @@ import { ConnectionModal } from './components/ConnectionModal.tsx'
 import { Loading } from './components/Loading.tsx'
 import { ChangePasswordModal } from './pages/Settings/components/ChangePasswordModal.tsx'
 import { CommentModal } from './components/Comments/CommentModal.tsx'
+import { UserService } from './services/UserService.ts'
 
 const LazyHome = lazy(() => import('./pages/Home/components/Home.tsx'))
 const LazyLogin = lazy(() => import('./pages/Login/components/Login.tsx'))
@@ -39,6 +40,13 @@ export default function App () {
   useEffect(() => {
     handleSession()
   }, [handleSession])
+
+  const getUsers = async () => {
+    const users = await UserService.getAll()
+    console.log('USERS: ', users)
+  }
+
+  getUsers()
 
   return (
     <>
