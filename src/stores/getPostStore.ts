@@ -7,11 +7,16 @@ export const getPostStore = create<PostStore>(set => ({
     likes: null,
     comments: null,
     date: null,
-    hasUserLiked: null,
-    post: null
+    content: null,
+    id: null,
+    userLiked: null
   },
   setPostData: newPostData => set({ postData: newPostData }),
 
   isLoading: true,
-  setIsLoading: newIsLoading => set({ isLoading: newIsLoading })
+  setIsLoading: newIsLoading => set({ isLoading: newIsLoading }),
+
+  commentsOpened: false,
+  setCommentsOpened: newCommentsOpened =>
+    set({ commentsOpened: newCommentsOpened })
 }))

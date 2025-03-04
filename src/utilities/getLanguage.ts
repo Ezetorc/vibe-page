@@ -1,4 +1,4 @@
-import { defaultLanguage } from "../constants/settings"
+import { defaultLanguage } from "../constants/SETTINGS"
 import { Language } from "../models/Language"
 
 export function getLanguage (): Language {

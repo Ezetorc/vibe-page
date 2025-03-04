@@ -1,7 +1,7 @@
 import { getAdaptedUser } from '../adapters/getAdaptedUser'
 import { User } from '../models/User'
 import { UserEndpoint } from '../models/UserEndpoint'
-import { api } from '../constants/settings'
+import { api } from '../constants/SETTINGS'
 import { Data } from '../models/Data'
 
 export class UserService {

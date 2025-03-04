@@ -2,7 +2,7 @@ import { getAdaptedFollower } from '../adapters/getAdaptedFollower'
 import { Follower } from '../models/Follower'
 import { FollowerEndpoint } from '../models/FollowerEndpoint'
 import { Data } from '../models/Data'
-import { api } from '../constants/settings'
+import { api } from '../constants/SETTINGS'
 
 export class FollowerService {
   static async create ({
