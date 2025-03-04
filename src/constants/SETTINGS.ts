@@ -4,7 +4,7 @@ import { API } from '../models/API'
 
 const settings: Settings = {
   api: new API({
-    url: 'http://localhost:3000',
+    url: 'https://vibe-api-production.up.railway.app',
     formatToJson: true
   })
     .setDefaultHeaders({ 'Content-Type': 'application/json' })
