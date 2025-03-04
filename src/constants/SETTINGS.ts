@@ -17,4 +17,6 @@ const settings: Settings = {
   cloudinary: new Cloud({ cloud: { cloudName: 'ddugvrea9' } })
 }
 
+console.log('🥑🥑🍎🍎🍎ALTOOO -> API: ', settings.api)
+
 export const { api, languages, defaultLanguage, cloudinary } = settings
