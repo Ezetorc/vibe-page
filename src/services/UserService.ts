@@ -57,6 +57,8 @@ export class UserService {
       body: JSON.stringify({ name, email, password })
     })
 
+    console.log("response: ", response)
+
     if (!response.value) return Data.failure()
 
     return Data.success(true)
