@@ -7,6 +7,8 @@ export function Root () {
   const { loadDictionaries, dictionaries } = getSettingsStore()
   const [loading, setLoading] = useState(true)
 
+  console.log("DICTIONARIES: ", dictionaries)
+
   useEffect(() => {
     loadDictionaries().then(() => setLoading(false))
   }, [loadDictionaries])
