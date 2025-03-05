@@ -141,20 +141,6 @@ export class User {
     return formattedDate
   }
 
-  public async share ({
-    title,
-    text
-  }: {
-    title: string
-    text: string
-  }): Promise<void> {
-    await navigator.share({
-      title,
-      text,
-      url: `http://localhost:8888/#/account/${this.name}`
-    })
-  }
-
   public async changeName ({
     newName
   }: {
