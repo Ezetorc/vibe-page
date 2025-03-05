@@ -57,8 +57,6 @@ export class UserService {
       body: JSON.stringify({ name, email, password })
     })
 
-    console.log("response: ", response)
-
     if (!response.value) return Data.failure()
 
     return Data.success(true)
@@ -98,11 +96,17 @@ export class UserService {
       endpoint: `users?amount=${amount}&page=${page}`
     })
 
+    console.log('response: ', response)
+    console.log('api: ', api)
+    console.log('endpoint: ', `${api.url}/users?amount=${amount}&page=${page}`)
+
     if (!response.value) return Data.failure()
 
     const users: User[] = response.value.map(userEndpoint =>
       getAdaptedUser({ userEndpoint })
     )
+
+    console.log('users: ', users)
 
     return Data.success(users)
   }
