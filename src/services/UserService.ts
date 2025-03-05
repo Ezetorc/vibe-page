@@ -74,6 +74,8 @@ export class UserService {
       body: JSON.stringify({ name, password })
     })
 
+    console.log("login response: ", response)
+
     return response
   }
 
