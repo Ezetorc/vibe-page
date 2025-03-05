@@ -24,13 +24,16 @@ export function useUser () {
 
   const handleSession = useCallback(async (): Promise<boolean> => {
     const accessToken = getAccessToken()
+    console.log('accessToken: ', accessToken)
 
     if (!accessToken) return false
 
     try {
       const session: AccessToken = jwtDecode(accessToken)
+      console.log('session: ', session)
 
       if ('id' in session.user) {
+        console.log('updateUser(): ', session.user.id)
         updateUser(session.user.id)
         return true
       }
