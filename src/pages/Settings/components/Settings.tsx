@@ -19,11 +19,34 @@ export default function Settings () {
   }
 
   const handleChangePassword = () => {
+    if (!isSessionActive()) {
+      openModal('session')
+      return
+    }
+
     openModal('password')
   }
 
   const handleChangeLanguage = () => {
     openModal('language')
+  }
+
+  const handleLogout = () => {
+    if (!isSessionActive()) {
+      openModal('session')
+      return
+    }
+
+    openModal('logout')
+  }
+
+  const handleDeleteAccount = () => {
+    if (!isSessionActive()) {
+      openModal('session')
+      return
+    }
+    
+    openModal('deleteAccount')
   }
 
   return (
@@ -36,6 +59,12 @@ export default function Settings () {
         <Button
           text={`${dictionary.change} ${dictionary.email}`}
           onClick={handleChangeEmail}
+        />
+        <Button text={`${dictionary.logout}`} onClick={handleLogout} />
+        <Button
+          classname='bg-red-500'
+          text={`${dictionary.deleteAccount}`}
+          onClick={handleDeleteAccount}
         />
       </SettingsSection>
 

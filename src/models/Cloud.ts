@@ -1,6 +1,5 @@
 import { Cloudinary } from '@cloudinary/url-gen'
 import { api } from '../constants/SETTINGS'
-import { Data } from './Data'
 
 export class Cloud extends Cloudinary {
   public async upload (args: {
@@ -25,11 +24,11 @@ export class Cloud extends Cloudinary {
     return data
   }
 
-  public async deleteImage (args: { publicId: string }): Promise<Data<boolean>> {
+  public async deleteImage (args: { publicId: string }): Promise<boolean> {
     const response = await api.post<boolean>({
-      endpoint: `users/image/${args.publicId}`
+      endpoint: `users/image?id=${args.publicId}`
     })
 
-    return response
+    return response.success
   }
 }

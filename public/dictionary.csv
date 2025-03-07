@@ -5,6 +5,9 @@ search,Buscar,Search
 posts,Publicaciones,Posts
 users,Usuarios,Users
 post,Publicar,Post
+logout,Cerrar sesión,Log out
+areYouSureLogout,¿Quieres cerrar sesión?,Do you wanna log out?
+deleteAccount,Eliminar cuenta,Delete account
 comment,Comentar,Comment
 changeProfileImage,Cambiar foto de perfil,Change profile image
 searchMyPosts,Buscar mis publicaciones...,Search my posts...
@@ -25,6 +28,8 @@ iHaveAnAccount,Tengo una cuenta,I have an account
 iDontHaveAnAccount,No tengo una cuenta,I don't have an account
 thisUserHasnotDescription,Este usuario no tiene descripción,This user hasn't description
 joined,Se unió el,Joined
+areYouSureDelete,¿Estás seguro de que quieres eliminar tu cuenta?,Are you sure that you wanna delete your account?
+irreversibleAction,Entiendo que esta acción es irreversible,I understand this action is irreversible
 welcomeTo,Bienvenido a,Welcome to
 emptyNameError,Completá tu nombre,Complete name field
 nameLengthError,Tu nombre debe tener entre 3 y 20 caracteres,Name must be between 3 and 20 characters long

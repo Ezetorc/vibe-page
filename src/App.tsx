@@ -10,6 +10,9 @@ import { ConnectionModal } from './components/ConnectionModal.tsx'
 import { Loading } from './components/Loading.tsx'
 import { ChangePasswordModal } from './pages/Settings/components/ChangePasswordModal.tsx'
 import { CommentModal } from './components/Comments/CommentModal.tsx'
+import { LogoutModal } from './pages/Settings/components/LogoutModal.tsx'
+import { ModalName } from './models/ModalName.ts'
+import { DeleteAccountModal } from './pages/Settings/components/DeleteAccountModal.tsx'
 
 const LazyHome = lazy(() => import('./pages/Home/components/Home.tsx'))
 const LazyLogin = lazy(() => import('./pages/Login/components/Login.tsx'))
@@ -26,14 +29,16 @@ const LazyRegister = lazy(
 export default function App () {
   const { visibleModal } = useSettings()
   const { handleSession } = useUser()
-  const modals = {
+  const modals: { [key in ModalName]: JSX.Element } = {
     session: <SessionModal />,
     language: <ChangeLanguageModal />,
     email: <ChangeEmailModal />,
     edit: <InvalidEditModal />,
     connection: <ConnectionModal />,
     password: <ChangePasswordModal />,
-    comment: <CommentModal />
+    comment: <CommentModal />,
+    logout: <LogoutModal />,
+    deleteAccount: <DeleteAccountModal />
   }
 
   useEffect(() => {

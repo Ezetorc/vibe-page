@@ -1,70 +1,60 @@
 import { getAdaptedComment } from '../adapters/getAdaptedComment'
 import { Comment } from '../models/Comment'
 import { CommentEndpoint } from '../models/CommentEndpoint'
-import { Data } from '../models/Data'
 import { api } from '../constants/SETTINGS'
 
 export class CommentService {
-  static async getAll ({
-    amount = 10,
-    page = 1
-  }: {
-    amount?: number
-    page?: number
-  } = {}): Promise<Data<Comment[]>> {
+  static async getAll (
+    args: {
+      amount?: number
+      page?: number
+    } = {}
+  ): Promise<Comment[]> {
     const response = await api.get<CommentEndpoint[]>({
-      endpoint: `comments?amount=${amount}&page=${page}`
+      endpoint: `comments/all?amount=${args.amount ?? 6}&page=${args.page ?? 1}`
     })
 
-    if (!response.value) return Data.failure()
+    if (!response.value) return []
 
     const comments = response.value.map(commentEndpoint =>
       getAdaptedComment({ commentEndpoint })
     )
 
-    return Data.success(comments)
+    return comments
   }
 
-  static async create ({
-    content,
-    postId,
-    userId
-  }: {
+  static async create (args: {
     content: string
     postId: number
     userId: number
-  }): Promise<Data<Comment>> {
-    const response = await api.post<CommentEndpoint | null>({
+  }): Promise<Comment | null> {
+    const response = await api.post<CommentEndpoint>({
       endpoint: 'comments',
       body: JSON.stringify({
-        content,
-        post_id: postId,
-        user_id: userId
+        content: args.content,
+        post_id: args.postId,
+        user_id: args.userId
       })
     })
 
-    if (response.value == null) return Data.failure()
+    if (!response.success) return null
 
-    const comment = getAdaptedComment({ commentEndpoint: response.value })
+    const comment = getAdaptedComment({ commentEndpoint: response.value! })
 
-    return Data.success(comment)
+    return comment
   }
 
-  static async getById ({
-    commentId
-  }: {
-    commentId: number
-  }): Promise<Data<Comment>> {
+  static async getById (args: { commentId: number }): Promise<Comment | null> {
     const response = await api.get<CommentEndpoint>({
-      endpoint: `comments/id/${commentId}`
+      endpoint: `comments/id?id=${args.commentId}`
     })
 
-    if (!response.value) return Data.failure()
+    if (!response.success) return null
 
     const comment = getAdaptedComment({
-      commentEndpoint: response.value
+      commentEndpoint: response.value!
     })
 
-    return Data.success(comment)
+    return comment
   }
 }

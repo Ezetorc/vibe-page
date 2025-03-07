@@ -1,83 +1,58 @@
-import { getAdaptedFollower } from '../adapters/getAdaptedFollower'
-import { Follower } from '../models/Follower'
-import { FollowerEndpoint } from '../models/FollowerEndpoint'
-import { Data } from '../models/Data'
 import { api } from '../constants/SETTINGS'
 
 export class FollowerService {
-  static async create ({
-    followerId,
-    followingId
-  }: {
+  static async create (args: {
     followerId: number
     followingId: number
-  }): Promise<Data<boolean>> {
+  }): Promise<boolean> {
     const response = await api.post({
       endpoint: `followers`,
       body: JSON.stringify({
-        follower_id: followerId,
-        following_id: followingId
+        follower_id: args.followerId,
+        following_id: args.followingId
       })
     })
 
-    if (!response.value) return Data.failure()
-
-    return Data.success(true)
+    return response.success
   }
 
-  static async delete ({
-    followerId,
-    followingId
-  }: {
+  static async delete (args: {
     followerId: number
     followingId: number
-  }): Promise<Data<boolean>> {
+  }): Promise<boolean> {
     const response = await api.delete({
       endpoint: `followers`,
       body: JSON.stringify({
-        follower_id: followerId,
-        following_id: followingId
+        follower_id: args.followerId,
+        following_id: args.followingId
       })
     })
 
-    if (!response.value) return Data.failure()
-
-    return Data.success(true)
+    return response.success
   }
 
-  static async exists ({
-    followerId,
-    followingId
-  }: {
+  static async exists (args: {
     followerId: number
     followingId: number
-  }): Promise<Data<boolean>> {
-    const response = await api.get<FollowerEndpoint[]>({ endpoint: `followers` })
-
-    if (!response.value) return Data.failure()
-
-    const followers: Follower[] = response.value.map(followerEndpoint =>
-      getAdaptedFollower({ followerEndpoint })
-    )
-    const followerExists: boolean = followers.some(follower => {
-      return (
-        follower.followerId === followerId &&
-        follower.followingId === followingId
-      )
+  }): Promise<boolean> {
+    const response = await api.get<boolean>({
+      endpoint: `followers/exists`,
+      body: JSON.stringify({
+        follower_id: args.followerId,
+        following_id: args.followingId
+      })
     })
 
-    return Data.success(followerExists)
+    return Boolean(response.value)
   }
 
-  static async getIdsOfUser ({
-    userId
-  }: {
-    userId: number
-  }): Promise<Data<number[]>> {
-    const response = await api.get<number[]>({ endpoint: `followers/user/${userId}` })
+  static async getIdsOfUser (args: { userId: number }): Promise<number[]> {
+    const response = await api.get<number[]>({
+      endpoint: `followers/all?userId=${args.userId}`
+    })
 
-    if (!response.value) return Data.failure()
-
-    return Data.success(response.value)
+    if (!response.value) return []
+    
+    return response.value
   }
 }

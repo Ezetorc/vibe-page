@@ -20,9 +20,9 @@ export function ChangeEmailModal () {
 
     if (newEmail === undefined || !user || !isNewEmailValid) return
 
-    const emailChange = await user.changeEmail({ newEmail })
+    const emailChangeSuccess = await user.changeEmail({ newEmail })
 
-    if (emailChange.success) {
+    if (emailChangeSuccess) {
       closeModal()
     } else {
       openModal("connection")

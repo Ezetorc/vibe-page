@@ -28,12 +28,12 @@ export function PostCreator () {
 
     if (!isPostValid) return
 
-    const creation = await PostService.create({
+    const createSuccess = await PostService.create({
       userId: user.id,
       content: postContent
     })
 
-    if (creation.success) {
+    if (createSuccess) {
       navigate('/')
     } else {
       setErrorMessage(dictionary.somethingWentWrong)

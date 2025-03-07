@@ -10,10 +10,10 @@ export function PostsDisplay({ posts, onPostDelete }: PostsDisplayProps) {
       {posts?.length === 0 ? (
         <span>{dictionary.noPosts}</span>
       ) : (
-        posts?.map((post) => (
+        posts?.map((post, index) => (
           <PostDisplay
             onDelete={onPostDelete}
-            key={post.id}
+            key={index}
             post={post}
           />
         ))

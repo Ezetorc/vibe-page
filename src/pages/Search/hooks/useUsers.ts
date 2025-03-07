@@ -4,65 +4,55 @@ import {
   useInfiniteQuery,
   useMutation
 } from '@tanstack/react-query'
-import { useEffect } from 'react'
+import { useCallback, useEffect } from 'react'
 import { useIntersectionObserver } from 'usehooks-ts'
 import { useSettings } from '../../../hooks/useSettings'
 import { UserService } from '../../../services/UserService'
 import { User } from '../../../models/User'
+import { QueryData } from '../../../models/QueryData'
 
 export function useUsers (searchQuery?: string) {
+  const usersKey = 'users'
   const queryClient = useQueryClient()
   const { openModal } = useSettings()
   const { isIntersecting, ref } = useIntersectionObserver({ threshold: 0.5 })
 
-  const {
-    data: searchResults,
-    isError: isSearchError,
-    isLoading: isSearchLoading
-  } = useQuery({
-    queryKey: ['users', searchQuery],
+  const search = useQuery({
+    queryKey: [usersKey, searchQuery],
     queryFn: () => UserService.search({ query: searchQuery! }),
     enabled: !!searchQuery
   })
 
-  const {
-    data: paginatedData,
-    fetchNextPage,
-    hasNextPage,
-    isError: isPaginationError,
-    isLoading: isPaginationLoading
-  } = useInfiniteQuery({
-    queryKey: ['users'],
+  const pagination = useInfiniteQuery({
+    queryKey: [usersKey],
     queryFn: ({ pageParam = 1 }) => UserService.getAll({ page: pageParam }),
     initialPageParam: 1,
     getNextPageParam: (lastPage, allPages) =>
-      lastPage.value?.length ? allPages.length + 1 : undefined,
+      lastPage.length ? allPages.length + 1 : undefined,
     enabled: !searchQuery
   })
 
-  const data: User[] = searchQuery
-    ? searchResults?.value || []
-    : (paginatedData?.pages
-        .flatMap(post => post.value)
-        .filter(Boolean) as User[]) || []
+  const data = searchQuery
+    ? search.data || []
+    : (pagination.data?.pages.flat().filter(Boolean) as User[]) || []
 
   const deleteMutation = useMutation({
     mutationFn: (userId: number) => UserService.delete({ userId }),
     onSuccess: deletedUserId => {
-      queryClient.setQueryData(
-        ['users'],
-        (oldData: { pages: { value: User[] }[] }) => {
-          if (!oldData) return oldData
+      queryClient.setQueryData([usersKey], (prevQueryData: QueryData<User>) => {
+        if (!prevQueryData) return prevQueryData
 
-          return {
-            ...oldData,
-            pages: oldData.pages.map(page => ({
-              ...page,
-              value: page.value.filter(user => user.id !== deletedUserId.value)
-            }))
-          }
+        const newPages = prevQueryData.pages.map(page =>
+          page.filter(user => user.id !== deletedUserId)
+        )
+
+        const newQueryData = {
+          ...prevQueryData,
+          pages: newPages
         }
-      )
+
+        return newQueryData
+      })
     }
   })
 
@@ -70,33 +60,30 @@ export function useUsers (searchQuery?: string) {
     deleteMutation.mutate(userId)
   }
 
-  useEffect(() => {
-    if (isPaginationError || isSearchError) {
-      openModal('connection')
-    } else if (
+  const handleMoreUsers = useCallback(() => {
+    const failed = pagination.isError || search.isError
+    const success =
       isIntersecting &&
-      hasNextPage &&
-      !isPaginationLoading &&
+      pagination.hasNextPage &&
+      !pagination.isLoading &&
       !searchQuery
-    ) {
-      fetchNextPage()
+
+    if (success) {
+      pagination.fetchNextPage()
+    } else if (failed) {
+      openModal('connection')
     }
-  }, [
-    isIntersecting,
-    fetchNextPage,
-    hasNextPage,
-    isPaginationLoading,
-    isPaginationError,
-    isSearchError,
-    openModal,
-    searchQuery
-  ])
+  }, [isIntersecting, openModal, pagination, search.isError, searchQuery])
+
+  useEffect(() => {
+    handleMoreUsers()
+  }, [handleMoreUsers])
 
   return {
-    isError: isPaginationError || isSearchError,
-    isLoading: isPaginationLoading || isSearchLoading,
-    fetchNextPage,
-    hasNextPage,
+    isError: pagination.isError || search.isError,
+    isLoading: pagination.isLoading || search.isLoading,
+    fetchNextPage: pagination.fetchNextPage,
+    hasNextPage: pagination.hasNextPage,
     data,
     delete: deleteUser,
     ref

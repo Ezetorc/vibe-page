@@ -27,9 +27,9 @@ export function CommentDisplay (props: CommentDisplayProps) {
 
     setCommentData(prev => ({
       ...prev,
-      user: newCommentUser.value ?? prev.user,
-      likes: newLikes.value ?? prev.likes,
-      userLiked: newUserLiked?.value ?? prev.userLiked,
+      user: newCommentUser ?? prev.user,
+      likes: newLikes ?? prev.likes,
+      userLiked: newUserLiked ?? prev.userLiked,
       id: props.comment.id,
       date: props.comment.getDate(),
       content: props.comment.content

@@ -3,7 +3,6 @@ import { Like } from './Like'
 import { LikeEndpoint } from './LikeEndpoint'
 import { getAdaptedLike } from '../adapters/getAdaptedLike'
 import { api } from '../constants/SETTINGS'
-import { Data } from '../models/Data'
 import { LikeService } from '../services/LikeService'
 
 export class Comment {
@@ -39,38 +38,35 @@ export class Comment {
 
     return formattedDate
   }
-  
-  public async delete (): Promise<Data<boolean>> {
+
+  public async delete (): Promise<boolean> {
     const response = await api.delete<boolean>({
-      endpoint: `comments/id/${this.id}`
+      endpoint: `comments?id=${this.id}`
     })
 
-    if (!response.success) return Data.failure()
+    if (!response.success) return false
 
     const commentLikes = await LikeService.getAllOfComment({
       commentId: this.id
     })
-
-    if (!commentLikes.value) return Data.failure()
-
-    const likesIds = commentLikes.value.map(commentLike => commentLike.id)
+    const likesIds = commentLikes.map(commentLike => commentLike.id)
 
     await Promise.all(likesIds.map(likeId => LikeService.delete({ likeId })))
 
-    return response
+    return true
   }
 
-  public async getLikes (): Promise<Data<Like[]>> {
+  public async getLikes (): Promise<Like[]> {
     const response = await api.get<LikeEndpoint[]>({
-      endpoint: `likes/comments/id/${this.id}`
+      endpoint: `likes/all?id=${this.id}&type=comment`
     })
 
-    if (!response.value) return Data.failure()
+    if (!response.success) return []
 
-    const likes = response.value.map(likeEndpoint =>
+    const likes = response.value!.map(likeEndpoint =>
       getAdaptedLike({ likeEndpoint })
     )
 
-    return Data.success(likes)
+    return likes
   }
 }

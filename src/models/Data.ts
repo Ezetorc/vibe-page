@@ -1,40 +1,23 @@
+import { DataError } from './DataError'
+import { DataSuccess } from './DataSuccess'
+import { DataValue } from './DataValue'
+
 export class Data<T> {
-  private _data: T | null
-  private _error: unknown
+  public value: DataValue<T>
+  public error: DataError
+  public success: DataSuccess
 
-  constructor ({ data, error }: { data: T | null; error: unknown }) {
-    this._data = data
-    this._error = error
+  constructor (error: DataError, success: DataSuccess, value: DataValue<T>) {
+    this.value = value
+    this.error = error
+    this.success = success
   }
 
-  get value (): T | null {
-    return this._data
+  static failure (error: DataError): Data<null> {
+    return new Data(error, false, null)
   }
 
-  set value (newValue: T | null) {
-    this._data = newValue
-  }
-
-  get success (): boolean {
-    return this._data !== null
-  }
-
-  get error (): unknown {
-    return this._error
-  }
-
-  public async toJSON<T> (): Promise<T | null> {
-    if (this._data instanceof Response) {
-      return await this._data.json()
-    }
-    return null
-  }
-
-  static success<T> (data: T): Data<T> {
-    return new Data<T>({ data, error: null })
-  }
-
-  static failure<T> (error?: unknown): Data<T> {
-    return new Data<T>({ data: null, error })
+  static success<T> (value: DataValue<T>): Data<T> {
+    return new Data(null, true, value)
   }
 }

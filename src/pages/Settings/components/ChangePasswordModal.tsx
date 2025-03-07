@@ -24,9 +24,9 @@ export function ChangePasswordModal () {
 
     if (!isNewPasswordValid || !user || !newPassword) return
 
-    const passwordChange = await user.changePassword({ newPassword })
+    const passwordChangeSuccess = await user.changePassword({ newPassword })
 
-    if (passwordChange.success) {
+    if (passwordChangeSuccess) {
       closeModal()
     } else {
       openModal("connection")

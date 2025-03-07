@@ -25,17 +25,16 @@ export default function Login () {
     const isPasswordValid = validatePassword({ password })
 
     if (isNameValid && isPasswordValid) {
-      const logSuccesfull = await UserService.login({
+      const logSuccess = await UserService.login({
         name: name!,
         password: password!
       })
 
-      if (logSuccesfull.value) {
+      if (logSuccess) {
         const sessionSuccess = await handleSession()
-        console.log('sessionSuccess: ', sessionSuccess)
 
         if (sessionSuccess) {
-          navigate('/')
+          navigate('/account/me')
         } else {
           openModal('connection')
         }

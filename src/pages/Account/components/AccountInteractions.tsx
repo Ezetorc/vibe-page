@@ -1,17 +1,12 @@
-import { Loading } from '../../../components/Loading'
-import { useAccount } from '../hooks/useAccount'
+import { AccountData } from '../models/AccountData'
 import { FollowButton } from './FollowButton'
 
-export function AccountInteractions () {
-  const account = useAccount()
-
-  if (!account.user) return <Loading />
-
+export function AccountInteractions (props: { accountData: AccountData }) {
   return (
     <div className='flex gap-x-[20px]'>
-      {!account.isUser && (
+      {!props.accountData.isUser && (
         <>
-          <FollowButton user={account.user} />
+          <FollowButton user={props.accountData.user!} />
         </>
       )}
     </div>

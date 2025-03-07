@@ -24,10 +24,10 @@ export function useValidation () {
     }
 
     if (unique) {
-      const nameExists = await UserService.nameAlreadyExists({ name })
+      const nameExists = await UserService.nameExists({ name })
 
-      if (!nameExists.value) return true
-      
+      if (!nameExists) return true
+
       setErrorMessage(dictionary.nameInUse)
       return false
     }
@@ -66,11 +66,9 @@ export function useValidation () {
       return false
     }
 
-    const emailAlreadyExists = await UserService.emailAlreadyExists({
-      email
-    })
+    const emailAlreadyExists = await UserService.emailExists({ email })
 
-    if (emailAlreadyExists.value) {
+    if (emailAlreadyExists) {
       setErrorMessage(dictionary.emailAlreadyExists)
       return false
     }
@@ -106,11 +104,7 @@ export function useValidation () {
       password: confirmedPassword
     })
 
-    if (!validPassword) {
-      return false
-    }
-
-    if (!validConfirmedPassword) {
+    if (!validPassword || !validConfirmedPassword) {
       return false
     }
 

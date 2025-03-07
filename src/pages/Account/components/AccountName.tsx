@@ -1,20 +1,16 @@
 import { EditButton } from './EditButton'
 import { CheckIcon, PencilIcon } from '../../../components/Icons'
-import { Loading } from '../../../components/Loading'
 import { useSettings } from '../../../hooks/useSettings'
-import { useAccount } from '../hooks/useAccount'
+import { AccountData } from '../models/AccountData'
 
-export function AccountName () {
+export function AccountName (props: { accountData: AccountData }) {
   const { dictionary } = useSettings()
-  const account = useAccount()
-
-  if (!account.user) return <Loading />
 
   return (
     <div className='flex w-full justify-center'>
-      {account.editState.field === 'name' ? (
+      {props.accountData.editState.field === 'name' ? (
         <>
-          <EditButton onEdit={account.handleEdit}>
+          <EditButton onEdit={props.accountData.handleEdit}>
             <CheckIcon />
           </EditButton>
           <input
@@ -22,27 +18,30 @@ export function AccountName () {
             maxLength={20}
             className='text-orange-crayola text-center w-full bg-transparent outline-hidden font-poppins-regular text-[clamp(15px,5.5vw,35px)]'
             onChange={event =>
-              account.setEditState({
+              props.accountData.setEditState({
                 field: 'name',
                 value: event.target.value
               })
             }
-            defaultValue={account.user.name || dictionary.loading}
+            defaultValue={props.accountData.user!.name || dictionary.loading}
           />
         </>
       ) : (
         <>
-          {account.isUser && (
+          {props.accountData.isUser && (
             <EditButton
               onEdit={() =>
-                account.setEditState({ field: 'name', value: account.user?.name ?? "" })
+                props.accountData.setEditState({
+                  field: 'name',
+                  value: props.accountData.user!.name
+                })
               }
             >
               <PencilIcon />
             </EditButton>
           )}
           <h2 className='text-orange-crayola w-full text-center bg-transparent font-poppins-regular text-[clamp(15px,5.5vw,35px)]'>
-            {account.user.name || dictionary.loading}
+            {props.accountData.user!.name}
           </h2>
         </>
       )}

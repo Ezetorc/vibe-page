@@ -1,72 +1,60 @@
 import { getAdaptedLike } from '../adapters/getAdaptedLike'
 import { Like } from '../models/Like'
 import { LikeEndpoint } from '../models/LikeEndpoint'
-import { Data } from '../models/Data'
 import { LikeType } from '../models/LikeType'
 import { api } from '../constants/SETTINGS'
 
 export class LikeService {
-  static async getAllOfPost ({
-    postId
-  }: {
-    postId: number
-  }): Promise<Data<Like[]>> {
+  static async getAllOfPost (args: { postId: number }): Promise<Like[]> {
     const response = await api.get<LikeEndpoint[]>({
-      endpoint: `likes/posts/id/${postId}`
+      endpoint: `likes/all?type=post&id=${args.postId}`
     })
 
-    if (!response.value) return Data.failure()
-    const likes: Like[] = response.value.map(likeEndpoint =>
+    if (!response.success) return []
+
+    const likes = response.value!.map(likeEndpoint =>
       getAdaptedLike({ likeEndpoint })
     )
 
-    return Data.success(likes)
+    return likes
   }
 
-  static async getAllOfComment ({
-    commentId
-  }: {
-    commentId: number
-  }): Promise<Data<Like[]>> {
+  static async getAllOfComment (args: { commentId: number }): Promise<Like[]> {
     const response = await api.get<LikeEndpoint[]>({
-      endpoint: `likes/comments/id/${commentId}`
+      endpoint: `likes/all?type=comment&id=${args.commentId}`
     })
 
-    if (!response.value) return Data.failure()
+    if (!response.success) return []
 
-    const likes: Like[] = response.value.map(likeEndpoint =>
+    const likes = response.value!.map(likeEndpoint =>
       getAdaptedLike({ likeEndpoint })
     )
 
-    return Data.success(likes)
+    return likes
   }
 
-  static async delete ({ likeId }: { likeId: number }): Promise<Data<boolean>> {
-    const response = await api.delete({ endpoint: `likes/id/${likeId}` })
+  static async delete (args: { likeId: number }): Promise<boolean> {
+    const response = await api.delete({
+      endpoint: `likes/id?id=${args.likeId}`
+    })
 
-    if (!response.value) return Data.failure()
-
-    return Data.success(true)
+    return response.success
   }
 
-  static async create ({
-    userId,
-    targetId,
-    type
-  }: {
+  static async create (args: {
     userId: number
     targetId: number
     type: LikeType
-  }): Promise<Data<Like>> {
+  }): Promise<Like | null> {
     const response = await api.post<Like>({
       endpoint: `likes`,
       body: JSON.stringify({
-        target_id: targetId,
-        type: type,
-        user_id: userId
+        target_id: args.targetId,
+        type: args.type,
+        user_id: args.userId
       })
     })
 
-    return response
+    return response.value
   }
 }

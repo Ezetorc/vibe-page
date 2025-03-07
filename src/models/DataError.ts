@@ -1,0 +1,1 @@
+export type DataError = string | null | undefined

@@ -2,150 +2,125 @@ import { getAdaptedUser } from '../adapters/getAdaptedUser'
 import { User } from '../models/User'
 import { UserEndpoint } from '../models/UserEndpoint'
 import { api } from '../constants/SETTINGS'
-import { Data } from '../models/Data'
 
 export class UserService {
-  static async getByUsername ({
-    username
-  }: {
-    username: string
-  }): Promise<Data<User>> {
+  static async getByName (args: { name: string }): Promise<User | null> {
     const response = await api.get<UserEndpoint>({
-      endpoint: `users/username/${username}`
+      endpoint: `users/name?name=${args.name}`
     })
 
-    if (!response.value) return Data.failure()
+    if (!response.success) return null
 
-    const user: User = getAdaptedUser({ userEndpoint: response.value })
+    const user: User = getAdaptedUser({ userEndpoint: response.value! })
 
-    return Data.success(user)
+    return user
   }
 
-  static async delete ({ userId }: { userId: number }): Promise<Data<number>> {
+  static async delete (args: { userId: number }): Promise<number> {
     const response = await api.delete<boolean>({
-      endpoint: `users/id/${userId}`
+      endpoint: `users?id=${args.userId}`
     })
 
-    if (!response.success) return Data.failure()
-
-    return Data.success(userId)
+    if (response.success) {
+      return args.userId
+    } else {
+      return -1
+    }
   }
 
-  static async getById ({ userId }: { userId: number }): Promise<Data<User>> {
+  static async getById (args: { userId: number }): Promise<User | null> {
     const response = await api.get<UserEndpoint>({
-      endpoint: `users/id/${userId}`
+      endpoint: `users/id?id=${args.userId}`
     })
 
-    if (!response.value) return Data.failure()
+    if (!response.success) return null
 
-    const user: User = getAdaptedUser({ userEndpoint: response.value })
+    const user: User = getAdaptedUser({ userEndpoint: response.value! })
 
-    return Data.success(user)
+    return user
   }
 
-  static async register ({
-    name,
-    email,
-    password
-  }: {
+  static async register (args: {
     name: string
     email: string
     password: string
-  }): Promise<Data<boolean>> {
+  }): Promise<boolean> {
     const response = await api.post<boolean>({
       endpoint: `users/register`,
-      body: JSON.stringify({ name, email, password })
+      body: JSON.stringify({
+        name: args.name,
+        email: args.email,
+        password: args.password
+      })
     })
 
-    if (!response.value) return Data.failure()
-
-    return Data.success(true)
+    return response.success
   }
 
-  static async login ({
-    name,
-    password
-  }: {
+  static async login (args: {
     name: string
     password: string
-  }): Promise<Data<boolean>> {
+  }): Promise<boolean> {
     const response = await api.post<boolean>({
       endpoint: `users/login`,
-      body: JSON.stringify({ name, password })
+      body: JSON.stringify({ name: args.name, password: args.password })
     })
 
-    console.log("login response: ", response)
-
-    return response
+    return response.success
   }
 
-  static async logout (): Promise<Data<boolean>> {
+  static async logout (): Promise<boolean> {
     const response = await api.post<boolean>({ endpoint: `logout` })
 
-    if (!response.value) return Data.failure()
-
-    return Data.success(true)
+    return response.success
   }
 
-  static async getAll ({
-    amount = 10,
-    page = 1
-  }: {
-    amount?: number
-    page?: number
-  } = {}): Promise<Data<User[]>> {
+  static async getAll (
+    args: {
+      amount?: number
+      page?: number
+    } = {}
+  ): Promise<User[]> {
     const response = await api.get<UserEndpoint[]>({
-      endpoint: `users?amount=${amount}&page=${page}`
+      endpoint: `users/all?amount=${args.amount ?? 6}&page=${args.page ?? 1}`
     })
 
-    if (!response.value) return Data.failure()
+    if (!response.success) return []
 
-    const users: User[] = response.value.map(userEndpoint =>
+    const users: User[] = response.value!.map(userEndpoint =>
       getAdaptedUser({ userEndpoint })
     )
 
-    return Data.success(users)
+    return users
   }
 
-  static async emailAlreadyExists ({
-    email
-  }: {
-    email: string
-  }): Promise<Data<boolean>> {
-    const response = await api.get({
-      endpoint: `users/emailExists/${encodeURIComponent(email)}`
+  static async emailExists (args: { email: string }): Promise<boolean> {
+    const response = await api.get<UserEndpoint>({
+      endpoint: `users/email?email=${encodeURIComponent(args.email)}`
     })
 
-    if (!response.value) return Data.failure()
-
-    return Data.success(true)
+    return response.success
   }
 
-  static async nameAlreadyExists ({
-    name
-  }: {
-    name: string
-  }): Promise<Data<boolean>> {
+  static async nameExists (args: { name: string }): Promise<boolean> {
     const response = await api.get<boolean>({
-      endpoint: `users/nameExists/${name}`
+      endpoint: `users/name?name=${args.name}`
     })
 
-    if (!response.value) return Data.failure()
-
-    return Data.success(true)
+    return response.success
   }
 
-  static async search ({ query }: { query: string }): Promise<Data<User[]>> {
+  static async search (args: { query: string }): Promise<User[]> {
     const response = await api.get<UserEndpoint[]>({
-      endpoint: `users/search/${encodeURIComponent(query)}`
+      endpoint: `users/search?query=${encodeURIComponent(args.query)}`
     })
 
-    if (!response.value) return Data.failure()
+    if (!response.success) return []
 
-    const users: User[] = response.value.map(userEndpoint =>
+    const users: User[] = response.value!.map(userEndpoint =>
       getAdaptedUser({ userEndpoint })
     )
 
-    return Data.success(users)
+    return users
   }
 }

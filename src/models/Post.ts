@@ -4,7 +4,6 @@ import { LikeService } from '../services/LikeService'
 import { CommentEndpoint } from './CommentEndpoint'
 import { getAdaptedComment } from '../adapters/getAdaptedComment'
 import { Comment } from './Comment'
-import { Data } from '../models/Data'
 import { api } from '../constants/SETTINGS'
 
 export class Post {
@@ -30,24 +29,19 @@ export class Post {
     this.createdAt = createdAt
   }
 
-  public async delete (): Promise<Data<boolean>> {
+  public async delete (): Promise<boolean> {
     const response = await api.delete<boolean>({
-      endpoint: `posts/id/${this.id}`
+      endpoint: `posts/id?id=${this.id}`
     })
 
-    if (!response.success) return Data.failure()
+    if (!response.success) return false
 
-    const postLikes = await LikeService.getAllOfPost({
-      postId: this.id
-    })
-
-    if (!postLikes.value) return Data.failure()
-
-    const likesIds = postLikes.value.map(postLike => postLike.id)
+    const postLikes = await LikeService.getAllOfPost({ postId: this.id })
+    const likesIds = postLikes.map(postLike => postLike.id)
 
     await Promise.all(likesIds.map(likeId => LikeService.delete({ likeId })))
 
-    return response
+    return true
   }
 
   public getDate (): string {
@@ -57,26 +51,23 @@ export class Post {
     return formattedDate
   }
 
-  public async getComments (): Promise<Data<Comment[]>> {
+  public async getComments (): Promise<Comment[]> {
     const response = await api.get<CommentEndpoint[]>({
-      endpoint: `comments/post/${this.id}`
+      endpoint: `comments/all?postId=${this.id}`
     })
 
-    if (!response.value) return Data.failure()
+    if (!response.success) return []
 
-    const comments = response.value.map(commentEndpoint =>
+    const comments = response.value!.map(commentEndpoint =>
       getAdaptedComment({ commentEndpoint })
     )
-    return Data.success(comments)
+    return comments
   }
 
-  public async getLikes (): Promise<Data<Like[]>> {
+  public async getLikes (): Promise<Like[]> {
     const likes = await LikeService.getAllOfPost({ postId: this.id })
+    const postLikes = likes.filter(like => like.targetId === this.id)
 
-    if (!likes.value) return Data.failure()
-
-    const postLikes = likes.value.filter(like => like.targetId === this.id)
-
-    return Data.success(postLikes)
+    return postLikes
   }
 }

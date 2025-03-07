@@ -10,7 +10,9 @@ export function UsersDisplay (props: UsersDisplayProps) {
       {props.users?.length === 0 ? (
         <span>{dictionary.noUsers}</span>
       ) : (
-        props.users?.map(user => <UserDisplay key={user.id} user={user} />)
+        props.users?.map((user, index) => (
+          <UserDisplay key={index} user={user} />
+        ))
       )}
     </div>
   )

@@ -42,21 +42,21 @@ export default function Register () {
     const isFormValid: boolean =
       isNameValid && isPasswordValid && isEmailValid && hasAgreedWithTerms
 
-      console.log("isFormValid: ", isFormValid)
-
-    if (isFormValid && name && email && password) {
-      const registerSuccessful = await UserService.register({
-        name,
-        email,
-        password
+    if (isFormValid) {
+      const registerSuccess = await UserService.register({
+        name: name!,
+        email: email!,
+        password: password!
       })
 
-      console.log("registerSuccessful: ", registerSuccessful)
+      if (registerSuccess) {
+        const sessionSuccess = await handleSession()
 
-      if (registerSuccessful.value) {
-        const session = await handleSession()
-        console.log("session: ", session)
-        navigate('/')
+        if (sessionSuccess) {
+          navigate('/account/me')
+        } else {
+          navigate('/')
+        }
       } else {
         setErrorMessage(dictionary.userAlreadyExists)
       }

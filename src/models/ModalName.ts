@@ -6,3 +6,5 @@ export type ModalName =
   | 'connection'
   | 'password'
   | 'comment'
+  | 'logout'
+  | 'deleteAccount'

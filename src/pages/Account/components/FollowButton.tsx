@@ -19,12 +19,12 @@ export function FollowButton (props: FollowButtonProps) {
       userId: props.user.id
     })
 
-    if (!following.success) {
+    if (!following) {
       openModal("connection")
       return
     }
 
-    setIsFollowing(following.value as boolean)
+    setIsFollowing(following)
   }, [props.user.id, user, openModal])
 
   const handleFollow = async () => {

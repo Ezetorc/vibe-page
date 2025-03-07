@@ -5,8 +5,8 @@ import { PostContent } from './PostContent'
 import { PostFooter } from './PostFooter'
 import { PostData } from '../../models/PostData'
 import { useUser } from '../../hooks/useUser'
-import { UserService } from '../../services/UserService'
 import { PostComments } from './PostComments'
+import { getPostData } from '../../utilities/getPostData'
 
 export function PostDisplay (props: PostDisplayProps) {
   const { user } = useUser()
@@ -22,24 +22,9 @@ export function PostDisplay (props: PostDisplayProps) {
   })
 
   const fetchPostData = useCallback(async () => {
-    const [newPostUser, newLikes, newComments, newUserLiked] =
-      await Promise.all([
-        UserService.getById({ userId: props.post.userId }),
-        props.post.getLikes(),
-        props.post.getComments(),
-        user?.hasLikedPost({ postId: props.post.id })
-      ])
+    const newPostData = await getPostData(props.post, user)
 
-    setPostData(prev => ({
-      ...prev,
-      user: newPostUser.value ?? prev.user,
-      likes: newLikes.value ?? prev.likes,
-      comments: newComments.value ?? prev.comments,
-      userLiked: newUserLiked?.value ?? prev.userLiked,
-      id: props.post.id,
-      date: props.post.getDate(),
-      content: props.post.content
-    }))
+    setPostData(newPostData)
   }, [props.post, user])
 
   useEffect(() => {

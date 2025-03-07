@@ -10,60 +10,53 @@ import { useSettings } from '../../../hooks/useSettings'
 import { Post } from '../../../models/Post'
 import { User } from '../../../models/User'
 import { PostService } from '../../../services/PostService'
+import { QueryData } from '../../../models/QueryData'
 
 export function useUserPosts (user: User | null, searchQuery?: string) {
+  const userPostsKey = 'userPosts'
   const queryClient = useQueryClient()
   const { openModal } = useSettings()
   const { isIntersecting, ref } = useIntersectionObserver({ threshold: 0.5 })
-
   const userId = user?.id
 
-  const {
-    data: searchResults,
-    isError: isSearchError,
-    isLoading: isSearchLoading
-  } = useQuery({
-    queryKey: userId ? ['userPosts', userId, 'search', searchQuery] : [],
+  const search = useQuery({
+    queryKey: userId ? [userPostsKey, userId, 'search', searchQuery] : [],
     queryFn: () => PostService.search({ query: searchQuery! }),
     enabled: !!searchQuery && !!userId
   })
 
-  const {
-    data: paginatedData,
-    fetchNextPage,
-    hasNextPage,
-    isError: isPaginationError,
-    isLoading: isPaginationLoading
-  } = useInfiniteQuery({
-    queryKey: userId ? ['userPosts', userId] : [],
+  const pagination = useInfiniteQuery({
+    queryKey: userId ? [userPostsKey, userId] : [],
     queryFn: ({ pageParam = 1 }) => user!.getPosts({ page: pageParam }),
     initialPageParam: 1,
     getNextPageParam: (lastPage, allPages) =>
-      lastPage.value?.length ? allPages.length + 1 : undefined,
+      lastPage.length ? allPages.length + 1 : undefined,
     enabled: !!userId && !searchQuery
   })
 
   const posts: Post[] = searchQuery
-    ? searchResults?.value || []
-    : (paginatedData?.pages
-        .flatMap(post => post.value)
-        .filter(Boolean) as Post[]) || []
+    ? search.data || []
+    : (pagination.data?.pages.flat().filter(Boolean) as Post[]) || []
 
   const deleteMutation = useMutation({
     mutationFn: (postId: number) => PostService.delete({ postId }),
     onSuccess: deletedPostId => {
       if (!userId) return
       queryClient.setQueryData(
-        ['userPosts', userId],
-        (oldData: { pages: { value: Post[] }[] }) => {
-          if (!oldData) return oldData
-          return {
-            ...oldData,
-            pages: oldData.pages.map(page => ({
-              ...page,
-              value: page.value.filter(post => post.id !== deletedPostId.value)
-            }))
+        [userPostsKey, userId],
+        (prevQueryData: QueryData<Post>) => {
+          if (!prevQueryData) return prevQueryData
+
+          const newPages = prevQueryData.pages.map(page =>
+            page.filter(post => post.id !== deletedPostId)
+          )
+
+          const newQueryData = {
+            ...prevQueryData,
+            pages: newPages
           }
+
+          return newQueryData
         }
       )
     }
@@ -74,32 +67,25 @@ export function useUserPosts (user: User | null, searchQuery?: string) {
   }
 
   useEffect(() => {
-    if (isPaginationError || isSearchError) {
-      openModal('connection')
-    } else if (
+    const failed = pagination.isError || search.isError
+    const success =
       isIntersecting &&
-      hasNextPage &&
-      !isPaginationLoading &&
+      pagination.hasNextPage &&
+      !pagination.isLoading &&
       !searchQuery
-    ) {
-      fetchNextPage()
+
+    if (success) {
+      pagination.fetchNextPage()
+    } else if (failed) {
+      openModal('connection')
     }
-  }, [
-    isIntersecting,
-    fetchNextPage,
-    hasNextPage,
-    isPaginationLoading,
-    isPaginationError,
-    isSearchError,
-    openModal,
-    searchQuery
-  ])
+  }, [isIntersecting, openModal, pagination, search.isError, searchQuery])
 
   return {
-    isError: isPaginationError || isSearchError,
-    isLoading: isPaginationLoading || isSearchLoading,
-    fetchNextPage,
-    hasNextPage,
+    isError: pagination.isError || search.isError,
+    isLoading: pagination.isLoading || search.isLoading,
+    fetchNextPage: pagination.fetchNextPage,
+    hasNextPage: pagination.hasNextPage,
     data: posts,
     delete: deletePost,
     ref

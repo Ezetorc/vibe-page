@@ -1,34 +1,43 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { useParams } from 'react-router'
-import { useUser } from '../../../hooks/useUser'
-import { useValidation } from '../../../hooks/useValidation'
-import { User } from '../../../models/User'
-import { Post } from '../../../models/Post'
 import { UserService } from '../../../services/UserService'
+import { AccountData } from '../models/AccountData'
+import { User } from '../../../models/User'
+import { useUser } from '../../../hooks/useUser'
+import { Post } from '../../../models/Post'
 import { useSettings } from '../../../hooks/useSettings'
+import { useValidation } from '../../../hooks/useValidation'
 
-export function useAccount () {
-  const { username } = useParams<{ username: string }>()
-  const { openModal, dictionary } = useSettings()
-  const { errorMessage, validateName, validateDescription } = useValidation()
-  const { updateUser, user } = useUser()
+export function useAccountData (username: string | undefined): AccountData {
+  const { user, updateUser } = useUser()
+  const { dictionary, openModal } = useSettings()
+  const { validateName, validateDescription, errorMessage } = useValidation()
+  const [isLoading, setIsLoading] = useState<boolean>(true)
+  const [isError, setIsError] = useState<boolean>(false)
   const [account, setAccount] = useState<User | null>(null)
-  const [posts, setPosts] = useState<Post[]>([])
+  const accountIsUser = useMemo(() => user?.id === account?.id, [user, account])
   const [editState, setEditState] = useState<{
     field: 'name' | 'description' | null
     value: string
   }>({ field: null, value: '' })
-  const accountIsUser = useMemo(() => user?.id === account?.id, [user, account])
+  const [posts, setPosts] = useState<Post[]>([])
 
   const fetchAccount = useCallback(async () => {
     if (username === 'me') {
       setAccount(user)
     } else if (username) {
-      const newAccount = await UserService.getByUsername({ username })
+      const newAccount = await UserService.getByName({ name: username })
 
-      setAccount(newAccount.value)
-      setEditState({ field: null, value: '' })
-      setPosts([])
+      if (newAccount) {
+        setAccount(newAccount)
+        setEditState({ field: null, value: '' })
+        setPosts([])
+      } else {
+        setIsLoading(false)
+        setIsError(true)
+      }
+    } else {
+      setIsError(true)
+      setIsLoading(false)
     }
   }, [user, username])
 
@@ -45,7 +54,7 @@ export function useAccount () {
 
     const nameChange = await account.changeName({ newName: editState.value })
 
-    if (nameChange.success) {
+    if (nameChange) {
       await updateUser(account.id)
     } else {
       openModal('edit', { message })
@@ -71,7 +80,7 @@ export function useAccount () {
       newDescription: editState.value
     })
 
-    if (descriptionChange.success) {
+    if (descriptionChange) {
       await updateUser(account.id)
     } else {
       openModal('edit', { message })
@@ -91,9 +100,11 @@ export function useAccount () {
   useEffect(() => {
     fetchAccount()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [user])
 
   return {
+    isLoading,
+    isError,
     user: account,
     posts,
     editState,

@@ -36,12 +36,12 @@ export function CommentFooter (props: {
 
     const newLike = await user!.likeComment({ commentId: props.commentData.id })
 
-    if (!newLike || !newLike.value) return
+    if (!newLike) return
 
     props.setCommentData(prevPostData => {
       if (prevPostData.likes === null) return prevPostData
 
-      const newLikes = [...prevPostData.likes, newLike.value!]
+      const newLikes = [...prevPostData.likes, newLike]
 
       return {
         ...prevPostData,
@@ -54,11 +54,9 @@ export function CommentFooter (props: {
   const unlikeComment = async () => {
     if (!props.commentData.id) return
 
-    const commentUnliked = await user!.unlikeComment({
-      commentId: props.commentData.id
-    })
+    const unlikeSuccess = await user!.dislikeComment({ commentId: props.commentData.id })
 
-    if (commentUnliked.success) {
+    if (unlikeSuccess) {
       props.setCommentData(prevCommentData => {
         if (prevCommentData.likes === null) return prevCommentData
 

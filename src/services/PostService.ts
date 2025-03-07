@@ -2,86 +2,81 @@ import { getAdaptedPost } from '../adapters/getAdaptedPost'
 import { Post } from '../models/Post'
 import { PostEndpoint } from '../models/PostEndpoint'
 import { api } from '../constants/SETTINGS'
-import { Data } from '../models/Data'
 import { LikeService } from './LikeService'
 
 export class PostService {
-  static async create ({
-    userId,
-    content
-  }: {
+  static async create (args: {
     userId: number
     content: string
-  }): Promise<Data<boolean>> {
-    const response = api.post<boolean>({
+  }): Promise<boolean> {
+    const response = await api.post<boolean>({
       endpoint: 'posts',
-      body: JSON.stringify({ user_id: userId, content })
+      body: JSON.stringify({ user_id: args.userId, content: args.content })
     })
-
-    return response
+    
+    return response.success
   }
 
-  static async delete ({ postId }: { postId: number }): Promise<Data<number>> {
+  static async delete (args: { postId: number }): Promise<number> {
     const response = await api.delete<boolean>({
-      endpoint: `posts/id/${postId}`
+      endpoint: `posts/id?id=${args.postId}`
     })
 
-    if (!response.success) return Data.failure()
+    if (!response.success) return -1
 
-    const postLikes = await LikeService.getAllOfPost({ postId })
+    const postLikes = await LikeService.getAllOfPost({ postId: args.postId })
 
-    if (!postLikes.value) return Data.failure()
+    if (!postLikes) return -1
 
-    const likesIds = postLikes.value.map(postLike => postLike.id)
+    const likesIds = postLikes.map(postLike => postLike.id)
 
     await Promise.all(likesIds.map(likeId => LikeService.delete({ likeId })))
 
-    return Data.success(postId)
+    return args.postId
   }
 
-  static async getAll ({
-    amount = 6,
-    page = 1
-  }: {
-    amount?: number
-    page?: number
-  } = {}): Promise<Data<Post[]>> {
+  static async getAll (
+    args: {
+      amount?: number
+      page?: number
+    } = {}
+  ): Promise<Post[]> {
     const response = await api.get<PostEndpoint[]>({
-      endpoint: `posts?amount=${amount}&page=${page}`
+      endpoint: `posts/all?amount=${args.amount ?? 6}&page=${args.page ?? 1}`
     })
 
-    if (!response.value) return Data.failure()
+    if (!response.value) return []
 
     const posts = response.value.map(postEndpoint =>
       getAdaptedPost({ postEndpoint })
     )
 
-    return Data.success(posts)
+    return posts
   }
 
-  static async getById ({ postId }: { postId: number }): Promise<Data<Post>> {
+  static async getById (args: { postId: number }): Promise<Post | null> {
     const response = await api.get<PostEndpoint>({
-      endpoint: `posts/id/${postId}`
+      endpoint: `posts/id?id=${args.postId}`
     })
 
-    if (!response.value) return Data.failure()
+    if (!response.success) return null
 
-    const post = getAdaptedPost({ postEndpoint: response.value })
+    const post = getAdaptedPost({ postEndpoint: response.value! })
 
-    return Data.success(post)
+    return post
   }
 
-  static async search ({ query }: { query: string }): Promise<Data<Post[]>> {
+  static async search (args: { query: string }): Promise<Post[]> {
     const response = await api.get<PostEndpoint[]>({
-      endpoint: `posts/search/${encodeURIComponent(query)}`
+      endpoint: `posts/search?query=${args.query}`
     })
 
-    if (!response.value) return Data.failure()
+    if (!response.success) return []
 
-    const posts = response.value.map(postEndpoint =>
+    const posts = response.value!.map(postEndpoint =>
       getAdaptedPost({ postEndpoint })
     )
 
-    return Data.success(posts)
+    return posts
   }
 }

@@ -38,12 +38,12 @@ export function PostFooter (props: {
 
     const newLike = await user!.likePost({ postId: props.postData.id })
 
-    if (!newLike || !newLike.value) return
+    if (!newLike) return
 
     props.setPostData(prevPostData => {
       if (prevPostData.likes === null) return prevPostData
 
-      const newLikes = [...prevPostData.likes, newLike.value!]
+      const newLikes = [...prevPostData.likes, newLike]
 
       return {
         ...prevPostData,
@@ -56,9 +56,9 @@ export function PostFooter (props: {
   const unlikePost = async () => {
     if (!props.postData.id) return
 
-    const postUnliked = await user!.unlikePost({ postId: props.postData.id })
+    const unlikeSuccess = await user!.dislikePost({ postId: props.postData.id })
 
-    if (postUnliked.success) {
+    if (unlikeSuccess) {
       props.setPostData(prevPostData => {
         if (prevPostData.likes === null) return prevPostData
 

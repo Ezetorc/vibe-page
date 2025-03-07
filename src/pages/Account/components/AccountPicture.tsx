@@ -1,25 +1,24 @@
 import { ChangeEvent, useState, useEffect } from 'react'
-import { useAccount } from '../hooks/useAccount'
 import { useSettings } from '../../../hooks/useSettings'
 import { useUser } from '../../../hooks/useUser'
 import { User } from '../../../models/User'
 import { cloudinary } from '../../../constants/SETTINGS'
+import { AccountData } from '../models/AccountData'
 
-export function AccountPicture () {
+export function AccountPicture (props: { accountData: AccountData }) {
   const { openModal, dictionary } = useSettings()
   const { setUser } = useUser()
-  const account = useAccount()
   const [imageUrl, setImageUrl] = useState<string | null>(
-    account.user?.imageUrl || null
+    props.accountData.user!.imageUrl
   )
   const [publicId, setPublicId] = useState<string | null>(
-    account.user?.imageId || null
+    props.accountData.user!.imageId
   )
 
   useEffect(() => {
-    setImageUrl(account.user?.imageUrl || null)
-    setPublicId(account.user?.imageId || null)
-  }, [account.user])
+    setImageUrl(props.accountData.user!.imageUrl)
+    setPublicId(props.accountData.user!.imageId)
+  }, [props.accountData.user])
 
   const handleImageChange = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
@@ -37,33 +36,31 @@ export function AccountPicture () {
           uploadPreset: 'profile_images'
         })
 
+      await saveImageToDatabase(newSecureUrl, newPublicId)
+      setImageUrl(newSecureUrl)
+      setPublicId(newPublicId)
+
       if (publicId) {
         const prevImageDeleted = await cloudinary.deleteImage({ publicId })
 
-        if (prevImageDeleted.success) {
-          await saveImageToDatabase(newSecureUrl, newPublicId)
-          setImageUrl(newSecureUrl)
-          setPublicId(newPublicId)
-        } else {
-
+        if (!prevImageDeleted) {
           openModal('connection')
         }
       }
     } catch {
-
       openModal('connection')
     }
   }
 
   const saveImageToDatabase = async (imageUrl: string, publicId: string) => {
-    if (!account.user) return
+    if (!props.accountData.user) return
 
     try {
-      await account.user.changeImageUrl({ newImageUrl: imageUrl })
-      await account.user.changeImageId({ newImageId: publicId })
+      await props.accountData.user.changeImageUrl({ newImageUrl: imageUrl })
+      await props.accountData.user.changeImageId({ newImageId: publicId })
 
       const newUser = new User({
-        ...account.user,
+        ...props.accountData.user,
         imageId: publicId,
         imageUrl: imageUrl
       })
@@ -77,7 +74,7 @@ export function AccountPicture () {
   return (
     <div className='relative rounded-full w-[clamp(40px,10vw,100px)] overflow-hidden aspect-square border-orange-crayola border-vibe'>
       <img
-        title={`${account.user?.name} Profile Picture`}
+        title={`${props.accountData.user!.name} Profile Picture`}
         className='absolute w-full h-full'
         src={imageUrl ?? 'src/assets/images/guest_user.jpg'}
         alt='Profile'

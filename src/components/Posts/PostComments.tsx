@@ -32,10 +32,10 @@ export function PostComments (props: {
         content: event.content
       })
 
-      if (newComment.value !== null) {
+      if (newComment) {
         const newComments: Comment[] = [...props.postData.comments]
 
-        newComments.push(newComment.value)
+        newComments.push(newComment)
         props.setPostData(prev => ({ ...prev, comments: newComments }))
         closeModal()
       } else {
@@ -54,9 +54,9 @@ export function PostComments (props: {
 
     if (!commentToDelete) return
 
-    const deleted = await commentToDelete.delete()
+    const deleteSuccess = await commentToDelete.delete()
 
-    if (deleted.success) {
+    if (deleteSuccess) {
       const newPostComments = props.postData.comments.filter(
         comment => comment.id !== commentToDelete.id
       )

@@ -1,24 +1,20 @@
 import { EditButton } from './EditButton'
 import { CheckIcon, PencilIcon } from '../../../components/Icons'
-import { Loading } from '../../../components/Loading'
 import { useSettings } from '../../../hooks/useSettings'
-import { useAccount } from '../hooks/useAccount'
+import { AccountData } from '../models/AccountData'
 
-export function AccountDescription () {
+export function AccountDescription (props: { accountData: AccountData}) {
   const { dictionary } = useSettings()
-  const account = useAccount()
-
-  if (!account.user) return <Loading />
 
   return (
     <div
       className={`gap-x-[10px] justify-center w-full h-full grid ${
-        account.isUser ? 'grid-cols-[auto_1fr]' : 'grid-cols-[1fr]'
+        props.accountData.isUser ? 'grid-cols-[auto_1fr]' : 'grid-cols-[1fr]'
       }`}
     >
-      {account.editState.field === 'description' ? (
+      {props.accountData.editState.field === 'description' ? (
         <>
-          <EditButton onEdit={account.handleEdit}>
+          <EditButton onEdit={props.accountData.handleEdit}>
             <CheckIcon />
           </EditButton>
           <textarea
@@ -26,23 +22,23 @@ export function AccountDescription () {
             maxLength={200}
             className='w-[90%] bg-transparent h-[160px] placeholder:text-caribbean-current resize-none outline-hidden break-words text-white text-[clamp(5px,6vw,20px)] font-poppins-regular'
             onChange={event =>
-              account.setEditState({
+              props.accountData.setEditState({
                 field: 'description',
                 value: event.target.value
               })
             }
             placeholder={dictionary.myNewDescription}
-            defaultValue={account.user.description || ''}
+            defaultValue={props.accountData.user!.description || ''}
           />
         </>
       ) : (
         <>
-          {account.isUser && (
+          {props.accountData.isUser && (
             <EditButton
               onEdit={() =>
-                account.setEditState({
+                props.accountData.setEditState({
                   field: 'description',
-                  value: account.user?.description ?? ''
+                  value: props.accountData.user!.description ?? ''
                 })
               }
             >
@@ -50,9 +46,9 @@ export function AccountDescription () {
             </EditButton>
           )}
           <p className='h-[clamp(160px,auto,320px)] w-[90%] text-white text-[clamp(5px,6vw,20px)] font-poppins-regular break-words whitespace-pre-wrap overflow-hidden overflow-wrap-anywhere'>
-            {account.user.description || (
+            {props.accountData.user!.description || (
               <span className='text-caribbean-current'>
-                {account.isUser
+                {props.accountData.isUser
                   ? dictionary.youDontHaveDescription
                   : dictionary.thisUserHasnotDescription}
               </span>

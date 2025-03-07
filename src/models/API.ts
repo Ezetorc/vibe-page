@@ -25,14 +25,6 @@ export class API {
     this.abortSeconds = abortSeconds ?? 20
   }
 
-  private _abort<T> (error: unknown): Data<T> {
-    if (error instanceof Error) {
-      console.warn(`Request error: ${error.message}`)
-    }
-    
-    return Data.failure<T>({ message: 'Request failed', error })
-  }
-
   private _getParsedEndpoint (endpoint: string): string {
     return endpoint.charAt(0) === '/' ? endpoint.slice(1) : endpoint
   }
@@ -50,7 +42,7 @@ export class API {
   private async _fetch<T> (
     method: string,
     options: FetchOptions
-  ): Promise<Data<T>> {
+  ): Promise<Data<T | null>> {
     const controller = new AbortController()
     const parsedEndpoint = this._getParsedEndpoint(options.endpoint)
     const url = `${this.url}/${parsedEndpoint}`
@@ -76,41 +68,38 @@ export class API {
 
       clearTimeout(timeout)
 
-      if (this.formatToJson) {
-        const jsonData = await response.json()
-        return Data.success(jsonData as T)
-      }
-
       if (!response.ok) {
-        return Data.failure({
-          status: response.status,
-          message: response.statusText
-        })
+        return Data.failure(response.statusText)
       }
 
-      return Data.success(response as T)
+      if (this.formatToJson) {
+        const jsonData: Data<T> = await response.json()
+        return jsonData
+      } else {
+        return response as unknown as Data<T>
+      }
     } catch (error) {
-      return this._abort<T>(error)
+      return Data.failure(String(error))
     }
   }
 
-  public get<T> (options: FetchOptions): Promise<Data<T>> {
+  public get<T> (options: FetchOptions): Promise<Data<T | null>> {
     return this._fetch<T>('GET', options)
   }
 
-  public post<T> (options: FetchOptions): Promise<Data<T>> {
+  public post<T> (options: FetchOptions): Promise<Data<T | null>> {
     return this._fetch<T>('POST', options)
   }
 
-  public put<T> (options: FetchOptions): Promise<Data<T>> {
+  public put<T> (options: FetchOptions): Promise<Data<T | null>> {
     return this._fetch<T>('PUT', options)
   }
 
-  public patch<T> (options: FetchOptions): Promise<Data<T>> {
+  public patch<T> (options: FetchOptions): Promise<Data<T | null>> {
     return this._fetch<T>('PATCH', options)
   }
 
-  public delete<T> (options: FetchOptions): Promise<Data<T>> {
+  public delete<T> (options: FetchOptions): Promise<Data<T | null>> {
     return this._fetch<T>('DELETE', options)
   }
 }

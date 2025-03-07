@@ -2,9 +2,9 @@ import { useCallback } from 'react'
 import { UserStore } from '../models/UserStore'
 import { getUserStore } from '../stores/getUserStore'
 import { jwtDecode } from 'jwt-decode'
-import { getAccessToken } from '../utilities/getAccessToken'
-import { AccessToken } from '../models/AccessToken'
 import { UserService } from '../services/UserService'
+import { getSessionCookie } from '../utilities/getSessionCookie'
+import { SessionCookie } from '../models/SessionCookie'
 
 export function useUser () {
   const userStore: UserStore = getUserStore()
@@ -14,26 +14,24 @@ export function useUser () {
     async (userId: number): Promise<boolean> => {
       const newUser = await UserService.getById({ userId })
 
-      if (!newUser.value) return false
-
-      setUser(newUser.value)
-      return true
+      if (newUser) {
+        setUser(newUser)
+        return true
+      } else {
+        return false
+      }
     },
     [setUser]
   )
 
   const handleSession = useCallback(async (): Promise<boolean> => {
-    const accessToken = getAccessToken()
-    console.log('accessToken: ', accessToken)
+    const sessionCookie = getSessionCookie()
 
-    if (!accessToken) return false
+    if (!sessionCookie) return false
 
     try {
-      const session: AccessToken = jwtDecode(accessToken)
-      console.log('session: ', session)
-
+      const session: SessionCookie = jwtDecode(sessionCookie)
       if ('id' in session.user) {
-        console.log('updateUser(): ', session.user.id)
         updateUser(session.user.id)
         return true
       }

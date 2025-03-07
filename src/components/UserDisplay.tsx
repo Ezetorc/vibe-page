@@ -16,8 +16,12 @@ export function UserDisplay (props: UserDisplayProps) {
   return (
     <article className='gap-y-[10px] flex flex-col justify-center w-[clamp(300px,100%,700px)] h-[clamp(300px,auto,400px)] p-[20px] rounded-vibe border-vibe border-caribbean-current overflow-hidden'>
       <div className='gap-x-[20px] justify-center grid grid-cols-[1fr_2fr] grid-rows-[1fr_1fr]'>
-        <img className='self-center mb-[10px] justify-self-end row-[span_2] rounded-full w-[clamp(70px,50%,90px)] aspect-square bg-orange-crayola' />
-
+        <img
+          title={`${props.user?.name} Profile Picture`}
+          className='self-center mb-[10px] justify-self-end row-[span_2] rounded-full w-[clamp(70px,50%,90px)] aspect-square border-vibe border-orange-crayola'
+          src={props.user.imageUrl ?? 'src/assets/images/guest_user.jpg'}
+          alt='Profile'
+        />
         <div className='flex items-end'>
           <Username>{props.user.name}</Username>
         </div>

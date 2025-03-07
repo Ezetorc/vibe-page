@@ -7,59 +7,53 @@ import {
 import { PostService } from '../services/PostService'
 import { Post } from '../models/Post'
 import { useIntersectionObserver } from 'usehooks-ts'
-import { useEffect } from 'react'
+import { useCallback, useEffect } from 'react'
 import { useSettings } from './useSettings'
+import { QueryData } from '../models/QueryData'
 
 export function usePosts (searchQuery?: string) {
+  const postsKey = 'posts'
   const queryClient = useQueryClient()
   const { openModal } = useSettings()
   const { isIntersecting, ref } = useIntersectionObserver({ threshold: 0.5 })
 
-  const {
-    data: searchResults,
-    isError: isSearchError,
-    isLoading: isSearchLoading
-  } = useQuery({
-    queryKey: ['posts', searchQuery],
+  const search = useQuery({
+    queryKey: [postsKey, searchQuery],
     queryFn: () => PostService.search({ query: searchQuery! }),
-    enabled: !!searchQuery
+    enabled: Boolean(searchQuery)
   })
 
-  const {
-    data: paginatedData,
-    fetchNextPage,
-    hasNextPage,
-    isError: isPaginationError,
-    isLoading: isPaginationLoading
-  } = useInfiniteQuery({
-    queryKey: ['posts'],
+  const pagination = useInfiniteQuery({
+    queryKey: [postsKey],
     queryFn: ({ pageParam = 1 }) => PostService.getAll({ page: pageParam }),
     initialPageParam: 1,
     getNextPageParam: (lastPage, allPages) =>
-      lastPage.value?.length ? allPages.length + 1 : undefined,
+      lastPage?.length ? allPages.length + 1 : undefined,
     enabled: !searchQuery
   })
 
   const data: Post[] = searchQuery
-    ? searchResults?.value || []
-    : (paginatedData?.pages
-        .flatMap(post => post.value)
-        .filter(Boolean) as Post[]) || []
+    ? search.data || []
+    : (pagination.data?.pages.flat().filter(Boolean) as Post[]) || []
 
   const deleteMutation = useMutation({
     mutationFn: (postId: number) => PostService.delete({ postId }),
     onSuccess: deletedPostId => {
       queryClient.setQueryData(
-        ['posts'],
-        (oldData: { pages: { value: Post[] }[] }) => {
-          if (!oldData) return oldData
-          return {
-            ...oldData,
-            pages: oldData.pages.map(page => ({
-              ...page,
-              value: page.value.filter(post => post.id !== deletedPostId.value)
-            }))
+        [postsKey],
+        (prevQueryData: QueryData<Post> | undefined) => {
+          if (!prevQueryData) return prevQueryData
+
+          const newPages = prevQueryData.pages.map(page =>
+            page.filter(post => post.id !== deletedPostId)
+          )
+
+          const newQueryData = {
+            ...prevQueryData,
+            pages: newPages
           }
+
+          return newQueryData
         }
       )
     }
@@ -69,33 +63,30 @@ export function usePosts (searchQuery?: string) {
     deleteMutation.mutate(postId)
   }
 
-  useEffect(() => {
-    if (isPaginationError || isSearchError) {
-      openModal('connection')
-    } else if (
+  const handleMorePosts = useCallback(() => {
+    const failed = pagination.isError || search.isError
+    const success =
       isIntersecting &&
-      hasNextPage &&
-      !isPaginationLoading &&
+      pagination.hasNextPage &&
+      !pagination.isLoading &&
       !searchQuery
-    ) {
-      fetchNextPage()
+
+    if (success) {
+      pagination.fetchNextPage()
+    } else if (failed) {
+      openModal('connection')
     }
-  }, [
-    isIntersecting,
-    fetchNextPage,
-    hasNextPage,
-    isPaginationLoading,
-    isPaginationError,
-    isSearchError,
-    openModal,
-    searchQuery
-  ])
+  }, [isIntersecting, openModal, pagination, search.isError, searchQuery])
+
+  useEffect(() => {
+    handleMorePosts()
+  }, [handleMorePosts])
 
   return {
-    isError: isPaginationError || isSearchError,
-    isLoading: isPaginationLoading || isSearchLoading,
-    fetchNextPage,
-    hasNextPage,
+    isError: pagination.isError || search.isError,
+    isLoading: pagination.isLoading || search.isLoading,
+    fetchNextPage: pagination.fetchNextPage,
+    hasNextPage: pagination.hasNextPage,
     data,
     delete: deletePost,
     ref
