@@ -36,6 +36,8 @@ export default function Login () {
         if (sessionSuccess) {
           navigate('/account/me')
         } else {
+      console.log('ACÁ!')
+
           openModal('connection')
         }
       } else {

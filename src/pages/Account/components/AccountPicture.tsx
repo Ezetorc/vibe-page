@@ -44,10 +44,14 @@ export function AccountPicture (props: { accountData: AccountData }) {
         const prevImageDeleted = await cloudinary.deleteImage({ publicId })
 
         if (!prevImageDeleted) {
+      console.log('ACÁ!')
+
           openModal('connection')
         }
       }
     } catch {
+      console.log('ACÁ!')
+
       openModal('connection')
     }
   }
@@ -67,6 +71,8 @@ export function AccountPicture (props: { accountData: AccountData }) {
 
       setUser(newUser)
     } catch {
+      console.log('ACÁ!')
+
       openModal('connection')
     }
   }

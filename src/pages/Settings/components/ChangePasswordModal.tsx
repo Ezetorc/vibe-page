@@ -29,7 +29,9 @@ export function ChangePasswordModal () {
     if (passwordChangeSuccess) {
       closeModal()
     } else {
-      openModal("connection")
+      console.log('ACÁ!')
+
+      openModal('connection')
     }
   }
 

@@ -16,7 +16,7 @@ export function AccountName (props: { accountData: AccountData }) {
           <input
             minLength={3}
             maxLength={20}
-            className='text-orange-crayola text-center w-full bg-transparent outline-hidden font-poppins-regular text-[clamp(15px,5.5vw,35px)]'
+            className='text-orange-crayola text-center w-full bg-transparent outline-hidden font-poppins-regular mobile:text-[clamp(13px,4vw,30px)] desktop:text-[clamp(15px,5.5vw,35px)]'
             onChange={event =>
               props.accountData.setEditState({
                 field: 'name',
@@ -40,7 +40,7 @@ export function AccountName (props: { accountData: AccountData }) {
               <PencilIcon />
             </EditButton>
           )}
-          <h2 className='text-orange-crayola w-full text-center bg-transparent font-poppins-regular text-[clamp(15px,5.5vw,35px)]'>
+          <h2 className='text-orange-crayola w-full text-center bg-transparent font-poppins-regular mobile:text-[clamp(13px,4vw,30px)] desktop:text-[clamp(15px,5.5vw,35px)]'>
             {props.accountData.user!.name}
           </h2>
         </>

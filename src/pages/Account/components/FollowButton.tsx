@@ -11,18 +11,13 @@ export function FollowButton (props: FollowButtonProps) {
 
   const fetchFollowing = useCallback(async () => {
     if (!user) {
-      openModal("session")
+      openModal('session')
       return
     }
 
     const following = await user.isFollowing({
       userId: props.user.id
     })
-
-    if (!following) {
-      openModal("connection")
-      return
-    }
 
     setIsFollowing(following)
   }, [props.user.id, user, openModal])

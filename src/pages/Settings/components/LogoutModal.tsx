@@ -20,6 +20,8 @@ export function LogoutModal () {
     if (logoutSuccess) {
       closeModal()
     } else {
+      console.log('ACÁ!')
+
       openModal('connection')
     }
   }

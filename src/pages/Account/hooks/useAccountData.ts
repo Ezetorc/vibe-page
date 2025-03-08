@@ -42,7 +42,10 @@ export function useAccountData (username: string | undefined): AccountData {
   }, [user, username])
 
   const handleChangeName = async () => {
-    if (!account) return
+    if (!account || editState.value === account.name) {
+      setEditState({ field: null, value: '' })
+      return
+    }
 
     const isNewNameValid = await validateName({ name: editState.value })
     const message = errorMessage || dictionary.errorDuringNameChange
@@ -64,7 +67,10 @@ export function useAccountData (username: string | undefined): AccountData {
   }
 
   const handleChangeDescription = async () => {
-    if (!account) return
+    if (!account || editState.value === account.description) {
+      setEditState({ field: null, value: '' })
+      return
+    }
 
     const isNewDescriptionValid = validateDescription({
       description: editState.value

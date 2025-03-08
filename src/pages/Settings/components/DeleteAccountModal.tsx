@@ -37,6 +37,8 @@ export function DeleteAccountModal () {
       closeModal()
       navigate('/')
     } else {
+      console.log('ACÁ!')
+
       openModal('connection')
     }
   }

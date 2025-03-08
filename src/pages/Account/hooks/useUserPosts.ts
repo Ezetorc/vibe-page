@@ -77,6 +77,8 @@ export function useUserPosts (user: User | null, searchQuery?: string) {
     if (success) {
       pagination.fetchNextPage()
     } else if (failed) {
+      console.log('ACÁ!')
+
       openModal('connection')
     }
   }, [isIntersecting, openModal, pagination, search.isError, searchQuery])

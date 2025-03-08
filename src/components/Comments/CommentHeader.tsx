@@ -25,14 +25,14 @@ export function CommentHeader (props: {
     >
       <img
         title={`${props.commentData.user.name} Profile Picture`}
-        className='mobile:col-[1] mobile:row-[1] desktop:col-auto desktop:justify-self-center mobile:justify-self-end desktop:row-auto rounded-full desktop:w-[clamp(40px,5vw,60px)] mobile:w-[clamp(40px,20vw,60px)] aspect-square bg-orange-crayola'
+        className='mobile:col-[1] mobile:row-[1] desktop:col-auto desktop:justify-self-center mobile:justify-self-end desktop:row-auto rounded-full desktop:w-[clamp(40px,5vw,60px)] mobile:w-[clamp(40px,20vw,50px)] aspect-square border-vibe border-orange-crayola'
         src={
           props.commentData.user.imageUrl ?? 'src/assets/images/guest_user.jpg'
         }
         alt='Profile'
       />
 
-      <Username className='mobile:text-center mobile:text-[clamp(18px,1rem,30px)] desktop:text-[clamp(20px,1.8rem,40px)] desktop:col-auto desktop:row-auto mobile:col-span-2 mobile:row-[2]'>
+      <Username className='mobile:text-center mobile:text-[clamp(5px,0.9rem,20px)] desktop:text-[clamp(20px,1.8rem,21px)] desktop:col-auto desktop:row-auto mobile:col-span-2 mobile:row-[2]'>
         {props.commentData.user.name}
       </Username>
 

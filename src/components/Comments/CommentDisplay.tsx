@@ -41,7 +41,7 @@ export function CommentDisplay (props: CommentDisplayProps) {
   }, [fetchCommentData])
 
   return (
-    <article className='w-[clamp(300px,90%,700px)] py-[10px] px-[20px] rounded-vibe border-vibe border-caribbean-current overflow-hidden'>
+    <article className='w-[clamp(300px,95%,700px)] py-[10px] px-[20px] rounded-vibe border-vibe border-caribbean-current overflow-hidden'>
       <CommentHeader commentData={commentData} onDelete={props.onDelete} />
       <CommentContent commentData={commentData} />
       <CommentFooter
