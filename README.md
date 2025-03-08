@@ -18,7 +18,7 @@
 
 ### Installation
 
-1. Request an API Key by sending an email to [my contact email](mailto:mrdadoxx@gmail.com)
+1. Request an API Key by sending an email to [my contact email](mailto:ezeplaythis@gmail.com)
 
 2. Clone the repo
    ```sh
