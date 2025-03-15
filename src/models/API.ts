@@ -1,3 +1,4 @@
+import { CacheService } from '../services/CacheService'
 import { Data } from './Data'
 
 interface FetchOptions extends RequestInit {
@@ -43,6 +44,16 @@ export class API {
     return this
   }
 
+  private async _getParsedResponse<T> (response: Response): Promise<Data<T>> {
+    if (this.formatToJson) {
+      const jsonData: Data<T> = await response.json()
+
+      return jsonData
+    } else {
+      return response as unknown as Data<T>
+    }
+  }
+
   private async _fetch<T> (
     method: string,
     options: FetchOptions
@@ -62,29 +73,35 @@ export class API {
       ...options
     }
 
-    try {
-      const response = await fetch(url, {
-        headers: fetchHeaders,
-        method,
-        signal: controller.signal,
-        ...fetchOptions
-      })
+    const isCached = CacheService.exists(url)
+    const cachedRecently = CacheService.isValid(url)
 
-      clearTimeout(timeout)
+    if (isCached && cachedRecently) {
+      const cachedData = CacheService.get(url)
 
-      if (!response.ok) {
-        return Data.failure(response.statusText)
+      return Data.success(cachedData!.data as T)
+    } else {
+      try {
+        const response = await fetch(url, {
+          headers: fetchHeaders,
+          method,
+          signal: controller.signal,
+          ...fetchOptions
+        })
+
+        clearTimeout(timeout)
+
+        if (!response.ok) {
+          return Data.failure(response.statusText)
+        }
+
+        const parsedResponse: Data<T> = await this._getParsedResponse(response)
+        CacheService.add(url, parsedResponse.value)
+
+        return parsedResponse
+      } catch (error) {
+        return Data.failure(String(error))
       }
-
-      if (this.formatToJson) {
-        const jsonData: Data<T> = await response.json()
-
-        return jsonData
-      } else {
-        return response as unknown as Data<T>
-      }
-    } catch (error) {
-      return Data.failure(String(error))
     }
   }
 

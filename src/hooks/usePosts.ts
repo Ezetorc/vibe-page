@@ -71,17 +71,22 @@ export function usePosts (searchQuery?: string) {
       isIntersecting &&
       pagination.hasNextPage &&
       !pagination.isLoading &&
-      !search.isLoading &&  
+      !search.isLoading &&
       !searchQuery
-  
+
     if (success) {
       pagination.fetchNextPage()
     } else if (failed) {
       openModal('connection')
     }
-  }, [isIntersecting, openModal, pagination, search.isError, search.isLoading, searchQuery]);
-  
-  
+  }, [
+    isIntersecting,
+    openModal,
+    pagination,
+    search.isError,
+    search.isLoading,
+    searchQuery
+  ])
 
   useEffect(() => {
     handleMorePosts()
