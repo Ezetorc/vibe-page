@@ -25,6 +25,12 @@ errorDuringAccountEditing,Error mientras se editaba la cuenta,Error during accou
 loading,Cargando,Loading
 youAreNotLogged,No iniciaste sesión!,You aren't logged!
 iHaveAnAccount,Tengo una cuenta,I have an account
+emailInUse,Este email está en uso,Email in use
+seeTerms,Ver términos,See terms
+policy,Politica,Policy
+followers,Seguidores,Followers
+following,Siguiendo,Following
+youMustUnderstandAction,Debes confirmar que entiendes que esta acción es irreversible,You must check that you understand this action is irreversible
 iDontHaveAnAccount,No tengo una cuenta,I don't have an account
 thisUserHasnotDescription,Este usuario no tiene descripción,This user hasn't description
 joined,Se unió el,Joined

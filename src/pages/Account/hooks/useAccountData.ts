@@ -1,122 +1,54 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useQuery } from '@tanstack/react-query'
+import { useUser } from '../../../hooks/useUser'
 import { UserService } from '../../../services/UserService'
 import { AccountData } from '../models/AccountData'
-import { User } from '../../../models/User'
-import { useUser } from '../../../hooks/useUser'
-import { Post } from '../../../models/Post'
-import { useSettings } from '../../../hooks/useSettings'
-import { useValidation } from '../../../hooks/useValidation'
 
 export function useAccountData (username: string | undefined): AccountData {
-  const { user, updateUser } = useUser()
-  const { dictionary, openModal } = useSettings()
-  const { validateName, validateDescription, errorMessage } = useValidation()
-  const [isLoading, setIsLoading] = useState<boolean>(true)
-  const [isError, setIsError] = useState<boolean>(false)
-  const [account, setAccount] = useState<User | null>(null)
-  const accountIsUser = useMemo(() => user?.id === account?.id, [user, account])
-  const [editState, setEditState] = useState<{
-    field: 'name' | 'description' | null
-    value: string
-  }>({ field: null, value: '' })
-  const [posts, setPosts] = useState<Post[]>([])
+  const { user, isSessionActive } = useUser()
 
-  const fetchAccount = useCallback(async () => {
-    if (username === 'me') {
-      setAccount(user)
-    } else if (username) {
-      const newAccount = await UserService.getByName({ name: username })
+  const fetchAccount = async () => {
+    if (username === 'me' && isSessionActive()) {
+      return {
+        postsAmount: await user!.getPostsAmount(),
+        followersAmount: await user!.getFollowersAmount(),
+        followingAmount: await user!.getFollowingAmount(),
+        user
+      } as AccountData
+    }
+    if (username) {
+      const newUser = await UserService.getByName({ name: username })
 
-      if (newAccount) {
-        setAccount(newAccount)
-        setEditState({ field: null, value: '' })
-        setPosts([])
-      } else {
-        setIsLoading(false)
-        setIsError(true)
+      if (newUser) {
+        return {
+          user: newUser,
+          postsAmount: await newUser.getPostsAmount(),
+          followersAmount: await newUser!.getFollowersAmount(),
+          followingAmount: await newUser!.getFollowingAmount()
+        } as AccountData
       }
-    } else {
-      setIsError(true)
-      setIsLoading(false)
-    }
-  }, [user, username])
-
-  const handleChangeName = async () => {
-    if (!account || editState.value === account.name) {
-      setEditState({ field: null, value: '' })
-      return
     }
 
-    const isNewNameValid = await validateName({ name: editState.value })
-    const message = errorMessage || dictionary.errorDuringNameChange
-
-    if (!isNewNameValid) {
-      openModal('edit', { message })
-      return
-    }
-
-    const nameChange = await account.changeName({ newName: editState.value })
-
-    if (nameChange) {
-      await updateUser(account.id)
-    } else {
-      openModal('edit', { message })
-    }
-
-    setEditState({ field: null, value: '' })
+    throw new Error('User not found')
   }
 
-  const handleChangeDescription = async () => {
-    if (!account || editState.value === account.description) {
-      setEditState({ field: null, value: '' })
-      return
-    }
-
-    const isNewDescriptionValid = validateDescription({
-      description: editState.value
-    })
-    const message = errorMessage || dictionary.errorDuringDescriptionChange
-
-    if (!isNewDescriptionValid) {
-      openModal('edit', { message })
-      return
-    }
-
-    const descriptionChange = await account.changeDescription({
-      newDescription: editState.value
-    })
-
-    if (descriptionChange) {
-      await updateUser(account.id)
-    } else {
-      openModal('edit', { message })
-    }
-
-    setEditState({ field: null, value: '' })
-  }
-
-  const handleEdit = async () => {
-    if (editState.field === 'name') {
-      handleChangeName()
-    } else if (editState.field === 'description') {
-      handleChangeDescription()
-    }
-  }
-
-  useEffect(() => {
-    fetchAccount()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user])
+  const {
+    data: accountData,
+    isLoading,
+    isError
+  } = useQuery({
+    queryKey: ['accountData', username],
+    queryFn: fetchAccount,
+    staleTime: 1000 * 60 * 5,
+    retry: 1
+  })
 
   return {
     isLoading,
     isError,
-    user: account,
-    posts,
-    editState,
-    setEditState,
-    handleEdit,
-    isUser: accountIsUser,
-    setPosts
+    postsAmount: accountData?.postsAmount ?? -1,
+    user: accountData?.user ?? null,
+    isUser: user?.id === accountData?.user?.id,
+    followersAmount: accountData?.followersAmount ?? -1,
+    followingAmount: accountData?.followingAmount ?? -1
   }
 }

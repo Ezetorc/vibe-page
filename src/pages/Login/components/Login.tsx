@@ -1,5 +1,5 @@
 import { FormInput } from '../../../components/FormInput'
-import { useRef } from 'react'
+import { useState, useCallback, ChangeEvent } from 'react'
 import { useValidation } from '../../../hooks/useValidation'
 import { WelcomeToVibe } from '../../../components/WelcomeToVibe'
 import { Link, useNavigate } from 'react-router'
@@ -13,55 +13,98 @@ export default function Login () {
   const { dictionary, openModal } = useSettings()
   const { errorMessage, validateName, validatePassword, setErrorMessage } =
     useValidation()
+  const [isLoading, setIsLoading] = useState<boolean>(false)
   const { handleSession } = useUser()
   const navigate = useNavigate()
-  const nameInputRef = useRef<HTMLInputElement | null>(null)
-  const passwordInputRef = useRef<HTMLInputElement | null>(null)
 
-  const handleLogin = async (): Promise<void> => {
-    const name = nameInputRef.current?.value
-    const password = passwordInputRef.current?.value
-    const isNameValid = await validateName({ name })
+  const [formData, setFormData] = useState({ name: '', password: '' })
+
+  const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = event.target
+
+    setFormData(prev => ({ ...prev, [name]: value }))
+  }
+
+  const isFormDataValid = useCallback(async () => {
+    const { name, password } = formData
+
     const isPasswordValid = validatePassword({ password })
 
-    if (isNameValid && isPasswordValid) {
-      const logSuccess = await UserService.login({
-        name: name!,
-        password: password!
-      })
-
-      if (logSuccess) {
-        const sessionSuccess = await handleSession()
-
-        if (sessionSuccess) {
-          navigate('/account/me')
-        } else {
-      console.log('ACÁ!')
-
-          openModal('connection')
-        }
-      } else {
-        setErrorMessage(dictionary.nameOrPasswordWrong)
-      }
+    if (!isPasswordValid) {
+      setIsLoading(false)
+      return false
     }
-  }
+
+    const isNameValid = await validateName({ name })
+
+    if (!isNameValid) {
+      setIsLoading(false)
+      return false
+    }
+
+    return true
+  }, [formData, validateName, validatePassword])
+
+  const handleLogin = useCallback(async () => {
+    if (isLoading) return
+    setIsLoading(true)
+
+    const formDataValid = await isFormDataValid()
+
+    if (!formDataValid) return
+
+    const logSuccess = await UserService.login({
+      name: formData.name,
+      password: formData.password
+    })
+
+    if (logSuccess) {
+      const sessionSuccess = await handleSession()
+      setIsLoading(false)
+
+      if (sessionSuccess) {
+        navigate('/account/me')
+      } else {
+        openModal('connection')
+      }
+    } else {
+      setIsLoading(false)
+      setErrorMessage(dictionary.nameOrPasswordWrong)
+    }
+  }, [
+    dictionary.nameOrPasswordWrong,
+    formData,
+    handleSession,
+    isFormDataValid,
+    isLoading,
+    navigate,
+    openModal,
+    setErrorMessage
+  ])
 
   return (
     <Section className='h-full gap-y-[50px]'>
       <WelcomeToVibe />
 
+      <span>nombre: Ezequias contraseña: ezequias123</span>
+
       <form className='w-full flex flex-col gap-y-[30px]'>
         <FormInput
           min={3}
           max={20}
-          reference={nameInputRef}
+          name='name'
+          type='text'
+          value={formData.name}
+          onChange={handleChange}
           placeholder={dictionary.name}
         />
         <FormInput
           min={6}
           max={30}
-          reference={passwordInputRef}
+          name='password'
           type='password'
+          value={formData.password}
+          onChange={handleChange}
           placeholder={dictionary.password}
         />
 

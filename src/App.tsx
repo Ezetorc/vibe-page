@@ -1,5 +1,5 @@
-import { Routes, HashRouter as Router, Route } from 'react-router'
-import { lazy, Suspense, useEffect } from 'react'
+import { Routes, Route, useNavigate } from 'react-router'
+import { lazy, useEffect } from 'react'
 import { useUser } from './hooks/useUser.ts'
 import { useSettings } from './hooks/useSettings.ts'
 import { SessionModal } from './components/SessionModal.tsx'
@@ -7,7 +7,6 @@ import { InvalidEditModal } from './pages/Account/components/InvalidEditModal.ts
 import { ChangeEmailModal } from './pages/Settings/components/ChangeEmailModal.tsx'
 import { ChangeLanguageModal } from './pages/Settings/components/ChangeLanguageModal.tsx'
 import { ConnectionModal } from './components/ConnectionModal.tsx'
-import { Loading } from './components/Loading.tsx'
 import { ChangePasswordModal } from './pages/Settings/components/ChangePasswordModal.tsx'
 import { CommentModal } from './components/Comments/CommentModal.tsx'
 import { LogoutModal } from './pages/Settings/components/LogoutModal.tsx'
@@ -19,6 +18,7 @@ const LazyLogin = lazy(() => import('./pages/Login/components/Login.tsx'))
 const LazySearch = lazy(() => import('./pages/Search/components/Search.tsx'))
 const LazyCreate = lazy(() => import('./pages/Create/components/Create.tsx'))
 const LazyAccount = lazy(() => import('./pages/Account/components/Account.tsx'))
+const LazyTerms = lazy(() => import('./pages/Terms/components/Terms.tsx'))
 const LazySettings = lazy(
   () => import('./pages/Settings/components/Settings.tsx')
 )
@@ -28,6 +28,7 @@ const LazyRegister = lazy(
 
 export default function App () {
   const { visibleModal } = useSettings()
+  const navigate = useNavigate()
   const { handleSession } = useUser()
   const modals: { [key in ModalName]: JSX.Element } = {
     session: <SessionModal />,
@@ -42,25 +43,31 @@ export default function App () {
   }
 
   useEffect(() => {
-    handleSession()
-  }, [handleSession])
+    const updateSession = async () => {
+      const sessionSuccess = await handleSession()
+
+      if (sessionSuccess) {
+        navigate('/')
+      }
+    }
+
+    updateSession()
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   return (
     <>
-      <Suspense fallback={<Loading />}>
-        <Router>
-          {visibleModal.name && modals[visibleModal.name]}
-          <Routes>
-            <Route path='/' element={<LazyHome />} />
-            <Route path='/register' element={<LazyRegister />} />
-            <Route path='/login' element={<LazyLogin />} />
-            <Route path='/search' element={<LazySearch />} />
-            <Route path='/create' element={<LazyCreate />} />
-            <Route path='/account/:username' element={<LazyAccount />} />
-            <Route path='/settings' element={<LazySettings />} />
-          </Routes>
-        </Router>
-      </Suspense>
+      {visibleModal.name && modals[visibleModal.name]}
+      <Routes>
+        <Route path='/' element={<LazyHome />} />
+        <Route path='/register' element={<LazyRegister />} />
+        <Route path='/login' element={<LazyLogin />} />
+        <Route path='/search' element={<LazySearch />} />
+        <Route path='/create' element={<LazyCreate />} />
+        <Route path='/account/:username' element={<LazyAccount />} />
+        <Route path='/settings' element={<LazySettings />} />
+        <Route path='/terms' element={<LazyTerms />} />
+      </Routes>
     </>
   )
 }

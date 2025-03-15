@@ -16,6 +16,7 @@ export function useUser () {
 
       if (newUser) {
         setUser(newUser)
+
         return true
       } else {
         return false
@@ -32,7 +33,7 @@ export function useUser () {
     try {
       const session: SessionCookie = jwtDecode(sessionCookie)
       if ('id' in session.user) {
-        updateUser(session.user.id)
+        await updateUser(session.user.id)
         return true
       }
 

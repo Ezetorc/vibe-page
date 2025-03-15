@@ -20,7 +20,8 @@ export function usePosts (searchQuery?: string) {
   const search = useQuery({
     queryKey: [postsKey, searchQuery],
     queryFn: () => PostService.search({ query: searchQuery! }),
-    enabled: Boolean(searchQuery)
+    enabled: Boolean(searchQuery),
+    staleTime: 1000 * 60 * 5
   })
 
   const pagination = useInfiniteQuery({
@@ -29,7 +30,8 @@ export function usePosts (searchQuery?: string) {
     initialPageParam: 1,
     getNextPageParam: (lastPage, allPages) =>
       lastPage?.length ? allPages.length + 1 : undefined,
-    enabled: !searchQuery
+    enabled: !searchQuery,
+    staleTime: 1000 * 60 * 5
   })
 
   const data: Post[] = searchQuery
@@ -59,7 +61,7 @@ export function usePosts (searchQuery?: string) {
     }
   })
 
-  const deletePost = (postId: number) => {
+  const deletePost = async (postId: number) => {
     deleteMutation.mutate(postId)
   }
 
@@ -69,15 +71,17 @@ export function usePosts (searchQuery?: string) {
       isIntersecting &&
       pagination.hasNextPage &&
       !pagination.isLoading &&
+      !search.isLoading &&  
       !searchQuery
-
+  
     if (success) {
       pagination.fetchNextPage()
     } else if (failed) {
-      console.log('ACÁ!')
       openModal('connection')
     }
-  }, [isIntersecting, openModal, pagination, search.isError, searchQuery])
+  }, [isIntersecting, openModal, pagination, search.isError, search.isLoading, searchQuery]);
+  
+  
 
   useEffect(() => {
     handleMorePosts()

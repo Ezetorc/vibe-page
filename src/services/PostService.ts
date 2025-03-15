@@ -13,7 +13,7 @@ export class PostService {
       endpoint: 'posts',
       body: JSON.stringify({ user_id: args.userId, content: args.content })
     })
-    
+
     return response.success
   }
 
@@ -39,11 +39,15 @@ export class PostService {
     args: {
       amount?: number
       page?: number
+      userId?: number
     } = {}
   ): Promise<Post[]> {
-    const response = await api.get<PostEndpoint[]>({
-      endpoint: `posts/all?amount=${args.amount ?? 6}&page=${args.page ?? 1}`
-    })
+    const endpoint = args.userId
+      ? `posts/all?amount=${args.amount ?? 6}&page=${args.page ?? 1}&userId=${
+          args.userId
+        }`
+      : `posts/all?amount=${args.amount ?? 6}&page=${args.page ?? 1}`
+    const response = await api.get<PostEndpoint[]>({ endpoint })
 
     if (!response.value) return []
 

@@ -77,6 +77,11 @@ export function PostComments (props: {
   }, [handleCommentCreated])
 
   const handleCreateComment = () => {
+    if (!user) {
+      openModal('session')
+      return
+    }
+
     openModal('comment', { postId: props.postData.id })
   }
 

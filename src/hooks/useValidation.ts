@@ -3,7 +3,7 @@ import { useState } from 'react'
 import { useSettings } from './useSettings'
 
 export function useValidation () {
-  const { dictionary } = useSettings()
+  const { dictionary, openModal } = useSettings()
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
 
   const validateName = async ({
@@ -26,7 +26,11 @@ export function useValidation () {
     if (unique) {
       const nameExists = await UserService.nameExists({ name })
 
-      if (!nameExists) return true
+      if (nameExists === null) {
+        openModal('connection')
+      } else if (!nameExists) {
+        return true
+      }
 
       setErrorMessage(dictionary.nameInUse)
       return false
@@ -55,7 +59,13 @@ export function useValidation () {
     return true
   }
 
-  const validateEmail = async ({ email }: { email: string | undefined }) => {
+  const validateEmail = async ({
+    email,
+    unique = false
+  }: {
+    email: string | undefined
+    unique?: boolean
+  }) => {
     if (!email) {
       setErrorMessage(dictionary.emptyEmailError)
       return false
@@ -66,10 +76,16 @@ export function useValidation () {
       return false
     }
 
-    const emailAlreadyExists = await UserService.emailExists({ email })
+    if (unique) {
+      const emailExists = await UserService.emailExists({ email })
 
-    if (emailAlreadyExists) {
-      setErrorMessage(dictionary.emailAlreadyExists)
+      if (emailExists === null) {
+        openModal('connection')
+      } else if (!emailExists) {
+        return true
+      }
+
+      setErrorMessage(dictionary.emailInUse)
       return false
     }
 

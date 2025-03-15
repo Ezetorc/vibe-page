@@ -4,19 +4,18 @@ import { PostsDisplay } from '../../../components/Posts/PostsDisplay'
 import { SearchBar } from '../../../components/SearchBar'
 import { useSettings } from '../../../hooks/useSettings'
 import { useUserPosts } from '../hooks/useUserPosts'
-import { useAccount } from '../hooks/useAccount'
+import { AccountData } from '../models/AccountData'
 
-export function AccountPosts () {
+export function AccountPosts (props: { accountData: AccountData }) {
   const { dictionary } = useSettings()
-  const account = useAccount()
   const [searchQuery, setSearchQuery] = useState<string | undefined>(undefined)
-  const posts = useUserPosts(account.user, searchQuery)
+  const posts = useUserPosts(props.accountData.user, searchQuery)
 
   const handleSearch = (query: string) => {
     setSearchQuery(query)
   }
 
-  const handlePostDelete = (postId: number) => {
+  const handlePostDelete = async (postId: number) => {
     posts.delete(postId)
   }
   

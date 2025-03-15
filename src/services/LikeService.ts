@@ -33,9 +33,13 @@ export class LikeService {
     return likes
   }
 
-  static async delete (args: { likeId: number }): Promise<boolean> {
+  static async delete (args: {
+    likeId: number
+    signal?: AbortSignal
+  }): Promise<boolean> {
     const response = await api.delete({
-      endpoint: `likes/id?id=${args.likeId}`
+      endpoint: `likes/id?id=${args.likeId}`,
+      signal: args.signal
     })
 
     return response.success
@@ -45,9 +49,11 @@ export class LikeService {
     userId: number
     targetId: number
     type: LikeType
+    signal?: AbortSignal
   }): Promise<Like | null> {
     const response = await api.post<Like>({
       endpoint: `likes`,
+      signal: args.signal,
       body: JSON.stringify({
         target_id: args.targetId,
         type: args.type,

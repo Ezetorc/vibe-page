@@ -22,7 +22,8 @@ export function useUserPosts (user: User | null, searchQuery?: string) {
   const search = useQuery({
     queryKey: userId ? [userPostsKey, userId, 'search', searchQuery] : [],
     queryFn: () => PostService.search({ query: searchQuery! }),
-    enabled: !!searchQuery && !!userId
+    enabled: !!searchQuery && !!userId,
+    staleTime: 1000 * 60 * 5
   })
 
   const pagination = useInfiniteQuery({
@@ -31,7 +32,8 @@ export function useUserPosts (user: User | null, searchQuery?: string) {
     initialPageParam: 1,
     getNextPageParam: (lastPage, allPages) =>
       lastPage.length ? allPages.length + 1 : undefined,
-    enabled: !!userId && !searchQuery
+    enabled: !!userId && !searchQuery,
+    staleTime: 1000 * 60 * 5
   })
 
   const posts: Post[] = searchQuery
@@ -62,7 +64,7 @@ export function useUserPosts (user: User | null, searchQuery?: string) {
     }
   })
 
-  const deletePost = (postId: number) => {
+  const deletePost = async (postId: number) => {
     deleteMutation.mutate(postId)
   }
 
@@ -77,8 +79,6 @@ export function useUserPosts (user: User | null, searchQuery?: string) {
     if (success) {
       pagination.fetchNextPage()
     } else if (failed) {
-      console.log('ACÁ!')
-
       openModal('connection')
     }
   }, [isIntersecting, openModal, pagination, search.isError, searchQuery])

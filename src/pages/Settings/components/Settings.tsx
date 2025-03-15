@@ -1,3 +1,4 @@
+import { useNavigate } from 'react-router'
 import { Button } from '../../../components/Button'
 import { Nav } from '../../../components/Nav'
 import { Section } from '../../../components/Section'
@@ -6,6 +7,7 @@ import { useUser } from '../../../hooks/useUser'
 import { SettingsSection } from './SettingsSection'
 
 export default function Settings () {
+  const navigate = useNavigate()
   const { isSessionActive } = useUser()
   const { openModal, dictionary } = useSettings()
 
@@ -45,8 +47,12 @@ export default function Settings () {
       openModal('session')
       return
     }
-    
+
     openModal('deleteAccount')
+  }
+
+  const handleSeeTerms = () => {
+    navigate('/terms')
   }
 
   return (
@@ -73,6 +79,10 @@ export default function Settings () {
           text={`${dictionary.change} ${dictionary.language}`}
           onClick={handleChangeLanguage}
         />
+      </SettingsSection>
+
+      <SettingsSection name={dictionary.policy}>
+        <Button text={`${dictionary.seeTerms}`} onClick={handleSeeTerms} />
       </SettingsSection>
 
       <Nav />

@@ -1,7 +1,7 @@
 import { getAdaptedUser } from '../adapters/getAdaptedUser'
 import { User } from '../models/User'
 import { UserEndpoint } from '../models/UserEndpoint'
-import { api } from '../constants/SETTINGS'
+import { api, cloudinary } from '../constants/SETTINGS'
 
 export class UserService {
   static async getByName (args: { name: string }): Promise<User | null> {
@@ -16,13 +16,26 @@ export class UserService {
     return user
   }
 
-  static async delete (args: { userId: number }): Promise<number> {
+  static async delete (args: {
+    userId: number
+    imageId: string | null | undefined
+  }): Promise<number> {
     const response = await api.delete<boolean>({
       endpoint: `users?id=${args.userId}`
     })
 
     if (response.success) {
-      return args.userId
+      if (!args.imageId) return args.userId
+
+      const deleteSuccess = await cloudinary.deleteImage({
+        publicId: args.imageId
+      })
+
+      if (deleteSuccess) {
+        return args.userId
+      } else {
+        return -1
+      }
     } else {
       return -1
     }
@@ -94,20 +107,20 @@ export class UserService {
     return users
   }
 
-  static async emailExists (args: { email: string }): Promise<boolean> {
-    const response = await api.get<UserEndpoint>({
-      endpoint: `users/email?email=${encodeURIComponent(args.email)}`
+  static async emailExists (args: { email: string }): Promise<boolean | null> {
+    const response = await api.get<boolean>({
+      endpoint: `users/exists?email=${args.email}`
     })
 
-    return response.success
+    return response.value
   }
 
-  static async nameExists (args: { name: string }): Promise<boolean> {
+  static async nameExists (args: { name: string }): Promise<boolean | null> {
     const response = await api.get<boolean>({
-      endpoint: `users/name?name=${args.name}`
+      endpoint: `users/exists?name=${args.name}`
     })
 
-    return response.success
+    return response.value
   }
 
   static async search (args: { query: string }): Promise<User[]> {

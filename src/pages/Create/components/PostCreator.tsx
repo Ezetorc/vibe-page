@@ -12,6 +12,7 @@ export function PostCreator () {
   const { user } = useUser()
   const { dictionary, openModal } = useSettings()
   const { validatePost, errorMessage, setErrorMessage } = useValidation()
+  const [isCreating, setIsCreating] = useState<boolean>(false)
   const [postContent, setPostContent] = useState<string>('')
   const randomPlaceholderIndex = useRef<number>(getRandomNumber(0, 10))
   const spanRef = useRef<HTMLSpanElement>(null)
@@ -19,8 +20,12 @@ export function PostCreator () {
     dictionary[`createPlaceholder${randomPlaceholderIndex.current}`] || ''
 
   const handleCreatePost = async () => {
+    if (isCreating) return
+
+    setIsCreating(true)
+
     if (!user) {
-      openModal("session")
+      openModal('session')
       return
     }
 
@@ -35,8 +40,10 @@ export function PostCreator () {
 
     if (createSuccess) {
       navigate('/')
+      setIsCreating(false)
     } else {
       setErrorMessage(dictionary.somethingWentWrong)
+      setIsCreating(false)
     }
   }
 

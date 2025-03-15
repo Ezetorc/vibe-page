@@ -1,5 +1,5 @@
 import { Link, useNavigate } from 'react-router'
-import { useRef } from 'react'
+import { useState, useCallback, ChangeEvent } from 'react'
 import { useValidation } from '../../../hooks/useValidation'
 import { FormInput } from '../../../components/FormInput'
 import { WelcomeToVibe } from '../../../components/WelcomeToVibe'
@@ -21,47 +21,97 @@ export default function Register () {
   const { dictionary } = useSettings()
   const { handleSession } = useUser()
   const navigate = useNavigate()
-  const nameInputRef = useRef<HTMLInputElement | null>(null)
-  const emailInputRef = useRef<HTMLInputElement | null>(null)
-  const passwordInputRef = useRef<HTMLInputElement | null>(null)
-  const confirmPasswordInputRef = useRef<HTMLInputElement | null>(null)
-  const agreeWithTermsInputRef = useRef<HTMLInputElement | null>(null)
+  const [isLoading, setIsLoading] = useState<boolean>(false)
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    password: '',
+    confirmedPassword: '',
+    agreeWithTerms: false
+  })
 
-  const handleRegister = async (): Promise<void> => {
-    const name = nameInputRef.current?.value
-    const email = emailInputRef.current?.value
-    const password = passwordInputRef.current?.value
-    const confirmedPassword = confirmPasswordInputRef.current?.value
-    const agreeWithTerms = agreeWithTermsInputRef.current?.checked
+  const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const { name, value, type, checked } = event.target
 
-    const isNameValid = await validateName({ name, unique: true })
-    const isPasswordValid = validatePasswords({ password, confirmedPassword })
-    const isEmailValid = await validateEmail({ email })
+    setFormData(prev => ({
+      ...prev,
+      [name]: type === 'checkbox' ? checked : value
+    }))
+  }
+
+  const isFormDataValid = useCallback(async () => {
+    const { name, email, password, confirmedPassword, agreeWithTerms } =
+      formData
     const hasAgreedWithTerms = validateAgreeWithTerms({ agreeWithTerms })
 
-    const isFormValid: boolean =
-      isNameValid && isPasswordValid && isEmailValid && hasAgreedWithTerms
-
-    if (isFormValid) {
-      const registerSuccess = await UserService.register({
-        name: name!,
-        email: email!,
-        password: password!
-      })
-
-      if (registerSuccess) {
-        const sessionSuccess = await handleSession()
-
-        if (sessionSuccess) {
-          navigate('/account/me')
-        } else {
-          navigate('/')
-        }
-      } else {
-        setErrorMessage(dictionary.userAlreadyExists)
-      }
+    if (!hasAgreedWithTerms) {
+      setIsLoading(false)
+      return
     }
-  }
+
+    const isPasswordValid = validatePasswords({ password, confirmedPassword })
+    if (!isPasswordValid) {
+      setIsLoading(false)
+      return
+    }
+
+    const isNameValid = await validateName({ name, unique: true })
+    if (!isNameValid) {
+      setIsLoading(false)
+      return
+    }
+
+    const isEmailValid = await validateEmail({ email, unique: true })
+    if (!isEmailValid) {
+      setIsLoading(false)
+      return
+    }
+
+    return true
+  }, [
+    formData,
+    validateAgreeWithTerms,
+    validateEmail,
+    validateName,
+    validatePasswords
+  ])
+
+  const handleRegister = useCallback(async () => {
+    if (isLoading) return
+    setIsLoading(true)
+
+    const formDataValid = await isFormDataValid()
+
+    if (!formDataValid) return
+
+    const registerSuccess = await UserService.register({
+      name: formData.name,
+      email: formData.email,
+      password: formData.password
+    })
+
+    if (registerSuccess) {
+      const sessionSuccess = await handleSession()
+
+      if (sessionSuccess) {
+        navigate('/account/me')
+      } else {
+        navigate('/')
+      }
+    } else {
+      setErrorMessage(dictionary.userAlreadyExists)
+    }
+
+    setIsLoading(false)
+  }, [
+    dictionary.userAlreadyExists,
+    formData,
+    handleSession,
+    isFormDataValid,
+    isLoading,
+    navigate,
+    setErrorMessage
+  ])
 
   return (
     <Section className='h-full gap-y-[50px]'>
@@ -71,34 +121,44 @@ export default function Register () {
         <FormInput
           min={3}
           max={20}
-          reference={nameInputRef}
+          name='name'
+          value={formData.name}
+          onChange={handleChange}
           placeholder={dictionary.name}
         />
         <FormInput
-          reference={emailInputRef}
+          name='email'
           type='email'
+          value={formData.email}
+          onChange={handleChange}
           placeholder={dictionary.email}
         />
         <FormInput
           min={6}
           max={30}
-          reference={passwordInputRef}
+          name='password'
           type='password'
+          value={formData.password}
+          onChange={handleChange}
           placeholder={dictionary.password}
         />
         <FormInput
           min={6}
           max={30}
-          reference={confirmPasswordInputRef}
+          name='confirmedPassword'
           type='password'
+          value={formData.confirmedPassword}
+          onChange={handleChange}
           placeholder={dictionary.confirmPassword}
         />
 
         <div className='flex gap-x-5 items-center'>
           <input
-            ref={agreeWithTermsInputRef}
+            name='agreeWithTerms'
             type='checkbox'
             id='agree-with-terms'
+            checked={formData.agreeWithTerms}
+            onChange={handleChange}
             className='peer hidden'
           />
           <label
@@ -108,8 +168,7 @@ export default function Register () {
             <span className='absolute w-3 h-3 bg-white rounded-full opacity-0 scale-0 peer-checked:opacity-100 peer-checked:scale-100'></span>
           </label>
           <label className='font-poppins-light' htmlFor='agree-with-terms'>
-            {dictionary.iAgreeWith}
-            {` `}
+            {dictionary.iAgreeWith}{' '}
             <Link
               to='/terms'
               className='border-b-2 border-b-white hover:border-b-orange-crayola hover:text-orange-crayola'
@@ -118,11 +177,12 @@ export default function Register () {
             </Link>
           </label>
         </div>
+
         {errorMessage && <p className='text-red-500'>{errorMessage}</p>}
 
         <Button
-          onClick={event => {
-            event.preventDefault()
+          onClick={e => {
+            e.preventDefault()
             handleRegister()
           }}
           text={dictionary.register}

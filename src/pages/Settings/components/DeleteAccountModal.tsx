@@ -24,21 +24,20 @@ export function DeleteAccountModal () {
     const understoodAction = irreversibleActionRef.current?.checked
 
     if (!understoodAction) {
-      setErrorMessage(
-        'You must check that you understand this action is irreversible'
-      )
+      setErrorMessage(dictionary.youMustUnderstandAction)
       return
     }
 
-    const deleteSuccess = await UserService.delete({ userId: user!.id })
+    const deleteSuccess = await UserService.delete({
+      userId: user!.id,
+      imageId: user?.imageId
+    })
 
-    if (deleteSuccess) {
+    if (deleteSuccess >= 0) {
       await UserService.logout()
       closeModal()
       navigate('/')
     } else {
-      console.log('ACÁ!')
-
       openModal('connection')
     }
   }
@@ -72,7 +71,7 @@ export function DeleteAccountModal () {
           </div>
 
           {errorMessage && <p className='text-red-500'>{errorMessage}</p>}
-          <Button text={dictionary.logout} onClick={handleDeleteAccount} />
+          <Button text={dictionary.deleteAccount} onClick={handleDeleteAccount} />
         </form>
       </article>
     </Modal>

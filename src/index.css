@@ -9,7 +9,7 @@
   --border-width-vibe: 2px;
 
   --padding-nav: 100px;
-  
+
   --breakpoint-*: initial;
   --breakpoint-mobile: 320px;
   --breakpoint-desktop: 720px;
@@ -50,6 +50,28 @@
 @font-face {
   font-family: 'poppins-semibold';
   src: url('./assets/fonts/poppins_semibold.ttf') format('truetype');
+}
+
+.animate-shimmer {
+  animation: shimmer 1.5s infinite linear;
+}
+
+.bg-shimmer {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.2) 50%,
+    transparent 100%
+  );
+}
+
+@keyframes shimmer {
+  0% {
+    transform: translateX(0%);
+  }
+  100% {
+    transform: translateX(900%);
+  }
 }
 
 :root {

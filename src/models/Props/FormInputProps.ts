@@ -1,3 +1,5 @@
+import { ChangeEvent } from "react"
+
 export interface FormInputProps {
   placeholder: string
   type?: React.HTMLInputTypeAttribute | undefined
@@ -5,5 +7,7 @@ export interface FormInputProps {
   min?: number
   max?: number
   name?: string
+  value?: string
+  onChange?: (event: ChangeEvent<HTMLInputElement>) => void
   className?: string
 }

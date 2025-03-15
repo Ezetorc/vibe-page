@@ -70,4 +70,16 @@ export class Post {
 
     return postLikes
   }
+
+  public async getLikesAmount (): Promise<number> {
+    const response = await api.get<number>({
+      endpoint: `likes/amount?targetId=${this.id}&type=post`
+    })
+
+    if (response.success) {
+      return response.value!
+    } else {
+      return -1
+    }
+  }
 }

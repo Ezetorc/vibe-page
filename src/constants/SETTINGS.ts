@@ -4,6 +4,7 @@ const envData = {
 import { Settings } from '../models/Settings'
 import { Cloud } from '../models/Cloud'
 import { API } from '../models/API'
+import { QueryClient } from '@tanstack/react-query'
 
 const settings: Settings = {
   api: new API({
@@ -20,7 +21,15 @@ const settings: Settings = {
     en: 'English',
     es: 'Español'
   },
-  cloudinary: new Cloud({ cloud: { cloudName: 'ddugvrea9' } })
+  cloudinary: new Cloud({ cloud: { cloudName: 'ddugvrea9' } }),
+  queryClient: new QueryClient({
+    defaultOptions: {
+      queries: {
+        refetchOnWindowFocus: false
+      }
+    }
+  })
 }
 
-export const { api, languages, defaultLanguage, cloudinary } = settings
+export const { api, languages, defaultLanguage, cloudinary, queryClient } =
+  settings

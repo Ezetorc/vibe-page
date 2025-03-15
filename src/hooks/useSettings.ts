@@ -17,7 +17,7 @@ export function useSettings () {
 
   useEffect(() => {
     updateDictionary()
-  }, [updateDictionary])
+  }, [dictionaries, language, updateDictionary])
 
   const openModal = useCallback(
     (modalName: ModalName, data: object | undefined = {}) => {

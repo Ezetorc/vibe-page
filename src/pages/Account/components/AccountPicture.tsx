@@ -9,16 +9,18 @@ export function AccountPicture (props: { accountData: AccountData }) {
   const { openModal, dictionary } = useSettings()
   const { setUser } = useUser()
   const [imageUrl, setImageUrl] = useState<string | null>(
-    props.accountData.user!.imageUrl
+    props.accountData.user?.imageUrl ?? null
   )
   const [publicId, setPublicId] = useState<string | null>(
-    props.accountData.user!.imageId
+    props.accountData.user?.imageId ?? null
   )
 
   useEffect(() => {
-    setImageUrl(props.accountData.user!.imageUrl)
-    setPublicId(props.accountData.user!.imageId)
+    setImageUrl(props.accountData.user?.imageUrl ?? null)
+    setPublicId(props.accountData.user?.imageId ?? null)
   }, [props.accountData.user])
+
+  if (!props.accountData.user) return
 
   const handleImageChange = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
@@ -37,21 +39,18 @@ export function AccountPicture (props: { accountData: AccountData }) {
         })
 
       await saveImageToDatabase(newSecureUrl, newPublicId)
-      setImageUrl(newSecureUrl)
-      setPublicId(newPublicId)
 
       if (publicId) {
-        const prevImageDeleted = await cloudinary.deleteImage({ publicId })
+        const deleteSuccess = await cloudinary.deleteImage({ publicId })
 
-        if (!prevImageDeleted) {
-      console.log('ACÁ!')
-
+        if (!deleteSuccess) {
           openModal('connection')
         }
       }
-    } catch {
-      console.log('ACÁ!')
 
+      setImageUrl(newSecureUrl)
+      setPublicId(newPublicId)
+    } catch {
       openModal('connection')
     }
   }
@@ -71,16 +70,14 @@ export function AccountPicture (props: { accountData: AccountData }) {
 
       setUser(newUser)
     } catch {
-      console.log('ACÁ!')
-
       openModal('connection')
     }
   }
 
   return (
-    <div className='relative rounded-full w-[clamp(40px,10vw,100px)] overflow-hidden aspect-square border-orange-crayola border-vibe'>
+    <div className='relative rounded-full w-[clamp(40px,25vw,100px)] overflow-hidden aspect-square border-orange-crayola border-vibe'>
       <img
-        title={`${props.accountData.user!.name} Profile Picture`}
+        title={`${props.accountData.user.name} Profile Picture`}
         className='absolute w-full h-full'
         src={imageUrl ?? 'src/assets/images/guest_user.jpg'}
         alt='Profile'

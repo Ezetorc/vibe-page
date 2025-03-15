@@ -221,13 +221,48 @@ export class User {
   }
 
   public async getPosts (args: { page?: number } = {}): Promise<Post[]> {
-    const posts = await PostService.getAll({ page: args.page ?? 1 })
+    const posts = await PostService.getAll({
+      page: args.page ?? 1,
+      userId: this.id
+    })
 
-    if (!posts) return []
+    return posts
+  }
 
-    const userPosts: Post[] = posts.filter(post => post.userId === this.id)
+  public async getPostsAmount (): Promise<number> {
+    const response = await api.get<number>({
+      endpoint: `posts/amount?userId=${this.id}`
+    })
 
-    return userPosts
+    if (response.success) {
+      return response.value!
+    } else {
+      return -1
+    }
+  }
+
+  public async getFollowersAmount (): Promise<number> {
+    const response = await api.get<number>({
+      endpoint: `followers/amount?userId=${this.id}&type=follower`
+    })
+
+    if (response.success) {
+      return response.value!
+    } else {
+      return -1
+    }
+  }
+
+  public async getFollowingAmount (): Promise<number> {
+    const response = await api.get<number>({
+      endpoint: `followers/amount?userId=${this.id}&type=following`
+    })
+
+    if (response.success) {
+      return response.value!
+    } else {
+      return -1
+    }
   }
 
   public async getFollowers (): Promise<User[]> {
@@ -247,17 +282,18 @@ export class User {
     return userFollowers
   }
 
-  public async likePost (args: { postId: number }): Promise<Like | null> {
+  public async likePost (args: { postId: number, signal: AbortSignal }): Promise<Like | null> {
     const response = await LikeService.create({
       userId: this.id,
       targetId: args.postId,
-      type: 'post'
+      type: 'post',
+      signal: args.signal
     })
 
     return response
   }
 
-  public async dislikePost (args: { postId: number }): Promise<boolean> {
+  public async dislikePost (args: { postId: number, signal: AbortSignal }): Promise<boolean> {
     const post = await PostService.getById({ postId: args.postId })
 
     if (!post) return false
@@ -271,7 +307,8 @@ export class User {
     if (!likeToDelete) return false
 
     const deleteSuccessful = await LikeService.delete({
-      likeId: likeToDelete.id
+      likeId: likeToDelete.id,
+      signal: args.signal
     })
 
     return deleteSuccessful

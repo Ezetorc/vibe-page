@@ -25,8 +25,6 @@ export function ChangeEmailModal () {
     if (emailChangeSuccess) {
       closeModal()
     } else {
-      console.log('ACÁ!')
-
       openModal('connection')
     }
   }

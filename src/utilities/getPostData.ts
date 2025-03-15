@@ -5,13 +5,13 @@ import { UserService } from '../services/UserService'
 
 export async function getPostData (
   post: Post,
-  user: User | null
+  loggedUser: User | null
 ): Promise<PostData> {
   const [newUser, newLikes, newComments, newUserLiked] = await Promise.all([
     UserService.getById({ userId: post.userId }),
-    post.getLikes(),
+    post.getLikesAmount(),
     post.getComments(),
-    user?.hasLikedPost({ postId: post.id })
+    loggedUser?.hasLikedPost({ postId: post.id })
   ])
 
   const postData: PostData = {

@@ -1,3 +1,3 @@
 export interface LoadSpinnerProps {
-    reference: (node?: Element | null) => void
+    reference?: (node?: Element | null) => void
 }

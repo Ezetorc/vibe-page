@@ -25,8 +25,12 @@ export class API {
     this.abortSeconds = abortSeconds ?? 20
   }
 
-  private _getParsedEndpoint (endpoint: string): string {
-    return endpoint.charAt(0) === '/' ? endpoint.slice(1) : endpoint
+  private getParsedUrl (endpoint: string): string {
+    const parsedEndpoint =
+      endpoint.charAt(0) === '/' ? endpoint.slice(1) : endpoint
+    const url = `${this.url}/${parsedEndpoint}`
+
+    return url
   }
 
   public setDefaultHeaders (headers: HeadersInit) {
@@ -44,26 +48,26 @@ export class API {
     options: FetchOptions
   ): Promise<Data<T | null>> {
     const controller = new AbortController()
-    const parsedEndpoint = this._getParsedEndpoint(options.endpoint)
-    const url = `${this.url}/${parsedEndpoint}`
+    const url = this.getParsedUrl(options.endpoint)
     const timeout = setTimeout(
       () => controller.abort(),
       this.abortSeconds * 1000
     )
+    const fetchHeaders = {
+      ...this.headers,
+      ...options.headers
+    }
+    const fetchOptions = {
+      ...this.options,
+      ...options
+    }
 
     try {
       const response = await fetch(url, {
-        headers: {
-          'Content-Type': 'application/json',
-          ...this.headers,
-
-          ...options.headers
-        },
-        credentials: 'include',
+        headers: fetchHeaders,
         method,
         signal: controller.signal,
-        ...this.options,
-        ...options
+        ...fetchOptions
       })
 
       clearTimeout(timeout)
@@ -74,6 +78,7 @@ export class API {
 
       if (this.formatToJson) {
         const jsonData: Data<T> = await response.json()
+
         return jsonData
       } else {
         return response as unknown as Data<T>

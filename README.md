@@ -1,12 +1,13 @@
 # 🌍 Vibe - Social Network
 
-**Vibe** is a modern social network project designed to practice API development, database management, and frontend implementation.
+**Vibe** is a social network project designed to practice API development, database management, and frontend implementation.
 
 ## 🚀 Features
 
 ✅ User authentication (signup/login)  
 ✅ Create, edit, and delete posts  
-✅ Like and comment on posts  
+✅ Like and comment on posts and comments
+✅ Customize your profile
 
 ## 🛠️ Built With
 
@@ -28,9 +29,9 @@
    ```sh
    npm install
    ```
-4. Enter your API in `.env`
+4. Enter your API KEY in `.env`
    ```js
-   API_KEY=<ENTER YOUR API>
+   VITE_API_KEY=<ENTER YOUR API>
    ```
 5. Change git remote url to avoid accidental pushes to base project
    ```sh
