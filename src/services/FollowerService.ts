@@ -36,11 +36,7 @@ export class FollowerService {
     followingId: number
   }): Promise<boolean> {
     const response = await api.get<boolean>({
-      endpoint: `followers/exists`,
-      body: JSON.stringify({
-        follower_id: args.followerId,
-        following_id: args.followingId
-      })
+      endpoint: `followers/exists?followerId=${args.followerId}&followingId=${args.followingId}`
     })
 
     return Boolean(response.value)
@@ -52,7 +48,7 @@ export class FollowerService {
     })
 
     if (!response.value) return []
-    
+
     return response.value
   }
 }

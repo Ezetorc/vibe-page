@@ -2,5 +2,5 @@ import { Post } from '../Post'
 
 export interface PostDisplayProps {
   post: Post
-  onDelete: (postId: number) => Promise<void>
+  onDelete: (postId: number) => void
 }

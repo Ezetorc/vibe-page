@@ -1,4 +1,3 @@
-import { CacheService } from '../services/CacheService'
 import { Data } from './Data'
 
 interface FetchOptions extends RequestInit {
@@ -73,35 +72,25 @@ export class API {
       ...options
     }
 
-    const isCached = CacheService.exists(url)
-    const cachedRecently = CacheService.isValid(url)
+    try {
+      const response = await fetch(url, {
+        headers: fetchHeaders,
+        method,
+        signal: controller.signal,
+        ...fetchOptions
+      })
 
-    if (isCached && cachedRecently) {
-      const cachedData = CacheService.get(url)
+      clearTimeout(timeout)
 
-      return Data.success(cachedData!.data as T)
-    } else {
-      try {
-        const response = await fetch(url, {
-          headers: fetchHeaders,
-          method,
-          signal: controller.signal,
-          ...fetchOptions
-        })
-
-        clearTimeout(timeout)
-
-        if (!response.ok) {
-          return Data.failure(response.statusText)
-        }
-
-        const parsedResponse: Data<T> = await this._getParsedResponse(response)
-        CacheService.add(url, parsedResponse.value)
-
-        return parsedResponse
-      } catch (error) {
-        return Data.failure(String(error))
+      if (!response.ok) {
+        return Data.failure(response.statusText)
       }
+
+      const parsedResponse: Data<T> = await this._getParsedResponse(response)
+
+      return parsedResponse
+    } catch (error) {
+      return Data.failure(String(error))
     }
   }
 

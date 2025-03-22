@@ -83,7 +83,7 @@ export class UserService {
   }
 
   static async logout (): Promise<boolean> {
-    const response = await api.post<boolean>({ endpoint: `logout` })
+    const response = await api.post<boolean>({ endpoint: `users/logout` })
 
     return response.success
   }

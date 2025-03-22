@@ -1,4 +1,4 @@
-import { Dispatch, useState } from 'react'
+import { useState } from 'react'
 import { LikeIcon } from '../Icons'
 import { useSettings } from '../../hooks/useSettings'
 import { useUser } from '../../hooks/useUser'
@@ -6,11 +6,12 @@ import { CommentData } from '../../models/CommentData'
 
 export function CommentFooter (props: {
   commentData: CommentData
-  setCommentData: Dispatch<React.SetStateAction<CommentData>>
+  likeComment: () => void
+  dislikeComment: () => void
 }) {
   const { dictionary, openModal } = useSettings()
   const [loading, setLoading] = useState<boolean>(false)
-  const { isSessionActive, user } = useUser()
+  const { isSessionActive } = useUser()
 
   const handleLike = async () => {
     if (!isSessionActive()) {
@@ -22,54 +23,12 @@ export function CommentFooter (props: {
 
     try {
       if (props.commentData.userLiked === true) {
-        unlikeComment()
+        props.dislikeComment()
       } else if (props.commentData.userLiked === false) {
-        likeComment()
+        props.likeComment()
       }
     } finally {
       setLoading(false)
-    }
-  }
-
-  const likeComment = async () => {
-    if (!props.commentData.id) return
-
-    const newLike = await user!.likeComment({ commentId: props.commentData.id })
-
-    if (!newLike) return
-
-    props.setCommentData(prevPostData => {
-      if (prevPostData.likes === null) return prevPostData
-
-      const newLikes = [...prevPostData.likes, newLike]
-
-      return {
-        ...prevPostData,
-        userLiked: true,
-        likes: newLikes
-      }
-    })
-  }
-
-  const unlikeComment = async () => {
-    if (!props.commentData.id) return
-
-    const unlikeSuccess = await user!.dislikeComment({ commentId: props.commentData.id })
-
-    if (unlikeSuccess) {
-      props.setCommentData(prevCommentData => {
-        if (prevCommentData.likes === null) return prevCommentData
-
-        const newLikes = prevCommentData.likes.filter(
-          like => like.userId === user!.id
-        )
-
-        return {
-          ...prevCommentData,
-          userLiked: false,
-          likes: newLikes
-        }
-      })
     }
   }
 
@@ -87,7 +46,7 @@ export function CommentFooter (props: {
         <span className='text-verdigris font-poppins-semibold'>
           {props.commentData.likes === null
             ? dictionary.loading
-            : props.commentData.likes.length}
+            : props.commentData.likes}
         </span>
       </div>
     </footer>

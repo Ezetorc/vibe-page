@@ -1,13 +1,10 @@
 import { EditButton } from './EditButton'
 import { CheckIcon, PencilIcon } from '../../../components/Icons'
 import { useSettings } from '../../../hooks/useSettings'
-import { AccountData } from '../models/AccountData'
 import { EditState } from '../models/EditState'
+import { UserData } from '../models/UserData'
 
-export function AccountName (props: {
-  accountData: AccountData
-  edit: EditState
-}) {
+export function AccountName (props: { userData: UserData; edit: EditState }) {
   const { dictionary } = useSettings()
 
   return (
@@ -27,17 +24,17 @@ export function AccountName (props: {
                 value: event.target.value
               })
             }
-            defaultValue={props.accountData.user!.name || dictionary.loading}
+            defaultValue={props.userData.name || dictionary.loading}
           />
         </>
       ) : (
         <>
-          {props.accountData.isUser && (
+          {props.userData.isLogged && (
             <EditButton
               onEdit={() =>
                 props.edit.set({
                   field: 'name',
-                  value: props.accountData.user!.name
+                  value: props.userData.name ?? ''
                 })
               }
             >
@@ -45,7 +42,7 @@ export function AccountName (props: {
             </EditButton>
           )}
           <h2 className='text-orange-crayola w-full content-center text-center bg-transparent font-poppins-regular mobile:text-[clamp(13px,4.5vw,30px)] desktop:text-[clamp(15px,5.5vw,35px)]'>
-            {props.accountData.user!.name}
+            {props.userData.name}
           </h2>
         </>
       )}

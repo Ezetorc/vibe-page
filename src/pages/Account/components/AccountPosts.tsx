@@ -3,22 +3,22 @@ import { LoadSpinner } from '../../../components/LoadSpinner'
 import { PostsDisplay } from '../../../components/Posts/PostsDisplay'
 import { SearchBar } from '../../../components/SearchBar'
 import { useSettings } from '../../../hooks/useSettings'
+import { UserData } from '../models/UserData'
 import { useUserPosts } from '../hooks/useUserPosts'
-import { AccountData } from '../models/AccountData'
 
-export function AccountPosts (props: { accountData: AccountData }) {
+export function AccountPosts (props: { userData: UserData }) {
   const { dictionary } = useSettings()
   const [searchQuery, setSearchQuery] = useState<string | undefined>(undefined)
-  const posts = useUserPosts(props.accountData.user, searchQuery)
+  const { deletePost, posts, hasMore, ref } = useUserPosts(props.userData, searchQuery)
 
   const handleSearch = (query: string) => {
     setSearchQuery(query)
   }
 
   const handlePostDelete = async (postId: number) => {
-    posts.delete(postId)
+    deletePost(postId)
   }
-  
+
   return (
     <>
       <SearchBar
@@ -26,8 +26,8 @@ export function AccountPosts (props: { accountData: AccountData }) {
         placeholder={dictionary.searchMyPosts}
       />
 
-      <PostsDisplay onPostDelete={handlePostDelete} posts={posts.data} />
-      {posts?.hasNextPage && <LoadSpinner reference={posts.ref} />}
+      <PostsDisplay onPostDelete={handlePostDelete} posts={posts} />
+      {hasMore && <LoadSpinner reference={ref} />}
     </>
   )
 }

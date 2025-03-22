@@ -8,13 +8,17 @@ export class PostService {
   static async create (args: {
     userId: number
     content: string
-  }): Promise<boolean> {
-    const response = await api.post<boolean>({
+  }): Promise<Post | null> {
+    const response = await api.post<PostEndpoint>({
       endpoint: 'posts',
       body: JSON.stringify({ user_id: args.userId, content: args.content })
     })
 
-    return response.success
+    if (!response.success) return null
+
+    const post = getAdaptedPost({ postEndpoint: response.value! })
+    
+    return post
   }
 
   static async delete (args: { postId: number }): Promise<number> {

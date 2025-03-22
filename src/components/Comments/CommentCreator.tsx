@@ -9,6 +9,7 @@ import eventEmitter from '../../constants/EVENT_EMITTER'
 export function CommentCreator () {
   const { user } = useUser()
   const { dictionary, openModal, visibleModal } = useSettings()
+  const [isLoading, setIsLoading] = useState<boolean>(false)
   const { validateComment, errorMessage, setErrorMessage } = useValidation()
   const [commentContent, setCommentContent] = useState<string>('')
   const randomPlaceholderIndex = useRef<number>(getRandomNumber(0, 10))
@@ -17,10 +18,14 @@ export function CommentCreator () {
     dictionary[`createPlaceholder${randomPlaceholderIndex.current}`] || ''
 
   const handleCreateComment = async () => {
+    if (isLoading) return
+
     if (!user) {
       openModal('session')
       return
     }
+
+    setIsLoading(true)
 
     const isCommentValid = validateComment({ comment: commentContent })
 
@@ -29,8 +34,10 @@ export function CommentCreator () {
         content: commentContent,
         postId: visibleModal.data.postId as number
       }
-      
+
       eventEmitter.emit('commentCreated', event)
+    } else {
+      setIsLoading(false)
     }
   }
 
@@ -64,7 +71,11 @@ export function CommentCreator () {
         {errorMessage}
       </div>
 
-      <Button onClick={handleCreateComment} text={dictionary.comment} />
+      <Button
+        onClick={handleCreateComment}
+        disabled={isLoading}
+        text={dictionary.comment}
+      />
     </article>
   )
 }

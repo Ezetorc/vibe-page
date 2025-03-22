@@ -3,12 +3,18 @@ import { UserStore } from '../models/UserStore'
 import { getUserStore } from '../stores/getUserStore'
 import { jwtDecode } from 'jwt-decode'
 import { UserService } from '../services/UserService'
-import { getSessionCookie } from '../utilities/getSessionCookie'
 import { SessionCookie } from '../models/SessionCookie'
 
 export function useUser () {
   const userStore: UserStore = getUserStore()
   const { user, setUser } = userStore
+
+  const getSessionCookie = () => {
+    return document.cookie
+      .split('; ')
+      .find(row => row.startsWith('session='))
+      ?.split('=')[1]
+  }
 
   const updateUser = useCallback(
     async (userId: number): Promise<boolean> => {
@@ -38,8 +44,8 @@ export function useUser () {
       }
 
       return false
-    } catch (error) {
-      console.error('Error decoding token:', error)
+    } catch {
+      console.error('Error decoding token')
       return false
     }
   }, [updateUser])

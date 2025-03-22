@@ -1,12 +1,14 @@
-import { AccountData } from '../models/AccountData'
-import { FollowButton } from './FollowButton'
+import { UserData } from '../models/UserData'
+import { FollowButton } from '../../../components/FollowButton'
 
-export function AccountInteractions (props: { accountData: AccountData }) {
+export function AccountInteractions (props: { userData: UserData }) {
+  if (!props.userData.id) return
+
   return (
     <div className='flex gap-x-[20px]'>
-      {!props.accountData.isUser && (
+      {!props.userData.isLogged && (
         <>
-          <FollowButton user={props.accountData.user!} />
+          <FollowButton userId={props.userData.id} />
         </>
       )}
     </div>

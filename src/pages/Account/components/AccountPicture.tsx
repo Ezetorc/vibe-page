@@ -3,24 +3,25 @@ import { useSettings } from '../../../hooks/useSettings'
 import { useUser } from '../../../hooks/useUser'
 import { User } from '../../../models/User'
 import { cloudinary } from '../../../constants/SETTINGS'
-import { AccountData } from '../models/AccountData'
+import { UserData } from '../models/UserData'
+import { UserService } from '../../../services/UserService'
 
-export function AccountPicture (props: { accountData: AccountData }) {
+export function AccountPicture (props: { userData: UserData }) {
   const { openModal, dictionary } = useSettings()
-  const { setUser } = useUser()
+  const { setUser, user } = useUser()
   const [imageUrl, setImageUrl] = useState<string | null>(
-    props.accountData.user?.imageUrl ?? null
+    props.userData.imageUrl ?? null
   )
   const [publicId, setPublicId] = useState<string | null>(
-    props.accountData.user?.imageId ?? null
+    props.userData.imageId ?? null
   )
 
   useEffect(() => {
-    setImageUrl(props.accountData.user?.imageUrl ?? null)
-    setPublicId(props.accountData.user?.imageId ?? null)
-  }, [props.accountData.user])
+    setImageUrl(props.userData.imageUrl ?? null)
+    setPublicId(props.userData.imageId ?? null)
+  }, [props.userData.imageId, props.userData.imageUrl])
 
-  if (!props.accountData.user) return
+  if (!props.userData.id) return
 
   const handleImageChange = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
@@ -56,14 +57,18 @@ export function AccountPicture (props: { accountData: AccountData }) {
   }
 
   const saveImageToDatabase = async (imageUrl: string, publicId: string) => {
-    if (!props.accountData.user) return
+    if (!props.userData.id) return
+
+    const dataUser = await UserService.getById({ userId: props.userData.id })
+
+    if (!dataUser || !user) return
 
     try {
-      await props.accountData.user.changeImageUrl({ newImageUrl: imageUrl })
-      await props.accountData.user.changeImageId({ newImageId: publicId })
+      await dataUser.changeImageUrl({ newImageUrl: imageUrl })
+      await dataUser.changeImageId({ newImageId: publicId })
 
       const newUser = new User({
-        ...props.accountData.user,
+        ...user,
         imageId: publicId,
         imageUrl: imageUrl
       })
@@ -77,7 +82,7 @@ export function AccountPicture (props: { accountData: AccountData }) {
   return (
     <div className='relative rounded-full w-[clamp(40px,25vw,100px)] overflow-hidden aspect-square border-orange-crayola border-vibe'>
       <img
-        title={`${props.accountData.user.name} Profile Picture`}
+        title={`${props.userData.name} Profile Picture`}
         className='absolute w-full h-full'
         src={imageUrl ?? 'src/assets/images/guest_user.jpg'}
         alt='Profile'

@@ -7,9 +7,9 @@ import { PostsDisplay } from '../../../components/Posts/PostsDisplay'
 import { UsersDisplay } from '../../../components/UsersDisplay'
 import { ToSearchButton } from './ToSearchButton'
 import { getInMinus } from '../../../utilities/getInMinus'
-import { usePosts } from '../../../hooks/usePosts'
 import { useUsers } from '../hooks/useUsers'
 import { LoadSpinner } from '../../../components/LoadSpinner'
+import { usePosts } from '../../../hooks/usePosts'
 
 export default function Search () {
   const { dictionary } = useSettings()
@@ -53,16 +53,16 @@ export default function Search () {
       />
 
       {toSearch === 'posts' ? (
-        <PostsDisplay posts={posts.data} onPostDelete={posts.delete} />
+        <PostsDisplay posts={posts.posts} onPostDelete={posts.deletePost} />
       ) : (
-        <UsersDisplay users={users.data} />
+        <UsersDisplay users={users.users} />
       )}
 
-      {toSearch === 'posts' && posts.hasNextPage && (
+      {toSearch === 'posts' && posts.hasMore && (
         <LoadSpinner reference={posts.ref} />
       )}
 
-      {toSearch === 'users' && users.hasNextPage && (
+      {toSearch === 'users' && users.hasMore && (
         <LoadSpinner reference={users.ref} />
       )}
 

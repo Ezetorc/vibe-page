@@ -1,11 +1,12 @@
 import { useState } from 'react'
 import { useSettings } from '../../../hooks/useSettings'
 import { useValidation } from '../../../hooks/useValidation'
-import { User } from '../../../models/User'
 import { useUser } from '../../../hooks/useUser'
 import { EditState } from '../models/EditState'
+import { UserData } from '../models/UserData'
+import { UserService } from '../../../services/UserService'
 
-export function useEditState (account: User | null): EditState {
+export function useEditState (userData: UserData): EditState {
   const { dictionary, openModal } = useSettings()
   const { updateUser } = useUser()
   const { validateName, validateDescription, errorMessage } = useValidation()
@@ -18,7 +19,7 @@ export function useEditState (account: User | null): EditState {
   })
 
   const handleChangeName = async () => {
-    if (!account || editState.value === account.name) {
+    if (!userData.id || editState.value === userData.name) {
       setEditState({ field: null, value: '' })
       return
     }
@@ -31,10 +32,11 @@ export function useEditState (account: User | null): EditState {
       return
     }
 
-    const nameChange = await account.changeName({ newName: editState.value })
+    const user = await UserService.getById({ userId: userData.id })
+    const nameChange = await user!.changeName({ newName: editState.value })
 
-    if (nameChange) {
-      await updateUser(account.id)
+    if (nameChange && userData.id) {
+      await updateUser(userData.id)
     } else {
       openModal('edit', { message })
     }
@@ -43,7 +45,7 @@ export function useEditState (account: User | null): EditState {
   }
 
   const handleChangeDescription = async () => {
-    if (!account || editState.value === account.description) {
+    if (!userData.id || editState.value === userData.description) {
       setEditState({ field: null, value: '' })
       return
     }
@@ -58,12 +60,13 @@ export function useEditState (account: User | null): EditState {
       return
     }
 
-    const descriptionChange = await account.changeDescription({
+    const user = await UserService.getById({ userId: userData.id })
+    const descriptionChange = await user!.changeDescription({
       newDescription: editState.value
     })
 
-    if (descriptionChange) {
-      await updateUser(account.id)
+    if (descriptionChange && userData.id) {
+      await updateUser(userData.id)
     } else {
       openModal('edit', { message })
     }

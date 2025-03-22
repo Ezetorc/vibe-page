@@ -6,45 +6,79 @@ import { useNavigate } from 'react-router'
 import { useUser } from '../../../hooks/useUser'
 import { useValidation } from '../../../hooks/useValidation'
 import { PostService } from '../../../services/PostService'
+import { InfiniteData, useQueryClient } from '@tanstack/react-query'
+import { Post } from '../../../models/Post'
+import { UserData } from '../../Account/models/UserData'
 
 export function PostCreator () {
   const navigate = useNavigate()
   const { user } = useUser()
+  const queryClient = useQueryClient()
   const { dictionary, openModal } = useSettings()
   const { validatePost, errorMessage, setErrorMessage } = useValidation()
-  const [isCreating, setIsCreating] = useState<boolean>(false)
+  const [isLoading, setIsLoading] = useState<boolean>(false)
   const [postContent, setPostContent] = useState<string>('')
   const randomPlaceholderIndex = useRef<number>(getRandomNumber(0, 10))
   const spanRef = useRef<HTMLSpanElement>(null)
   const placeholder =
     dictionary[`createPlaceholder${randomPlaceholderIndex.current}`] || ''
 
-  const handleCreatePost = async () => {
-    if (isCreating) return
+  const updateQueryData = (postCreated: Post | null) => {
+    queryClient.setQueriesData(
+      { queryKey: ['posts'] },
+      (data: InfiniteData<Post[]> | undefined) => {
+        if (!data) return data
 
-    setIsCreating(true)
+        return {
+          ...data,
+          pages: [[postCreated, ...data.pages[0]], ...data.pages.slice(1)],
+          pageParams: data.pageParams
+        }
+      }
+    )
+
+    queryClient.setQueryData(['userData', 'me'], (oldUserData: UserData) => {
+      if (!oldUserData?.postsAmount) return oldUserData
+
+      return new UserData({
+        ...oldUserData,
+        postsAmount: oldUserData.postsAmount + 1
+      })
+    })
+  }
+
+  const handleCreatePost = async () => {
+    if (isLoading) return
+
+    setIsLoading(true)
 
     if (!user) {
       openModal('session')
+      setIsLoading(false)
       return
     }
 
     const isPostValid = validatePost({ post: postContent })
 
-    if (!isPostValid) return
+    if (!isPostValid) {
+      setIsLoading(false)
+      return
+    }
 
-    const createSuccess = await PostService.create({
+    const postCreated = await PostService.create({
       userId: user.id,
       content: postContent
     })
 
-    if (createSuccess) {
+    if (postCreated !== null) {
+      updateQueryData(postCreated)
+      setPostContent('')
       navigate('/')
-      setIsCreating(false)
     } else {
       setErrorMessage(dictionary.somethingWentWrong)
-      setIsCreating(false)
     }
+
+    setIsLoading(false)
   }
 
   const handleWrite = (event: FormEvent<HTMLTextAreaElement>) => {

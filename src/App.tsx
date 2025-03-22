@@ -1,6 +1,5 @@
-import { Routes, Route, useNavigate } from 'react-router'
-import { lazy, useEffect } from 'react'
-import { useUser } from './hooks/useUser.ts'
+import { Routes, Route } from 'react-router'
+import { lazy } from 'react'
 import { useSettings } from './hooks/useSettings.ts'
 import { SessionModal } from './components/SessionModal.tsx'
 import { InvalidEditModal } from './pages/Account/components/InvalidEditModal.tsx'
@@ -28,8 +27,6 @@ const LazyRegister = lazy(
 
 export default function App () {
   const { visibleModal } = useSettings()
-  const navigate = useNavigate()
-  const { handleSession } = useUser()
   const modals: { [key in ModalName]: JSX.Element } = {
     session: <SessionModal />,
     language: <ChangeLanguageModal />,
@@ -41,19 +38,6 @@ export default function App () {
     logout: <LogoutModal />,
     deleteAccount: <DeleteAccountModal />
   }
-
-  useEffect(() => {
-    const updateSession = async () => {
-      const sessionSuccess = await handleSession()
-
-      if (sessionSuccess) {
-        navigate('/')
-      }
-    }
-
-    updateSession()
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
 
   return (
     <>

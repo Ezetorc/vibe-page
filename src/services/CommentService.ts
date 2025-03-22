@@ -2,6 +2,7 @@ import { getAdaptedComment } from '../adapters/getAdaptedComment'
 import { Comment } from '../models/Comment'
 import { CommentEndpoint } from '../models/CommentEndpoint'
 import { api } from '../constants/SETTINGS'
+import { LikeService } from './LikeService'
 
 export class CommentService {
   static async getAll (
@@ -38,6 +39,25 @@ export class CommentService {
     })
 
     if (!response.success) return null
+
+    const comment = getAdaptedComment({ commentEndpoint: response.value! })
+
+    return comment
+  }
+
+  static async delete (args: { commentId: number }): Promise<Comment | null> {
+    const response = await api.delete<CommentEndpoint>({
+      endpoint: `comments?id=${args.commentId}`
+    })
+
+    if (!response.success) return null
+
+    const commentLikes = await LikeService.getAllOfComment({
+      commentId: args.commentId
+    })
+    const likesIds = commentLikes.map(commentLike => commentLike.id)
+
+    await Promise.all(likesIds.map(likeId => LikeService.delete({ likeId })))
 
     const comment = getAdaptedComment({ commentEndpoint: response.value! })
 

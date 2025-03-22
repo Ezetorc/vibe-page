@@ -282,7 +282,10 @@ export class User {
     return userFollowers
   }
 
-  public async likePost (args: { postId: number, signal: AbortSignal }): Promise<Like | null> {
+  public async likePost (args: {
+    postId: number
+    signal?: AbortSignal
+  }): Promise<Like | null> {
     const response = await LikeService.create({
       userId: this.id,
       targetId: args.postId,
@@ -293,7 +296,10 @@ export class User {
     return response
   }
 
-  public async dislikePost (args: { postId: number, signal: AbortSignal }): Promise<boolean> {
+  public async dislikePost (args: {
+    postId: number
+    signal?: AbortSignal
+  }): Promise<boolean> {
     const post = await PostService.getById({ postId: args.postId })
 
     if (!post) return false

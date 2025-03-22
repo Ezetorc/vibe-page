@@ -1,71 +1,33 @@
-import { Dispatch, useCallback, useEffect } from 'react'
+import { useCallback, useEffect } from 'react'
 import { useSettings } from '../../hooks/useSettings'
 import { PostData } from '../../models/PostData'
 import { Button } from '../Button'
 import eventEmitter from '../../constants/EVENT_EMITTER'
-import { CommentService } from '../../services/CommentService'
-import { useValidation } from '../../hooks/useValidation'
 import { useUser } from '../../hooks/useUser'
 import { CommentDisplay } from '../Comments/CommentDisplay'
-import { Comment } from '../../models/Comment'
+import { NewCommentEvent } from '../../models/NewCommentEvent'
 
 export function PostComments (props: {
   postData: PostData
-  setPostData: Dispatch<React.SetStateAction<PostData>>
+  createComment: (event: { content: string; postId: number }) => void
+  deleteComment: (commentId: number) => void
 }) {
-  const { dictionary, openModal, closeModal } = useSettings()
+  const { dictionary, openModal } = useSettings()
   const { user } = useUser()
-  const { setErrorMessage } = useValidation()
 
   const handleCommentCreated = useCallback(
-    async (event: { content: string; postId: number }) => {
-      if (
-        !props.postData.comments ||
-        !user ||
-        event.postId !== props.postData.id
-      )
-        return
+    async (event: NewCommentEvent) => {
+      if (event.postId !== props.postData.id) return
 
-      const newComment = await CommentService.create({
-        userId: user.id,
-        postId: props.postData.id,
-        content: event.content
-      })
-
-      if (newComment) {
-        const newComments: Comment[] = [...props.postData.comments]
-
-        newComments.push(newComment)
-        props.setPostData(prev => ({ ...prev, comments: newComments }))
-        closeModal()
-      } else {
-        setErrorMessage(dictionary.somethingWentWrong)
-      }
+      props.createComment(event)
     },
-    [closeModal, dictionary.somethingWentWrong, props, setErrorMessage, user]
+    [props]
   )
 
   const handleCommentDelete = async (commentId: number) => {
     if (!props.postData.comments) return
 
-    const commentToDelete = props.postData.comments.find(
-      comment => comment.id === commentId
-    )
-
-    if (!commentToDelete) return
-
-    const deleteSuccess = await commentToDelete.delete()
-
-    if (deleteSuccess) {
-      const newPostComments = props.postData.comments.filter(
-        comment => comment.id !== commentToDelete.id
-      )
-
-      props.setPostData(prevPostData => ({
-        ...prevPostData,
-        comments: newPostComments
-      }))
-    }
+    props.deleteComment(commentId)
   }
 
   useEffect(() => {

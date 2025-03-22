@@ -1,11 +1,11 @@
 import { EditButton } from './EditButton'
 import { CheckIcon, PencilIcon } from '../../../components/Icons'
 import { useSettings } from '../../../hooks/useSettings'
-import { AccountData } from '../models/AccountData'
 import { EditState } from '../models/EditState'
+import { UserData } from '../models/UserData'
 
 export function AccountDescription (props: {
-  accountData: AccountData
+  userData: UserData
   edit: EditState
 }) {
   const { dictionary } = useSettings()
@@ -13,7 +13,7 @@ export function AccountDescription (props: {
   return (
     <div
       className={`gap-x-[10px] justify-center w-full h-full grid ${
-        props.accountData.isUser ? 'grid-cols-[auto_1fr]' : 'grid-cols-[1fr]'
+        props.userData.isLogged ? 'grid-cols-[auto_1fr]' : 'grid-cols-[1fr]'
       }`}
     >
       {props.edit.field === 'description' ? (
@@ -32,17 +32,17 @@ export function AccountDescription (props: {
               })
             }
             placeholder={dictionary.myNewDescription}
-            defaultValue={props.accountData.user!.description || ''}
+            defaultValue={props.userData.description ?? ''}
           />
         </>
       ) : (
         <>
-          {props.accountData.isUser && (
+          {props.userData.isLogged && (
             <EditButton
               onEdit={() =>
                 props.edit.set({
                   field: 'description',
-                  value: props.accountData.user!.description ?? ''
+                  value: props.userData.description ?? ''
                 })
               }
             >
@@ -50,9 +50,9 @@ export function AccountDescription (props: {
             </EditButton>
           )}
           <p className='h-[clamp(160px,auto,320px)] mobile:w-full desktop:w-[90%] text-white text-[clamp(5px,6vw,20px)] font-poppins-regular break-words whitespace-pre-wrap overflow-hidden overflow-wrap-anywhere'>
-            {props.accountData.user!.description || (
+            {props.userData.description ?? (
               <span className='text-caribbean-current'>
-                {props.accountData.isUser
+                {props.userData.isLogged
                   ? dictionary.youDontHaveDescription
                   : dictionary.thisUserHasnotDescription}
               </span>

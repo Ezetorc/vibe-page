@@ -4,9 +4,11 @@ import { CloseModalButton } from '../../../components/CloseModalButton'
 import { useSettings } from '../../../hooks/useSettings'
 import { useUser } from '../../../hooks/useUser'
 import { UserService } from '../../../services/UserService'
+import { useQueryClient } from '@tanstack/react-query'
 
 export function LogoutModal () {
-  const { isSessionActive } = useUser()
+  const { isSessionActive, setUser } = useUser()
+  const queryClient = useQueryClient()
   const { dictionary, openModal, closeModal } = useSettings()
 
   const handleLogout = async () => {
@@ -18,6 +20,9 @@ export function LogoutModal () {
     const logoutSuccess = await UserService.logout()
 
     if (logoutSuccess) {
+      queryClient.resetQueries({ queryKey: ['userData', 'me'] })
+      queryClient.removeQueries({ queryKey: ['userData', 'me'] })
+      setUser(null)
       closeModal()
     } else {
       openModal('connection')

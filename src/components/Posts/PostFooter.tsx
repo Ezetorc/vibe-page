@@ -1,4 +1,4 @@
-import { Dispatch, useRef, useState } from 'react'
+import { Dispatch, useRef } from 'react'
 import { LikeIcon, CommentIcon } from '../Icons'
 import { useSettings } from '../../hooks/useSettings'
 import { PostData } from '../../models/PostData'
@@ -8,11 +8,12 @@ export function PostFooter (props: {
   postData: PostData
   commentsOpened: boolean
   setCommentsOpened: Dispatch<React.SetStateAction<boolean>>
-  setPostData: Dispatch<React.SetStateAction<PostData>>
+  likePost: (signal: AbortSignal) => void
+  dislikePost: (signal: AbortSignal) => void
+  isLoading: boolean
 }) {
   const { openModal } = useSettings()
-  const [loading, setLoading] = useState<boolean>(false)
-  const { isSessionActive, user } = useUser()
+  const { isSessionActive } = useUser()
 
   const abortControllerRef = useRef<AbortController | null>(null)
 
@@ -22,6 +23,18 @@ export function PostFooter (props: {
       return
     }
 
+    const controller = handleController()
+
+    if (props.postData.id !== null || props.postData.likes !== null) {
+      if (props.postData.userLiked) {
+        props.dislikePost(controller.signal)
+      } else {
+        props.likePost(controller.signal)
+      }
+    }
+  }
+
+  const handleController = () => {
     if (abortControllerRef.current) {
       abortControllerRef.current.abort()
     }
@@ -29,69 +42,7 @@ export function PostFooter (props: {
     const controller = new AbortController()
     abortControllerRef.current = controller
 
-    setLoading(true)
-
-    try {
-      if (props.postData.id === null || props.postData.likes === null) return
-
-      if (props.postData.userLiked) {
-        await unlikePost(controller.signal)
-      } else {
-        await likePost(controller.signal)
-      }
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  const likePost = async (signal: AbortSignal) => {
-    props.setPostData(prevPostData => ({
-      ...prevPostData,
-      likes: prevPostData.likes! + 1,
-      userLiked: true
-    }))
-
-    try {
-      const likeSuccess = await user!.likePost({
-        postId: props.postData.id!,
-        signal
-      })
-      if (!likeSuccess) throw new Error()
-    } catch {
-      if (signal.aborted) return 
-
-      props.setPostData(prevPostData => ({
-        ...prevPostData,
-        likes: prevPostData.likes! - 1,
-        userLiked: false
-      }))
-      openModal('connection')
-    }
-  }
-
-  const unlikePost = async (signal: AbortSignal) => {
-    props.setPostData(prevPostData => ({
-      ...prevPostData,
-      likes: prevPostData.likes! - 1,
-      userLiked: false
-    }))
-
-    try {
-      const dislikeSuccess = await user!.dislikePost({
-        postId: props.postData.id!,
-        signal
-      })
-      if (!dislikeSuccess) throw new Error()
-    } catch {
-      if (signal.aborted) return 
-
-      props.setPostData(prevPostData => ({
-        ...prevPostData,
-        likes: prevPostData.likes! + 1,
-        userLiked: true
-      }))
-      openModal('connection')
-    }
+    return controller
   }
 
   const handleOpenComments = () => {
@@ -104,7 +55,7 @@ export function PostFooter (props: {
         <button
           className='cursor-pointer'
           onClick={handleClickLike}
-          disabled={loading}
+          disabled={props.isLoading}
           title='Like'
         >
           <LikeIcon filled={props.postData.userLiked ?? false} />
@@ -118,7 +69,7 @@ export function PostFooter (props: {
         <button
           className='cursor-pointer'
           onClick={handleOpenComments}
-          disabled={loading}
+          disabled={props.isLoading}
           title='Comments'
         >
           <CommentIcon filled={props.commentsOpened} />

@@ -56,6 +56,18 @@ export class Comment {
     return true
   }
 
+  public async getLikesAmount (): Promise<number> {
+    const response = await api.get<number>({
+      endpoint: `likes/amount?targetId=${this.id}&type=comment`
+    })
+
+    if (response.success) {
+      return response.value!
+    } else {
+      return -1
+    }
+  }
+
   public async getLikes (): Promise<Like[]> {
     const response = await api.get<LikeEndpoint[]>({
       endpoint: `likes/all?id=${this.id}&type=comment`

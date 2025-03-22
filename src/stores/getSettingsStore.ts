@@ -10,7 +10,13 @@ export const getSettingsStore = create<SettingsStore>(set => ({
   dictionaries: null,
   loadDictionaries: async () => {
     const data: Dictionaries = await getDictionaries()
-    set({ dictionaries: data })
+
+    if (!data) {
+      return false
+    } else {
+      set({ dictionaries: data })
+      return true
+    }
   },
 
   language: getLanguage(),

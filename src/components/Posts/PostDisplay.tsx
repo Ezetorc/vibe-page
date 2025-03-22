@@ -1,35 +1,21 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useState } from 'react'
 import { PostDisplayProps } from '../../models/Props/PostDisplayProps'
 import { PostHeader } from './PostHeader'
 import { PostContent } from './PostContent'
 import { PostFooter } from './PostFooter'
-import { PostData } from '../../models/PostData'
-import { useUser } from '../../hooks/useUser'
 import { PostComments } from './PostComments'
-import { getPostData } from '../../utilities/getPostData'
+import { usePostData } from '../../hooks/usePostData'
 
 export function PostDisplay (props: PostDisplayProps) {
-  const { user } = useUser()
   const [commentsOpened, setCommentsOpened] = useState<boolean>(false)
-  const [postData, setPostData] = useState<PostData>({
-    user: null,
-    likes: null,
-    comments: null,
-    date: null,
-    userLiked: null,
-    id: null,
-    content: null
-  })
-
-  const fetchPostData = useCallback(async () => {
-    const newPostData = await getPostData(props.post, user)
-
-    setPostData(newPostData)
-  }, [props.post, user])
-
-  useEffect(() => {
-    fetchPostData()
-  }, [fetchPostData])
+  const {
+    postData,
+    likePost,
+    dislikePost,
+    createComment,
+    deleteComment,
+    isLoading
+  } = usePostData(props.post)
 
   return (
     <>
@@ -40,12 +26,18 @@ export function PostDisplay (props: PostDisplayProps) {
           postData={postData}
           setCommentsOpened={setCommentsOpened}
           commentsOpened={commentsOpened}
-          setPostData={setPostData}
+          likePost={likePost}
+          dislikePost={dislikePost}
+          isLoading={isLoading}
         />
       </article>
 
       {commentsOpened && postData.comments && (
-        <PostComments postData={postData} setPostData={setPostData} />
+        <PostComments
+          postData={postData}
+          createComment={createComment}
+          deleteComment={deleteComment}
+        />
       )}
     </>
   )

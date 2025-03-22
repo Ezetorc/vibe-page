@@ -4,7 +4,7 @@ import { ModalName } from './ModalName'
 
 export interface SettingsStore {
   dictionaries: Dictionaries | null
-  loadDictionaries: () => Promise<void>
+  loadDictionaries: () => Promise<boolean>
 
   language: Language
   setLanguage: (newLanguage: Language) => void
