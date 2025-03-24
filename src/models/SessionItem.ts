@@ -1,3 +1,3 @@
 export interface SessionItem {
-  id: number
+  userId: string
 }

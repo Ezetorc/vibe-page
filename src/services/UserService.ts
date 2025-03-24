@@ -2,6 +2,7 @@ import { getAdaptedUser } from '../adapters/getAdaptedUser'
 import { User } from '../models/User'
 import { UserEndpoint } from '../models/UserEndpoint'
 import { api, cloudinary } from '../constants/SETTINGS'
+import { Session } from '../models/Session'
 
 export class UserService {
   static async getByName (args: { name: string }): Promise<User | null> {
@@ -58,8 +59,9 @@ export class UserService {
     email: string
     password: string
   }): Promise<boolean> {
-    const response = await api.post<boolean>({
+    const response = await api.post({
       endpoint: `users/register`,
+      formatToJson: false,
       body: JSON.stringify({
         name: args.name,
         email: args.email,
@@ -67,25 +69,40 @@ export class UserService {
       })
     })
 
-    return response.success
+    if (response.ok) {
+      const authorizationHeader = response.headers.get('Authorization')
+
+      if (authorizationHeader) {
+        Session.set(authorizationHeader.split(' ')[1])
+      }
+
+      return true
+    } else {
+      return false
+    }
   }
 
   static async login (args: {
     name: string
     password: string
   }): Promise<boolean> {
-    const response = await api.post<boolean>({
+    const response = await api.post({
       endpoint: `users/login`,
-      body: JSON.stringify({ name: args.name, password: args.password })
+      body: JSON.stringify({ name: args.name, password: args.password }),
+      formatToJson: false
     })
 
-    return response.success
-  }
+    if (response.ok) {
+      const authorizationHeader = response.headers.get('Authorization')
 
-  static async logout (): Promise<boolean> {
-    const response = await api.post<boolean>({ endpoint: `users/logout` })
+      if (authorizationHeader) {
+        Session.set(authorizationHeader.split(' ')[1])
+      }
 
-    return response.success
+      return true
+    } else {
+      return false
+    }
   }
 
   static async getAll (

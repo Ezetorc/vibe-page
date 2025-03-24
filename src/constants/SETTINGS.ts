@@ -5,17 +5,20 @@ const envData = {
 import { Settings } from '../models/Settings'
 import { Cloud } from '../models/Cloud'
 import { API } from '../models/API'
+import { Session } from '../models/Session'
+
+const session = Session.get()
+const defaultHeaders: Record<string, string> = {
+  'Content-Type': 'application/json'
+}
+
+if (session) {
+  defaultHeaders['Authorization'] = `Bearer ${session}`
+}
 
 const settings: Settings = {
-  api: new API({
-    url: envData.API_URL,
-    formatToJson: true
-  })
-    .setDefaultHeaders({
-      'Content-Type': 'application/json',
-      'x-origin': 'https://vibe-page.vercel.app',
-      Authorization: `Bearer ${localStorage.getItem('session')}`
-    })
+  api: new API({ url: envData.API_URL, formatToJson: true })
+    .setDefaultHeaders(defaultHeaders)
     .setDefaultOptions({ credentials: 'include' }),
   defaultLanguage: 'en',
   languages: {

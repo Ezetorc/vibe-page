@@ -60,6 +60,7 @@ export default function Login () {
 
     if (logSuccess) {
       const sessionSuccess = await handleSession()
+
       setIsLoading(false)
 
       if (sessionSuccess) {

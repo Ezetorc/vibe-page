@@ -34,7 +34,6 @@ export function DeleteAccountModal () {
     })
 
     if (deleteSuccess >= 0) {
-      await UserService.logout()
       closeModal()
       navigate('/')
     } else {
