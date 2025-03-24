@@ -28,10 +28,14 @@ export function useUser () {
   const handleSession = useCallback(async (): Promise<boolean> => {
     const sessionItem = Session.get()
 
+    console.log('sessionItem: ', sessionItem)
+
     if (!sessionItem) return false
 
     try {
       const session: SessionItem = jwtDecode(sessionItem)
+
+      console.log('session: ', session)
 
       return await updateUser(Number(session.userId))
     } catch {

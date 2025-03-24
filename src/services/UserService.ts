@@ -92,8 +92,11 @@ export class UserService {
       formatToJson: false
     })
 
+    console.log("login: ", response)
+
     if (response.ok) {
       const authorizationHeader = response.headers.get('Authorization')
+      console.log("authorizationHeader: ", authorizationHeader)
 
       if (authorizationHeader) {
         Session.set(authorizationHeader.split(' ')[1])
