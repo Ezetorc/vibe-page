@@ -8,7 +8,6 @@ export function useUsers (searchQuery?: string) {
   return searchQuery
     ? {
         ...search,
-        deleteUser: pagination.deleteUser,
         ref: null,
         hasMore: false
       }
