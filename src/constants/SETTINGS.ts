@@ -4,6 +4,7 @@ const envData = {
   PRODUCTION_API_URL: import.meta.env.VITE_PRODUCTION_API_URL ?? '',
   MODE: import.meta.env.VITE_MODE ?? 'PRODUCTION'
 }
+
 import { Settings } from '../models/Settings'
 import { Cloud } from '../models/Cloud'
 import { API } from '../models/API'
