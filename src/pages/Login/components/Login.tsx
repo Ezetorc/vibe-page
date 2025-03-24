@@ -86,8 +86,6 @@ export default function Login () {
     <Section className='h-full gap-y-[50px]'>
       <WelcomeToVibe />
 
-      <span>nombre: Ezequias contraseña: ezequias123</span>
-
       <form className='w-full flex flex-col gap-y-[30px]'>
         <FormInput
           min={3}

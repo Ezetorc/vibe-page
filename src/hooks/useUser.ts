@@ -3,17 +3,14 @@ import { UserStore } from '../models/UserStore'
 import { getUserStore } from '../stores/getUserStore'
 import { jwtDecode } from 'jwt-decode'
 import { UserService } from '../services/UserService'
-import { SessionCookie } from '../models/SessionCookie'
+import { SessionItem } from '../models/SessionItem'
 
 export function useUser () {
   const userStore: UserStore = getUserStore()
   const { user, setUser } = userStore
 
-  const getSessionCookie = () => {
-    return document.cookie
-      .split('; ')
-      .find(row => row.startsWith('session='))
-      ?.split('=')[1]
+  const getSessionItem = () => {
+    return localStorage.getItem('session')
   }
 
   const updateUser = useCallback(
@@ -32,18 +29,14 @@ export function useUser () {
   )
 
   const handleSession = useCallback(async (): Promise<boolean> => {
-    const sessionCookie = getSessionCookie()
+    const sessionItem = getSessionItem()
 
-    if (!sessionCookie) return false
+    if (!sessionItem) return false
 
     try {
-      const session: SessionCookie = jwtDecode(sessionCookie)
-      if ('id' in session.user) {
-        await updateUser(session.user.id)
-        return true
-      }
+      const session: SessionItem = jwtDecode(sessionItem)
 
-      return false
+      return await updateUser(session.id)
     } catch {
       console.error('Error decoding token')
       return false

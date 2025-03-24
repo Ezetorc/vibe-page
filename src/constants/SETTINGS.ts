@@ -13,7 +13,8 @@ const settings: Settings = {
   })
     .setDefaultHeaders({
       'Content-Type': 'application/json',
-      'x-origin': 'https://vibe-page.vercel.app'
+      'x-origin': 'https://vibe-page.vercel.app',
+      Authorization: `Bearer ${localStorage.getItem('session')}`
     })
     .setDefaultOptions({ credentials: 'include' }),
   defaultLanguage: 'en',
