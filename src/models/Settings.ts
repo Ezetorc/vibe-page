@@ -7,4 +7,7 @@ export interface Settings {
   languages: { [key in Language]: string }
   defaultLanguage: Language
   cloudinary: Cloud
+  images: {
+    guest: string
+  }
 }

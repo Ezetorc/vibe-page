@@ -1,5 +1,6 @@
 import { Loading } from '../../../components/Loading'
 import { Username } from '../../../components/Username'
+import { images } from '../../../constants/SETTINGS'
 import { useUser } from '../../../hooks/useUser'
 
 export function PostOwner () {
@@ -12,10 +13,12 @@ export function PostOwner () {
           <img
             title={`${user.name} Profile Picture`}
             className='rounded-full desktop:w-[clamp(40px,5vw,60px)] mobile:w-[clamp(40px,20vw,60px)] aspect-square border-orange-crayola border-vibe'
-            src={user.imageUrl ?? 'src/assets/images/guest_user.jpg'}
+            src={user.imageUrl ?? images.guest}
             alt='Profile'
           />
-          <Username className='mobile:text-[clamp(10px,1.5rem,17px)] mobile:text-center desktop:text-left desktop:text-[clamp(10px,1.5rem,30px)]'>{user.name}</Username>
+          <Username className='mobile:text-[clamp(10px,1.5rem,17px)] mobile:text-center desktop:text-left desktop:text-[clamp(10px,1.5rem,30px)]'>
+            {user.name}
+          </Username>
         </header>
       ) : (
         <Loading />

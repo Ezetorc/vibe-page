@@ -10,10 +10,10 @@ import { useNavigate } from 'react-router'
 
 export function DeleteAccountModal () {
   const { errorMessage, setErrorMessage } = useValidation()
-  const irreversibleActionRef = useRef<HTMLInputElement | null>(null)
   const { isSessionActive, user } = useUser()
   const { dictionary, openModal, closeModal } = useSettings()
   const navigate = useNavigate()
+  const irreversibleActionRef = useRef<HTMLInputElement | null>(null)
 
   const handleDeleteAccount = async () => {
     if (!isSessionActive()) {
@@ -71,7 +71,10 @@ export function DeleteAccountModal () {
           </div>
 
           {errorMessage && <p className='text-red-500'>{errorMessage}</p>}
-          <Button text={dictionary.deleteAccount} onClick={handleDeleteAccount} />
+          <Button
+            text={dictionary.deleteAccount}
+            onClick={handleDeleteAccount}
+          />
         </form>
       </article>
     </Modal>

@@ -1,14 +1,17 @@
 import { UserData } from '../models/UserData'
 import { FollowButton } from '../../../components/FollowButton'
+import { useUser } from '../../../hooks/useUser'
 
 export function AccountInteractions (props: { userData: UserData }) {
-  if (!props.userData.id) return
+  const { user } = useUser()
+
+  if (!props.userData.id || !user?.id) return
 
   return (
     <div className='flex gap-x-[20px]'>
       {!props.userData.isLogged && (
         <>
-          <FollowButton userId={props.userData.id} />
+          <FollowButton followingId={props.userData.id} followerId={user.id} />
         </>
       )}
     </div>

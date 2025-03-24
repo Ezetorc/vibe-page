@@ -3,31 +3,26 @@ import { Nav } from '../../../components/Nav'
 import { SearchBar } from '../../../components/SearchBar'
 import { useSettings } from '../../../hooks/useSettings'
 import { Section } from '../../../components/Section'
-import { PostsDisplay } from '../../../components/Posts/PostsDisplay'
-import { UsersDisplay } from '../../../components/UsersDisplay'
 import { ToSearchButton } from './ToSearchButton'
 import { getInMinus } from '../../../utilities/getInMinus'
-import { useUsers } from '../hooks/useUsers'
-import { LoadSpinner } from '../../../components/LoadSpinner'
-import { usePosts } from '../../../hooks/usePosts'
+import { SearchPosts } from './SearchPosts'
+import { SearchUsers } from './SearchUsers'
+import { ToSearch } from '../models/ToSearch'
 
 export default function Search () {
   const { dictionary } = useSettings()
-  const [toSearch, setToSearch] = useState<'users' | 'posts'>('posts')
+  const [toSearch, setToSearch] = useState<ToSearch>('posts')
   const [searchQuery, setSearchQuery] = useState<string | undefined>(undefined)
-  const posts = usePosts(searchQuery)
-  const users = useUsers(searchQuery)
 
   const handleSearch = (query: string) => {
     setSearchQuery(query)
   }
 
   const changeToSearch = (event: MouseEvent<HTMLButtonElement>) => {
-    const type = (event.target as HTMLButtonElement).dataset.type as
-      | 'posts'
-      | 'users'
+    const button = event.target as HTMLButtonElement
+    const newToSearch = button.dataset.type as ToSearch
 
-    setToSearch(type)
+    setToSearch(newToSearch)
   }
 
   return (
@@ -53,17 +48,9 @@ export default function Search () {
       />
 
       {toSearch === 'posts' ? (
-        <PostsDisplay posts={posts.posts} onPostDelete={posts.deletePost} />
+        <SearchPosts searchQuery={searchQuery} />
       ) : (
-        <UsersDisplay users={users.users} />
-      )}
-
-      {toSearch === 'posts' && posts.hasMore && (
-        <LoadSpinner reference={posts.ref} />
-      )}
-
-      {toSearch === 'users' && users.hasMore && (
-        <LoadSpinner reference={users.ref} />
+        <SearchUsers searchQuery={searchQuery} />
       )}
 
       <Nav />

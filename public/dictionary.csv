@@ -9,6 +9,10 @@ logout,Cerrar sesión,Log out
 areYouSureLogout,¿Quieres cerrar sesión?,Do you wanna log out?
 deleteAccount,Eliminar cuenta,Delete account
 comment,Comentar,Comment
+cancel,Cancelar,Cancel
+uploadImage,Subir imágen,Upload image
+removeImage,Remover imágen,Remove image
+changePicture,Cambiar foto de perfil,Change profile picture
 changeProfileImage,Cambiar foto de perfil,Change profile image
 searchMyPosts,Buscar mis publicaciones...,Search my posts...
 account,Cuenta,Account

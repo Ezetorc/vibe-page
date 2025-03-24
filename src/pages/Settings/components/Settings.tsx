@@ -68,7 +68,7 @@ export default function Settings () {
         />
         <Button text={`${dictionary.logout}`} onClick={handleLogout} />
         <Button
-          classname='bg-red-500'
+          classname='bg-red-500 hover:text-red-500'
           text={`${dictionary.deleteAccount}`}
           onClick={handleDeleteAccount}
         />

@@ -1,5 +1,4 @@
 const envData = {
-  API_KEY: import.meta.env.VITE_API_KEY ?? '',
   CLOUD_NAME: import.meta.env.VITE_CLOUD_NAME ?? '',
   API_URL: import.meta.env.VITE_API_URL ?? ''
 }
@@ -13,8 +12,7 @@ const settings: Settings = {
     formatToJson: true
   })
     .setDefaultHeaders({
-      'Content-Type': 'application/json',
-      'x-api-key': envData.API_KEY
+      'Content-Type': 'application/json'
     })
     .setDefaultOptions({ credentials: 'include' }),
   defaultLanguage: 'en',
@@ -22,8 +20,10 @@ const settings: Settings = {
     en: 'English',
     es: 'Español'
   },
-  cloudinary: new Cloud({ cloud: { cloudName: envData.CLOUD_NAME } })
+  cloudinary: new Cloud({ cloud: { cloudName: envData.CLOUD_NAME } }),
+  images: {
+    guest: 'src/assets/images/guest_user.webp'
+  }
 }
 
-export const { api, languages, defaultLanguage, cloudinary } =
-  settings
+export const { api, languages, defaultLanguage, cloudinary, images } = settings

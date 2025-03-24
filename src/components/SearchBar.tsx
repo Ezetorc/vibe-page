@@ -12,8 +12,7 @@ export function SearchBar (props: SearchBarProps) {
 
   useEffect(() => {
     props.onSearch(debouncedSearch)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [debouncedSearch])
+  }, [debouncedSearch, props])
 
   return (
     <input

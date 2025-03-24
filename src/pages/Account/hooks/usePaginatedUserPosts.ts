@@ -44,6 +44,23 @@ export function usePaginatedUserPosts (userData: UserData) {
         }
       }
     )
+
+    queryClient.setQueryData(['userData', 'me'], (oldData: UserData | null) => {
+      if (!oldData?.postsAmount) return oldData
+
+      return new UserData({
+        id: oldData.id,
+        name: oldData.name,
+        imageId: oldData.imageId,
+        imageUrl: oldData.imageUrl,
+        description: oldData.description,
+        date: oldData.date,
+        postsAmount: oldData.postsAmount - 1,
+        followersAmount: oldData.followersAmount,
+        followingAmount: oldData.followingAmount,
+        isLogged: oldData.isLogged
+      })
+    })
   }
 
   const deleteMutation = useMutation({

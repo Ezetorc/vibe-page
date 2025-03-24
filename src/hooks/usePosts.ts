@@ -6,6 +6,11 @@ export function usePosts (searchQuery?: string) {
   const search = useSearchedPosts(searchQuery)
 
   return searchQuery
-    ? { ...search, deletePost: pagination.deletePost, ref: null, hasMore: false }
+    ? {
+        ...search,
+        deletePost: pagination.deletePost,
+        ref: null,
+        hasMore: false
+      }
     : { ...pagination }
 }

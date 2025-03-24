@@ -1,11 +1,11 @@
 import { Button } from './Button'
 import { useSettings } from '../hooks/useSettings'
 import { useFollow } from '../hooks/useFollow'
-import { FollowButtonProps } from '../pages/Account/models/FollowButtonProps'
+import { FollowButtonProps } from '../models/Props/FollowButtonProps'
 
 export function FollowButton (props: FollowButtonProps) {
   const { dictionary } = useSettings()
-  const { isFollowing, follow, unfollow } = useFollow(props.userId)
+  const { isFollowing, follow, unfollow } = useFollow(props.followerId, props.followingId)
 
   const handleFollow = () => {
     if (isFollowing) {

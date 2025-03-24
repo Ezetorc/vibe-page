@@ -8,3 +8,5 @@ export type ModalName =
   | 'comment'
   | 'logout'
   | 'deleteAccount'
+  | 'picture'
+  | 'crop'

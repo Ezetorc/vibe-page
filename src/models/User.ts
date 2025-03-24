@@ -52,7 +52,7 @@ export class User {
     this.createdAt = createdAt
   }
 
-  public isOwnerOfPost (args: { postUserId: number }): boolean {
+  public isOwnerOfPost (args: { postUserId: User['id'] }): boolean {
     return this.id === args.postUserId
   }
 
@@ -60,7 +60,7 @@ export class User {
     return this.id === args.comment.userId
   }
 
-  public async follow (args: { userId: number }): Promise<boolean> {
+  public async follow (args: { userId: User['id'] }): Promise<boolean> {
     const response = await FollowerService.create({
       followerId: this.id,
       followingId: args.userId
@@ -69,7 +69,7 @@ export class User {
     return response
   }
 
-  public async unfollow (args: { userId: number }): Promise<boolean> {
+  public async unfollow (args: { userId: User['id'] }): Promise<boolean> {
     const response = await FollowerService.delete({
       followerId: this.id,
       followingId: args.userId
@@ -78,7 +78,7 @@ export class User {
     return response
   }
 
-  public async isFollowing (args: { userId: number }): Promise<boolean> {
+  public async isFollowing (args: { userId: User['id'] }): Promise<boolean> {
     const following = await FollowerService.exists({
       followerId: this.id,
       followingId: args.userId
@@ -87,7 +87,7 @@ export class User {
     return following
   }
 
-  public async hasLikedPost (args: { postId: number }): Promise<boolean> {
+  public async hasLikedPost (args: { postId: Post['id'] }): Promise<boolean> {
     const response = await api.get<boolean>({
       endpoint: `users/liked?type=post&userId=${this.id}&targetId=${args.postId}`
     })
@@ -95,7 +95,9 @@ export class User {
     return Boolean(response.value)
   }
 
-  public async hasLikedComment (args: { commentId: number }): Promise<boolean> {
+  public async hasLikedComment (args: {
+    commentId: Comment['id']
+  }): Promise<boolean> {
     const response = await api.get<boolean>({
       endpoint: `users/liked?type=comment&userId=${this.id}&targetId=${args.commentId}`
     })
@@ -110,7 +112,7 @@ export class User {
     return formattedDate
   }
 
-  public async changeName (args: { newName: string }): Promise<boolean> {
+  public async changeName (args: { newName: User['name'] }): Promise<boolean> {
     const response = await api.patch<UserEndpoint>({
       endpoint: `users?id=${this.id}`,
       body: JSON.stringify({ name: args.newName })
@@ -128,7 +130,9 @@ export class User {
     }
   }
 
-  public async changeImageUrl (args: { newImageUrl: string }): Promise<boolean> {
+  public async changeImageUrl (args: {
+    newImageUrl: User['imageUrl']
+  }): Promise<boolean> {
     const response = await api.patch<UserEndpoint>({
       endpoint: `users?id=${this.id}`,
       body: JSON.stringify({ image_url: args.newImageUrl })
@@ -146,7 +150,9 @@ export class User {
     }
   }
 
-  public async changeImageId (args: { newImageId: string }): Promise<boolean> {
+  public async changeImageId (args: {
+    newImageId: User['imageId']
+  }): Promise<boolean> {
     const response = await api.patch<UserEndpoint>({
       endpoint: `users?id=${this.id}`,
       body: JSON.stringify({ image_id: args.newImageId })
@@ -164,7 +170,9 @@ export class User {
     }
   }
 
-  public async changePassword (args: { newPassword: string }): Promise<boolean> {
+  public async changePassword (args: {
+    newPassword: User['password']
+  }): Promise<boolean> {
     const response = await api.patch<UserEndpoint>({
       endpoint: `users?id=${this.id}`,
       body: JSON.stringify({ password: args.newPassword })
@@ -183,7 +191,7 @@ export class User {
   }
 
   public async changeDescription (args: {
-    newDescription: string
+    newDescription: User['description']
   }): Promise<boolean> {
     const response = await api.patch<UserEndpoint>({
       endpoint: `users?id=${this.id}`,
@@ -202,7 +210,9 @@ export class User {
     }
   }
 
-  public async changeEmail (args: { newEmail: string }): Promise<boolean> {
+  public async changeEmail (args: {
+    newEmail: User['email']
+  }): Promise<boolean> {
     const response = await api.patch<UserEndpoint>({
       endpoint: `users?id=${this.id}`,
       body: JSON.stringify({ email: args.newEmail })
@@ -243,7 +253,7 @@ export class User {
 
   public async getFollowersAmount (): Promise<number> {
     const response = await api.get<number>({
-      endpoint: `followers/amount?userId=${this.id}&type=follower`
+      endpoint: `followers/amount?userId=${this.id}&type=following`
     })
 
     if (response.success) {
@@ -255,7 +265,7 @@ export class User {
 
   public async getFollowingAmount (): Promise<number> {
     const response = await api.get<number>({
-      endpoint: `followers/amount?userId=${this.id}&type=following`
+      endpoint: `followers/amount?userId=${this.id}&type=follower`
     })
 
     if (response.success) {

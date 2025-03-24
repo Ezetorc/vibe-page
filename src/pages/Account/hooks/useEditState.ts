@@ -5,8 +5,10 @@ import { useUser } from '../../../hooks/useUser'
 import { EditState } from '../models/EditState'
 import { UserData } from '../models/UserData'
 import { UserService } from '../../../services/UserService'
+import { useQueryClient } from '@tanstack/react-query'
 
 export function useEditState (userData: UserData): EditState {
+  const queryClient = useQueryClient()
   const { dictionary, openModal } = useSettings()
   const { updateUser } = useUser()
   const { validateName, validateDescription, errorMessage } = useValidation()
@@ -36,6 +38,26 @@ export function useEditState (userData: UserData): EditState {
     const nameChange = await user!.changeName({ newName: editState.value })
 
     if (nameChange && userData.id) {
+      queryClient.setQueryData(
+        ['userData', 'me'],
+        (prevUserData: UserData | null) => {
+          if (!prevUserData) return prevUserData
+
+          return new UserData({
+            id: prevUserData.id,
+            name: editState.value,
+            imageId: prevUserData.imageId,
+            imageUrl: prevUserData.imageUrl,
+            description: prevUserData.description,
+            date: prevUserData.date,
+            postsAmount: prevUserData.postsAmount,
+            followersAmount: prevUserData.followersAmount,
+            followingAmount: prevUserData.followingAmount,
+            isLogged: prevUserData.isLogged
+          })
+        }
+      )
+
       await updateUser(userData.id)
     } else {
       openModal('edit', { message })
@@ -66,6 +88,26 @@ export function useEditState (userData: UserData): EditState {
     })
 
     if (descriptionChange && userData.id) {
+      queryClient.setQueryData(
+        ['userData', 'me'],
+        (prevUserData: UserData | null) => {
+          if (!prevUserData) return prevUserData
+
+          return new UserData({
+            id: prevUserData.id,
+            name: prevUserData.name,
+            imageId: prevUserData.imageId,
+            imageUrl: prevUserData.imageUrl,
+            description: editState.value,
+            date: prevUserData.date,
+            postsAmount: prevUserData.postsAmount,
+            followersAmount: prevUserData.followersAmount,
+            followingAmount: prevUserData.followingAmount,
+            isLogged: prevUserData.isLogged
+          })
+        }
+      )
+
       await updateUser(userData.id)
     } else {
       openModal('edit', { message })

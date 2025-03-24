@@ -4,11 +4,11 @@ import { api } from '../constants/SETTINGS'
 export class Cloud extends Cloudinary {
   public async upload (args: {
     file: File
-    uploadPreset: string
+    preset: string
   }): Promise<{ secure_url: string; public_id: string }> {
     const formData = new FormData()
     formData.append('file', args.file)
-    formData.append('upload_preset', args.uploadPreset)
+    formData.append('upload_preset', args.preset)
 
     const response = await fetch(
       `https://api.cloudinary.com/v1_1/${

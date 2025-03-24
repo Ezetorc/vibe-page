@@ -12,12 +12,12 @@ export function Root () {
 
   useEffect(() => {
     const handleThings = async () => {
-      const [sessionSuccess, dictionariesLoaded] = await Promise.all([
-        handleSession(),
-        loadDictionaries()
+      const [dictionariesLoaded] = await Promise.all([
+        loadDictionaries(),
+        handleSession()
       ])
 
-      if (sessionSuccess && dictionariesLoaded) {
+      if (dictionariesLoaded) {
         setLoading(false)
       }
     }

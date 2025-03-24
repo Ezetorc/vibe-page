@@ -1,3 +1,4 @@
+import { images } from '../../constants/SETTINGS'
 import { useUser } from '../../hooks/useUser'
 import { PostData } from '../../models/PostData'
 import { Username } from '../Username'
@@ -31,7 +32,7 @@ export function PostHeader (props: {
             className='mobile:col-[1] mobile:ml-[clamp(20px,22%,50px)] desktop:ml-0 mobile:row-[1] desktop:col-auto mobile:justify-self-center desktop:justify-self-start desktop:row-auto rounded-full desktop:w-[clamp(40px,5vw,55px)] mobile:w-[clamp(40px,20vw,60px)] aspect-square border-orange-crayola border-vibe'
             src={
               props.postData.user?.imageUrl ??
-              'src/assets/images/guest_user.jpg'
+              images.guest
             }
             alt='Profile'
           />

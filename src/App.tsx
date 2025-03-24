@@ -11,6 +11,8 @@ import { CommentModal } from './components/Comments/CommentModal.tsx'
 import { LogoutModal } from './pages/Settings/components/LogoutModal.tsx'
 import { ModalName } from './models/ModalName.ts'
 import { DeleteAccountModal } from './pages/Settings/components/DeleteAccountModal.tsx'
+import { ChangePictureModal } from './pages/Account/components/ChangePictureModal.tsx'
+import { CropImageModal } from './pages/Account/components/CropImageModal.tsx'
 
 const LazyHome = lazy(() => import('./pages/Home/components/Home.tsx'))
 const LazyLogin = lazy(() => import('./pages/Login/components/Login.tsx'))
@@ -36,7 +38,9 @@ export default function App () {
     password: <ChangePasswordModal />,
     comment: <CommentModal />,
     logout: <LogoutModal />,
-    deleteAccount: <DeleteAccountModal />
+    deleteAccount: <DeleteAccountModal />,
+    picture: <ChangePictureModal />,
+    crop: <CropImageModal />
   }
 
   return (

@@ -10,7 +10,7 @@ export default function MarkdownRenderer () {
   const [content, setContent] = useState('')
 
   useEffect(() => {
-    const fileName = `/${language}_TERMS.md`
+    const fileName = `/terms[${language}].md`
 
     fetch(fileName)
       .then(res => res.text())
