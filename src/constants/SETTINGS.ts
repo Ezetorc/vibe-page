@@ -1,6 +1,8 @@
 const envData = {
   CLOUD_NAME: import.meta.env.VITE_CLOUD_NAME ?? '',
-  API_URL: import.meta.env.VITE_API_URL ?? ''
+  DEVELOPMENT_API_URL: import.meta.env.VITE_DEVELOPMENT_API_URL ?? '',
+  PRODUCTION_API_URL: import.meta.env.VITE_PRODUCTION_API_URL ?? '',
+  MODE: import.meta.env.VITE_MODE ?? 'PRODUCTION'
 }
 import { Settings } from '../models/Settings'
 import { Cloud } from '../models/Cloud'
@@ -16,8 +18,13 @@ if (session) {
   defaultHeaders['Authorization'] = `Bearer ${session}`
 }
 
+const apiUrl =
+  envData.MODE === 'PRODUCTION'
+    ? envData.PRODUCTION_API_URL
+    : envData.DEVELOPMENT_API_URL
+
 const settings: Settings = {
-  api: new API({ url: envData.API_URL, formatToJson: true })
+  api: new API({ url: apiUrl, formatToJson: true })
     .setDefaultHeaders(defaultHeaders)
     .setDefaultOptions({ credentials: 'include' }),
   defaultLanguage: 'en',
