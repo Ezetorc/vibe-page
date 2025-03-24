@@ -23,7 +23,7 @@ const settings: Settings = {
   },
   cloudinary: new Cloud({ cloud: { cloudName: envData.CLOUD_NAME } }),
   images: {
-    guest: 'src/assets/images/guest_user.webp'
+    guest: '/guest_user.webp'
   }
 }
 
