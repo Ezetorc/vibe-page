@@ -53,8 +53,6 @@ export class PostService {
       : `posts/all?amount=${args.amount ?? 6}&page=${args.page ?? 1}`
     const response = await api.get<PostEndpoint[]>({ endpoint })
 
-    console.log('response: ', response)
-
     if (!response.value) return []
 
     const posts = response.value.map(postEndpoint =>

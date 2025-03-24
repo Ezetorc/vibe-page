@@ -12,7 +12,8 @@ const settings: Settings = {
     formatToJson: true
   })
     .setDefaultHeaders({
-      'Content-Type': 'application/json'
+      'Content-Type': 'application/json',
+      'x-origin': 'https://vibe-page.vercel.app'
     })
     .setDefaultOptions({ credentials: 'include' }),
   defaultLanguage: 'en',
