@@ -14,9 +14,13 @@ export class PostService {
       body: JSON.stringify({ user_id: args.userId, content: args.content })
     })
 
+    console.log("create response: ", response)
+
     if (!response.success) return null
 
     const post = getAdaptedPost({ postEndpoint: response.value! })
+
+    console.log("adapted post: ", post)
 
     return post
   }

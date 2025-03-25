@@ -70,6 +70,8 @@ export function PostCreator () {
       content: postContent
     })
 
+    console.log('postCreated: ', postCreated, user.id, postContent)
+
     if (postCreated !== null) {
       updateQueryData(postCreated)
       setPostContent('')
