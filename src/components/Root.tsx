@@ -4,6 +4,7 @@ import App from '../App'
 import { Loading } from './Loading'
 import { useSettings } from '../hooks/useSettings'
 import { useUser } from '../hooks/useUser'
+import eruda from 'eruda'
 
 export function Root () {
   const { loadDictionaries, dictionaries } = useSettings()
@@ -11,6 +12,8 @@ export function Root () {
   const { handleSession } = useUser()
 
   useEffect(() => {
+    eruda.init()
+
     const handleThings = async () => {
       const [dictionariesLoaded] = await Promise.all([
         loadDictionaries(),

@@ -27,6 +27,7 @@
     "axios-cache-interceptor": "^1.6.2",
     "clsx": "^2.1.1",
     "dotenv": "^16.4.7",
+    "eruda": "^3.4.1",
     "eventemitter3": "^5.0.1",
     "jwt-decode": "^4.0.0",
     "papaparse": "^5.5.2",
