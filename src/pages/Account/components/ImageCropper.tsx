@@ -1,24 +1,20 @@
 import Cropper, { Area, Point } from 'react-easy-crop'
 import { Slider } from '@mui/material'
-import { getCroppedImage } from '../../../utilities/getCroppedImage'
+import { getCroppedImage } from '../utilities/getCroppedImage'
 import { useEffect, useState } from 'react'
 import { useSettings } from '../../../hooks/useSettings'
 import { useUser } from '../../../hooks/useUser'
 
-export function ImageCropper ({
-  onCropComplete
-}: {
-  onCropComplete: (file: File) => void
-}) {
+export function ImageCropper (props: { onCropComplete: (file: File) => void }) {
   const { user } = useUser()
-  const { visibleModal } = useSettings()
+  const { activeModal } = useSettings()
   const [crop, setCrop] = useState<Point>({ x: 0, y: 0 })
   const [zoom, setZoom] = useState<number>(1)
   const [imageSrc, setImageSrc] = useState<string | null>(null)
 
   const newImage =
-    visibleModal.data && 'newImage' in visibleModal.data
-      ? (visibleModal.data.newImage as File)
+    activeModal.data && 'newImage' in activeModal.data
+      ? (activeModal.data.newImage as File)
       : null
 
   useEffect(() => {
@@ -36,11 +32,11 @@ export function ImageCropper ({
     const file = await getCroppedImage(
       newImage,
       croppedAreaPixels,
-      `${user?.name}'s Profile Picture`
+      String(user?.id)
     )
 
     if (file) {
-      onCropComplete(file)
+      props.onCropComplete(file)
     }
   }
 

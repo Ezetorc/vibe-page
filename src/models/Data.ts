@@ -1,6 +1,6 @@
-import { DataError } from './DataError'
-import { DataSuccess } from './DataSuccess'
-import { DataValue } from './DataValue'
+type DataError = string | null | undefined
+type DataSuccess = boolean
+type DataValue<T> = T
 
 export class Data<T> {
   public value: DataValue<T>

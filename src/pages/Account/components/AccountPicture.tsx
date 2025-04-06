@@ -1,9 +1,9 @@
-import { images } from '../../../constants/SETTINGS'
+import { UserImage } from '../../../components/UserImage'
 import { useSettings } from '../../../hooks/useSettings'
 import { UserData } from '../models/UserData'
 
 export function AccountPicture (props: { userData: UserData }) {
-  const { openModal } = useSettings()
+  const { openModal, dictionary } = useSettings()
 
   const handleClick = () => {
     openModal('picture')
@@ -12,13 +12,12 @@ export function AccountPicture (props: { userData: UserData }) {
   return (
     <button
       onClick={handleClick}
-      className='relative cursor-pointer grid place-items-center rounded-full w-[clamp(40px,25vw,100px)] overflow-hidden aspect-square border-orange-crayola border-vibe'
+      className='relative cursor-pointer grid place-items-center w-[clamp(40px,25vw,100px)] overflow-hidden rounded-user-image aspect-square border-vibe border-caribbean-current'
     >
-      <img
-        title={`${props.userData.name} Profile Picture`}
-        className='absolute w-full h-full'
-        src={props.userData.imageUrl ?? images.guest}
-        alt='Profile'
+      <UserImage
+        title={dictionary.changeProfileImage}
+        className='absolute w-full h-full rounded-none aspect-auto border-none'
+        user={props.userData.user}
       />
     </button>
   )

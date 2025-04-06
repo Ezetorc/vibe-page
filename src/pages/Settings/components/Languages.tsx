@@ -1,9 +1,9 @@
-import { languages } from "../../../constants/SETTINGS";
+import { LANGUAGES } from '../../../constants/LANGUAGES'
 
 export function Languages () {
   return (
     <>
-      {Object.entries(languages).map((language, index) => (
+      {Object.entries(LANGUAGES).map((language, index) => (
         <option key={index} value={language[0]}>
           {language[1]}
         </option>

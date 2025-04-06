@@ -1,16 +1,14 @@
 import { Comment } from '../models/Comment'
 import { CommentEndpoint } from '../models/CommentEndpoint'
 
-export function getAdaptedComment ({
-  commentEndpoint
-}: {
+export function getAdaptedComment (params: {
   commentEndpoint: CommentEndpoint
 }): Comment {
   return new Comment({
-    id: commentEndpoint.id,
-    content: commentEndpoint.content,
-    userId: commentEndpoint.user_id,
-    createdAt: commentEndpoint.created_at,
-    postId: commentEndpoint.post_id
+    id: params.commentEndpoint.id,
+    content: params.commentEndpoint.content,
+    userId: params.commentEndpoint.user_id,
+    createdAt: params.commentEndpoint.created_at,
+    postId: params.commentEndpoint.post_id
   })
 }

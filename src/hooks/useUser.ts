@@ -4,10 +4,12 @@ import { getUserStore } from '../stores/getUserStore'
 import { jwtDecode } from 'jwt-decode'
 import { UserService } from '../services/UserService'
 import { SessionItem } from '../models/SessionItem'
-import { Session } from '../models/Session'
+import { SessionService } from '../services/SessionService'
+import { useQueryClient } from '@tanstack/react-query'
 
 export function useUser () {
   const userStore: UserStore = getUserStore()
+  const queryClient = useQueryClient()
   const { user, setUser } = userStore
 
   const updateUser = useCallback(
@@ -16,7 +18,6 @@ export function useUser () {
 
       if (newUser) {
         setUser(newUser)
-
         return true
       } else {
         return false
@@ -25,21 +26,31 @@ export function useUser () {
     [setUser]
   )
 
+  const logout = () => {
+    queryClient.resetQueries({ queryKey: ['userData', user?.id] })
+    queryClient.removeQueries({ queryKey: ['userData', user?.id] })
+    SessionService.remove()
+    setUser(null)
+  }
+
   const handleSession = useCallback(async (): Promise<boolean> => {
-    const sessionItem = Session.get()
+    const decodedSessionItem = SessionService.get()
 
-    console.log('sessionItem: ', sessionItem)
-
-    if (!sessionItem) return false
+    if (!decodedSessionItem) return false
 
     try {
-      const session: SessionItem = jwtDecode(sessionItem)
+      const session: SessionItem = jwtDecode(decodedSessionItem)
 
-      console.log('session: ', session)
+      if (session.isExpired) {
+        SessionService.remove()
+        return false
+      }
 
-      return await updateUser(Number(session.userId))
+      const userUpdate = await updateUser(Number(session.userId))
+
+      return userUpdate
     } catch {
-      console.error('Error decoding token')
+      SessionService.remove()
       return false
     }
   }, [updateUser])
@@ -48,5 +59,5 @@ export function useUser () {
     return Boolean(user)
   }
 
-  return { ...userStore, isSessionActive, handleSession, updateUser }
+  return { ...userStore, isSessionActive, handleSession, updateUser, logout }
 }

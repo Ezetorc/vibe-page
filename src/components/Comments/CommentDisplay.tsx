@@ -1,10 +1,13 @@
-import { CommentDisplayProps } from '../../models/Props/CommentDisplayProps'
 import { CommentHeader } from './CommentHeader'
 import { CommentContent } from './CommentContent'
 import { CommentFooter } from './CommentFooter'
 import { useCommentData } from '../../hooks/useCommentData'
+import { Comment } from '../../models/Comment'
 
-export function CommentDisplay (props: CommentDisplayProps) {
+export function CommentDisplay (props: {
+  comment: Comment
+  onDelete: (commentId: number) => void
+}) {
   const { commentData, likeComment, dislikeComment } = useCommentData(
     props.comment
   )

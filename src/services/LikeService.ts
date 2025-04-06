@@ -1,13 +1,13 @@
 import { getAdaptedLike } from '../adapters/getAdaptedLike'
+import { VIBE } from '../constants/VIBE'
 import { Like } from '../models/Like'
 import { LikeEndpoint } from '../models/LikeEndpoint'
 import { LikeType } from '../models/LikeType'
-import { api } from '../constants/SETTINGS'
 
 export class LikeService {
-  static async getAllOfPost (args: { postId: number }): Promise<Like[]> {
-    const response = await api.get<LikeEndpoint[]>({
-      endpoint: `likes/all?type=post&id=${args.postId}`
+  static async getAllOfPost (params: { postId: number }): Promise<Like[]> {
+    const response = await VIBE.get<LikeEndpoint[]>({
+      endpoint: `likes/?type=post&targetId=${params.postId}`
     })
 
     if (!response.success) return []
@@ -19,9 +19,9 @@ export class LikeService {
     return likes
   }
 
-  static async getAllOfComment (args: { commentId: number }): Promise<Like[]> {
-    const response = await api.get<LikeEndpoint[]>({
-      endpoint: `likes/all?type=comment&id=${args.commentId}`
+  static async getAllOfComment (params: { commentId: number }): Promise<Like[]> {
+    const response = await VIBE.get<LikeEndpoint[]>({
+      endpoint: `likes/?type=comment&targetId=${params.commentId}`
     })
 
     if (!response.success) return []
@@ -33,34 +33,63 @@ export class LikeService {
     return likes
   }
 
-  static async delete (args: {
+  static async getAmountOfPost (params: { postId: number }): Promise<number> {
+    const response = await VIBE.get<number>({
+      endpoint: `likes/count?type=post&targetId=${params.postId}`
+    })
+
+    if (response.success) {
+      return response.value
+    } else {
+      return -1
+    }
+  }
+
+  static async getAmountOfComment (params: {
+    commentId: number
+  }): Promise<number> {
+    const response = await VIBE.get<number>({
+      endpoint: `likes/count?type=comment&targetId=${params.commentId}`
+    })
+
+    if (response.success) {
+      return response.value
+    } else {
+      return -1
+    }
+  }
+
+  static async delete (params: {
     likeId: number
     signal?: AbortSignal
   }): Promise<boolean> {
-    const response = await api.delete({
-      endpoint: `likes/id?id=${args.likeId}`,
-      signal: args.signal
+    const response = await VIBE.delete({
+      endpoint: `likes/${params.likeId}`,
+      signal: params.signal
     })
 
     return response.success
   }
 
-  static async create (args: {
+  static async create (params: {
     userId: number
     targetId: number
     type: LikeType
     signal?: AbortSignal
   }): Promise<Like | null> {
-    const response = await api.post<Like>({
+    const response = await VIBE.post<LikeEndpoint>({
       endpoint: `likes`,
-      signal: args.signal,
+      signal: params.signal,
       body: JSON.stringify({
-        target_id: args.targetId,
-        type: args.type,
-        user_id: args.userId
+        target_id: params.targetId,
+        type: params.type
       })
     })
 
-    return response.value
+    if (!response.success) return null
+
+    const like = getAdaptedLike({ likeEndpoint: response.value })
+
+    return like
   }
 }

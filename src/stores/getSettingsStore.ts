@@ -3,8 +3,8 @@ import { SettingsStore } from '../models/SettingsStore'
 import { Language } from '../models/Language'
 import { getDictionaries } from '../utilities/getDictionaries'
 import { Dictionaries } from '../models/Dictionaries'
-import { getLanguage } from '../utilities/getLanguage'
-import { ModalName } from '../models/ModalName'
+import { LanguageService } from '../services/LanguageService'
+import { Modal } from '../models/Modal'
 
 export const getSettingsStore = create<SettingsStore>(set => ({
   dictionaries: null,
@@ -19,15 +19,13 @@ export const getSettingsStore = create<SettingsStore>(set => ({
     }
   },
 
-  language: getLanguage(),
+  language: LanguageService.get(),
   setLanguage: (newLanguage: Language) => set({ language: newLanguage }),
 
-  visibleModal: {
+  activeModal: {
     name: null,
     data: undefined
   },
-  setVisibleModal: (newVisibleModal: {
-    name: ModalName | null
-    data?: object | undefined
-  }) => set({ visibleModal: newVisibleModal })
+  setActiveModal: (newActiveModal: Modal) =>
+    set({ activeModal: newActiveModal })
 }))

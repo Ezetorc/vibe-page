@@ -1,81 +1,63 @@
 import { useQueryClient, useQuery, useMutation } from '@tanstack/react-query'
-import { useSettings } from './useSettings'
 import { UserData } from '../pages/Account/models/UserData'
-import { UserService } from '../services/UserService'
+import { useSettings } from './useSettings'
+import { useUser } from './useUser'
+import { User } from '../models/User'
 
-export function useFollow (followerId: number | undefined, followingId: number) {
-  const { openModal } = useSettings()
+export function useFollow (following: User | null) {
   const queryClient = useQueryClient()
-  const queryKey = ['isFollowing', followerId, followingId]
-
-  const { data: follower, isLoading: followerIsLoading } = useQuery({
-    queryKey: ['user', followerId],
-    queryFn: async () => {
-      if (!followerId) return null
-      return await UserService.getById({ userId: followerId })
-    },
-    enabled: !!followerId
-  })
-
-  const { data: following, isLoading: followingIsLoading } = useQuery({
-    queryKey: ['user', followingId],
-    queryFn: async () => {
-      if (!followingId) return null
-      return await UserService.getById({ userId: followingId })
-    },
-    enabled: !!followingId
-  })
+  const { openModal } = useSettings()
+  const { user: follower } = useUser()
+  const queryKey = ['isFollowing', follower?.id, following?.id]
 
   const isFollowingQuery = useQuery({
     queryKey,
     queryFn: async () => {
-      if (!follower) {
-        openModal('session')
+      if (!!follower && !!following && !!following.id) {
+        return await follower.isFollowing({ userId: following.id })
+      } else {
         return false
       }
-
-      return await follower.isFollowing({ userId: followingId })
-    },
-    enabled: !!follower
+    }
   })
 
   const onMutate = () => {
     queryClient.setQueryData(
       queryKey,
-      (oldData: boolean | undefined) => !oldData
+      (oldIsFollowingData: boolean | undefined) => !oldIsFollowingData
     )
   }
 
   const follow = useMutation({
     mutationFn: async () => {
-      if (!follower) {
-        openModal('session')
+      if (follower && following && following.id) {
+        return await follower.follow({ userId: following.id })
+      } else {
         return false
       }
-
-      return await follower.follow({ userId: followingId })
     },
     onMutate,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey })
 
-      queryClient.setQueryData(['userData', 'me'], (oldUserData?: UserData) => {
-        if (!oldUserData) return oldUserData
+      queryClient.setQueryData(
+        ['userData', follower?.id],
+        (prevUserData?: UserData) => {
+          if (!prevUserData) return prevUserData
 
-        return new UserData({
-          ...oldUserData,
-          followingAmount: (oldUserData.followingAmount ?? 0) + 1
-        })
-      })
+          return prevUserData.update({
+            followingAmount: (prevUserData.followingAmount ?? 0) + 1
+          })
+        }
+      )
 
       queryClient.setQueryData(
-        ['userData', following?.name],
-        (oldUserData?: UserData) => {
-          if (!oldUserData) return oldUserData
+        ['userData', following?.id],
+        (prevUserData?: UserData) => {
+          if (!prevUserData) return prevUserData
 
-          return new UserData({
-            ...oldUserData,
-            followersAmount: (oldUserData.followersAmount ?? 0) + 1
+          return prevUserData.update({
+            followersAmount: (prevUserData.followersAmount ?? 0) + 1
           })
         }
       )
@@ -86,34 +68,40 @@ export function useFollow (followerId: number | undefined, followingId: number) 
 
   const unfollow = useMutation({
     mutationFn: async () => {
-      if (!follower) {
-        openModal('session')
+      if (follower && following && following.id) {
+        return await follower.unfollow({ userId: following.id })
+      } else {
         return false
       }
-
-      return await follower.unfollow({ userId: followingId })
     },
     onMutate,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey })
 
-      queryClient.setQueryData(['userData', 'me'], (oldUserData?: UserData) => {
-        if (!oldUserData) return oldUserData
+      queryClient.setQueryData(
+        ['userData', follower?.id],
+        (prevUserData?: UserData) => {
+          if (!prevUserData) return prevUserData
 
-        return new UserData({
-          ...oldUserData,
-          followingAmount: Math.max((oldUserData.followingAmount ?? 0) - 1, 0)
-        })
-      })
+          return prevUserData.update({
+            followingAmount: Math.max(
+              (prevUserData.followingAmount ?? 0) - 1,
+              0
+            )
+          })
+        }
+      )
 
       queryClient.setQueryData(
-        ['userData', following?.name],
-        (oldUserData?: UserData) => {
-          if (!oldUserData) return oldUserData
+        ['userData', following?.id],
+        (prevUserData?: UserData) => {
+          if (!prevUserData) return prevUserData
 
-          return new UserData({
-            ...oldUserData,
-            followersAmount: Math.max((oldUserData.followersAmount ?? 0) - 1, 0)
+          return prevUserData.update({
+            followersAmount: Math.max(
+              (prevUserData.followersAmount ?? 0) - 1,
+              0
+            )
           })
         }
       )
@@ -123,7 +111,8 @@ export function useFollow (followerId: number | undefined, followingId: number) 
   })
 
   return {
-    isFollowing: followerIsLoading || followingIsLoading ? undefined : isFollowingQuery.data,
+    isFollowing:
+      isFollowingQuery.data === undefined ? null : isFollowingQuery.data,
     follow: follow.mutate,
     unfollow: unfollow.mutate
   }

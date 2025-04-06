@@ -1,53 +1,30 @@
-import { useSettings } from '../hooks/useSettings'
 import { FollowButton } from './FollowButton'
 import { Username } from './Username'
-import { UserDisplayProps } from '../models/Props/UserDisplayProps'
-import { useUserData } from '../hooks/useUserData'
-import { images } from '../constants/SETTINGS'
 import { useUser } from '../hooks/useUser'
+import { UserImage } from './UserImage'
+import { User } from '../models/User'
 
-export function UserDisplay (props: UserDisplayProps) {
-  const { dictionary } = useSettings()
+export function UserDisplay (props: {
+  user: User | null
+}) {
   const { user } = useUser()
-  const { userData, isLoading } = useUserData(props.user.name)
+  const isLoading = props.user === null
+  const isLogged = props.user?.name != user?.name
 
   return (
-    <article className='gap-y-[10px] flex flex-col justify-center w-[clamp(300px,100%,700px)] h-[clamp(300px,auto,400px)] p-[20px] rounded-vibe border-vibe border-caribbean-current overflow-hidden'>
+    <article className='gap-y-[10px] gap-x-[5px] items-center grid mobile:grid-cols-[2fr_4fr_2fr] desktop:grid-cols-[1fr_4fr_2fr] w-full p-[2%] rounded-vibe border-vibe border-caribbean-current overflow-hidden'>
       {isLoading ? (
-        <div className='w-[clamp(100px,100%,200px)] h-[100px] animate-shimmer bg-shimmer'></div>
+        <div className='bg-green-400 w-[clamp(100px,100%,200px)] h-[100px] animate-shimmer bg-shimmer' />
       ) : (
         <>
-          <div className='gap-x-[20px] justify-center grid grid-cols-[1fr_2fr] grid-rows-[1fr_1fr]'>
-            <img
-              title={`${userData.name} Profile Picture`}
-              className='self-center mb-[10px] justify-self-end row-[span_2] rounded-full w-[clamp(70px,50%,90px)] aspect-square border-vibe border-orange-crayola'
-              src={userData.imageUrl ?? images.guest}
-              alt='Profile'
-            />
-            <div className='flex items-end'>
-              <Username>{userData.name}</Username>
-            </div>
+          <UserImage className='w-[clamp(50px,100%,70px)]' user={props.user} />
 
-            <span className='text-caribbean-current font-poppins-light text-[clamp(10px,4vw,20px)]'>
-              {`${dictionary.joined} ${userData.date}`}
-            </span>
+          <div className='overflow-hidden relative'>
+            <Username id={props.user!.id}>{props.user!.name}</Username>
+            <div className='pointer-events-none absolute right-0 top-0 h-full w-12 bg-gradient-to-l from-gunmetal to-transparent'></div>
           </div>
 
-          <p className='h-[clamp(50px,auto,160px)] w-full text-white text-[clamp(5px,6vw,20px)] font-poppins-regular break-words whitespace-pre-wrap overflow-hidden overflow-wrap-anywhere'>
-            {userData.description || (
-              <span className='text-caribbean-current'>
-                {userData.isLogged
-                  ? dictionary.youDontHaveDescription
-                  : dictionary.thisUserHasnotDescription}
-              </span>
-            )}
-          </p>
-
-          <div className='flex gap-x-[20px]'>
-            {!userData.isLogged && (
-              <FollowButton followerId={user?.id} followingId={userData.id!} />
-            )}
-          </div>
+          {isLogged && <FollowButton following={props.user} />}
         </>
       )}
     </article>

@@ -1,12 +1,15 @@
 import { useState } from 'react'
-import { PostDisplayProps } from '../../models/Props/PostDisplayProps'
 import { PostHeader } from './PostHeader'
 import { PostContent } from './PostContent'
 import { PostFooter } from './PostFooter'
 import { PostComments } from './PostComments'
 import { usePostData } from '../../hooks/usePostData'
+import { Post } from '../../models/Post'
 
-export function PostDisplay (props: PostDisplayProps) {
+export function PostDisplay (props: {
+  post: Post
+  onDelete: (postId: number) => void
+}) {
   const [commentsOpened, setCommentsOpened] = useState<boolean>(false)
   const {
     postData,

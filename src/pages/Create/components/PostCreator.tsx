@@ -9,6 +9,7 @@ import { PostService } from '../../../services/PostService'
 import { InfiniteData, useQueryClient } from '@tanstack/react-query'
 import { Post } from '../../../models/Post'
 import { UserData } from '../../Account/models/UserData'
+import { PATHS } from '../../../constants/PATHS'
 
 export function PostCreator () {
   const navigate = useNavigate()
@@ -37,14 +38,14 @@ export function PostCreator () {
       }
     )
 
-    queryClient.setQueryData(['userData', 'me'], (oldUserData: UserData) => {
-      if (!oldUserData?.postsAmount) return oldUserData
+    queryClient.setQueryData(
+      ['userData', user?.id],
+      (prevUserData: UserData) => {
+        if (!prevUserData?.postsAmount) return prevUserData
 
-      return new UserData({
-        ...oldUserData,
-        postsAmount: oldUserData.postsAmount + 1
-      })
-    })
+        return prevUserData.update({ postsAmount: prevUserData.postsAmount + 1 })
+      }
+    )
   }
 
   const handleCreatePost = async () => {
@@ -70,12 +71,10 @@ export function PostCreator () {
       content: postContent
     })
 
-    console.log('postCreated: ', postCreated, user.id, postContent)
-
     if (postCreated !== null) {
       updateQueryData(postCreated)
       setPostContent('')
-      navigate('/')
+      navigate(PATHS.homeSection)
     } else {
       setErrorMessage(dictionary.somethingWentWrong)
     }
@@ -92,12 +91,12 @@ export function PostCreator () {
   }
 
   return (
-    <article className='relative w-full h-full border-vibe border-caribbean-current rounded-vibe'>
+    <article className='relative w-full mobile:h-[clamp(200px,50%,300px)] desktop:h-[clamp(400px,100%,600px)] border-vibe border-caribbean-current rounded-vibe'>
       <textarea
         onInput={handleWrite}
         maxLength={200}
         placeholder={placeholder}
-        className='p-[10px] text-[clamp(25px,7vw,30px)] outline-hidden resize-none w-full h-full bg-transparent font-poppins-regular'
+        className='p-[10px] text-[clamp(25px,7vw,30px)] outline-hidden resize-none w-full h-full bg-transparent '
       ></textarea>
       <span
         ref={spanRef}

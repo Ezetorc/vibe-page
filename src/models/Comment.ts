@@ -1,9 +1,7 @@
 import { format } from '@formkit/tempo'
 import { Like } from './Like'
-import { LikeEndpoint } from './LikeEndpoint'
-import { getAdaptedLike } from '../adapters/getAdaptedLike'
-import { api } from '../constants/SETTINGS'
 import { LikeService } from '../services/LikeService'
+import { CommentService } from '../services/CommentService'
 
 export class Comment {
   constructor ({
@@ -39,46 +37,15 @@ export class Comment {
     return formattedDate
   }
 
-  public async delete (): Promise<boolean> {
-    const response = await api.delete<boolean>({
-      endpoint: `comments?id=${this.id}`
-    })
-
-    if (!response.success) return false
-
-    const commentLikes = await LikeService.getAllOfComment({
-      commentId: this.id
-    })
-    const likesIds = commentLikes.map(commentLike => commentLike.id)
-
-    await Promise.all(likesIds.map(likeId => LikeService.delete({ likeId })))
-
-    return true
+  public async delete (): Promise<Comment | null> {
+    return await CommentService.delete({ commentId: this.id })
   }
 
   public async getLikesAmount (): Promise<number> {
-    const response = await api.get<number>({
-      endpoint: `likes/amount?targetId=${this.id}&type=comment`
-    })
-
-    if (response.success) {
-      return response.value!
-    } else {
-      return -1
-    }
+    return await LikeService.getAmountOfComment({ commentId: this.id })
   }
 
   public async getLikes (): Promise<Like[]> {
-    const response = await api.get<LikeEndpoint[]>({
-      endpoint: `likes/all?id=${this.id}&type=comment`
-    })
-
-    if (!response.success) return []
-
-    const likes = response.value!.map(likeEndpoint =>
-      getAdaptedLike({ likeEndpoint })
-    )
-
-    return likes
+    return await LikeService.getAllOfComment({ commentId: this.id })
   }
 }

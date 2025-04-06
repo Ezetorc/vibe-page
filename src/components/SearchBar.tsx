@@ -1,8 +1,10 @@
 import { useState, FormEvent, useEffect } from 'react'
 import { useDebounce } from '../hooks/useDebounce'
-import { SearchBarProps } from '../models/Props/SearchBarProps'
 
-export function SearchBar (props: SearchBarProps) {
+export function SearchBar (props: {
+  onSearch: (query: string) => void
+  placeholder: string
+}) {
   const [search, setSearch] = useState<string>('')
   const debouncedSearch = useDebounce({ value: search, delay: 200 })
 
@@ -19,7 +21,7 @@ export function SearchBar (props: SearchBarProps) {
       onInput={onInput}
       name='Search Bar'
       placeholder={props.placeholder}
-      className='bg-transparent font-poppins-regular outline-hidden placeholder:text-caribbean-current w-full h-[45px] border-vibe border-caribbean-current rounded-vibe px-[2%]'
+      className='bg-transparent  outline-hidden placeholder:text-caribbean-current w-full h-[45px] border-vibe border-caribbean-current rounded-vibe px-[2%]'
     />
   )
 }

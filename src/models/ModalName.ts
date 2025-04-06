@@ -10,3 +10,5 @@ export type ModalName =
   | 'deleteAccount'
   | 'picture'
   | 'crop'
+  | 'name'
+  | 'description'

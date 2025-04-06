@@ -8,6 +8,8 @@ import { useUser } from '../../../hooks/useUser'
 import { useSettings } from '../../../hooks/useSettings'
 import { Section } from '../../../components/Section'
 import { UserService } from '../../../services/UserService'
+import { Nav } from '../../../components/Nav'
+import { PATHS } from '../../../constants/PATHS'
 
 export default function Register () {
   const {
@@ -94,9 +96,9 @@ export default function Register () {
       const sessionSuccess = await handleSession()
 
       if (sessionSuccess) {
-        navigate('/account/me')
+        navigate(PATHS.accountSection)
       } else {
-        navigate('/')
+        navigate(PATHS.homeSection)
       }
     } else {
       setErrorMessage(dictionary.userAlreadyExists)
@@ -192,6 +194,8 @@ export default function Register () {
       <Link to='/login' className='text-verdigris underline'>
         {dictionary.iHaveAnAccount}
       </Link>
+
+      <Nav />
     </Section>
   )
 }

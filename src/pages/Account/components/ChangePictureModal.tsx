@@ -2,16 +2,17 @@ import { Button } from '../../../components/Button'
 import { CloseModalButton } from '../../../components/CloseModalButton'
 import { Modal } from '../../../components/Modal'
 import { ChangeEvent } from 'react'
-import { cloudinary, images } from '../../../constants/SETTINGS'
 import { useUser } from '../../../hooks/useUser'
 import { User } from '../../../models/User'
 import { useSettings } from '../../../hooks/useSettings'
+import { UserImage } from '../../../components/UserImage'
+import { PATHS } from '../../../constants/PATHS'
 
 export function ChangePictureModal () {
-  const { user, setUser } = useUser()
-  const { openModal, dictionary } = useSettings()
+  const { user, isSessionActive, setUser } = useUser()
+  const { openModal, dictionary, closeModal } = useSettings()
 
-  if (!user) return
+  if (!isSessionActive()) return
 
   const handleUploadImage = (event: ChangeEvent<HTMLInputElement>) => {
     const newImage = event.target.files?.[0]
@@ -22,21 +23,24 @@ export function ChangePictureModal () {
   }
 
   const handleRemoveImage = async () => {
-    try {
-      if (user.imageId) {
-        await cloudinary.deleteImage({ publicId: user.imageId })
-      }
+    if (!user) return
 
-      await user.changeImageUrl({ newImageUrl: null })
-      await user.changeImageId({ newImageId: null })
+    try {
+      user.saveImage(null, null)
 
       const newUser = new User({
-        ...user,
-        imageUrl: null,
-        imageId: null
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        password: user.password,
+        description: user.description,
+        createdAt: user.createdAt,
+        imageId: null,
+        imageUrl: null
       })
 
       setUser(newUser)
+      closeModal()
     } catch {
       openModal('connection')
     }
@@ -44,7 +48,7 @@ export function ChangePictureModal () {
 
   return (
     <Modal>
-      <article className='p-[clamp(10px,5%,20px)] pt-[50px] items-center relative flex flex-col gap-4 rounded-vibe bg-caribbean-current w-[clamp(300px,70%,1000px)] h-[clamp(400px,80%,600px)]'>
+      <article className='p-[clamp(10px,5%,20px)] items-center relative flex flex-col gap-4 rounded-vibe bg-caribbean-current w-[clamp(300px,70%,1000px)] h-[clamp(300px,fit,600px)]'>
         <CloseModalButton />
 
         <h2 className='text-center font-poppins-semibold text-[clamp(20px,7vw,60px)] bg-clip-text text-transparent bg-orange-gradient'>
@@ -53,33 +57,33 @@ export function ChangePictureModal () {
 
         <section className='flex gap-x-[5%]'>
           <div className='flex flex-col justify-center gap-y-[30px] items-center'>
-            <img
-              title={`${user?.name} Profile Picture`}
-              className='rounded-full desktop:w-[clamp(40px,30vw,300px)] mobile:w-[clamp(40px,20vw,60px)] aspect-square border-orange-crayola border-vibe'
-              src={user?.imageUrl ?? images.guest}
-              alt='Profile'
+            <UserImage
+              className='border-verdigris desktop:w-[clamp(40px,30vw,300px)] mobile:w-[clamp(40px,30vw,90px)]'
+              user={user}
             />
 
-            <label className='cursor-pointer hover:bg-white hover:text-orange-crayola w-full h-[50px] bg-orange-crayola font-poppins-regular rounded-vibe flex items-center justify-center'>
+            <label className='cursor-pointer text-center hover:bg-white hover:text-orange-crayola p-[10px] w-full h-[50px] bg-orange-crayola  rounded-vibe flex items-center justify-center'>
               {dictionary.uploadImage}
               <input
                 type='file'
                 className='hidden'
+                accept='image/*'
                 onChange={handleUploadImage}
               />
             </label>
           </div>
 
-          {user.imageUrl && (
+          {user!.imageUrl && (
             <div className='flex flex-col justify-center gap-y-[30px] items-center'>
-              <img
-                title={`${user?.name} Profile Picture`}
-                className='rounded-full desktop:w-[clamp(40px,30vw,300px)] mobile:w-[clamp(40px,20vw,60px)] aspect-square border-orange-crayola border-vibe'
-                src={images.guest}
-                alt='Profile'
+              <UserImage
+                className='border-verdigris desktop:w-[clamp(40px,30vw,300px)] mobile:w-[clamp(40px,30vw,90px)]'
+                src={PATHS.guestImage}
               />
 
-              <Button text={dictionary.removeImage} onClick={handleRemoveImage} />
+              <Button
+                text={dictionary.removeImage}
+                onClick={handleRemoveImage}
+              />
             </div>
           )}
         </section>

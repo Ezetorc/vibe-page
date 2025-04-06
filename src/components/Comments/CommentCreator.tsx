@@ -5,10 +5,11 @@ import { useValidation } from '../../hooks/useValidation'
 import { getRandomNumber } from '../../pages/Create/utilities/getRandomNumber'
 import { Button } from '../Button'
 import eventEmitter from '../../constants/EVENT_EMITTER'
+import { NewCommentEvent } from '../../models/NewCommentEvent'
 
 export function CommentCreator () {
-  const { user } = useUser()
-  const { dictionary, openModal, visibleModal } = useSettings()
+  const { isSessionActive } = useUser()
+  const { dictionary, openModal, activeModal } = useSettings()
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const { validateComment, errorMessage, setErrorMessage } = useValidation()
   const [commentContent, setCommentContent] = useState<string>('')
@@ -20,7 +21,7 @@ export function CommentCreator () {
   const handleCreateComment = async () => {
     if (isLoading) return
 
-    if (!user) {
+    if (!isSessionActive()) {
       openModal('session')
       return
     }
@@ -29,10 +30,10 @@ export function CommentCreator () {
 
     const isCommentValid = validateComment({ comment: commentContent })
 
-    if (isCommentValid && 'postId' in visibleModal.data!) {
-      const event = {
+    if (isCommentValid && 'postId' in activeModal.data!) {
+      const event: NewCommentEvent = {
         content: commentContent,
-        postId: visibleModal.data.postId as number
+        postId: activeModal.data.postId as number
       }
 
       eventEmitter.emit('commentCreated', event)
@@ -51,7 +52,7 @@ export function CommentCreator () {
 
   return (
     <article className='relative flex flex-col gap-y-[10px] w-full h-[500px]'>
-      <div className='p-[10px] relative text-[clamp(25px,7vw,30px)] bg-transparent rounded-vibe border-vibe border-verdigris outline-hidden resize-none w-full h-full font-poppins-regular'>
+      <div className='p-[10px] relative text-[clamp(25px,7vw,30px)] bg-transparent rounded-vibe border-vibe border-verdigris outline-hidden resize-none w-full h-full '>
         <textarea
           onInput={handleWrite}
           maxLength={200}

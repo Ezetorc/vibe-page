@@ -1,17 +1,12 @@
 import { format } from '@formkit/tempo'
 import { Post } from './Post'
-import { FollowerService } from '../services/FollowerService'
 import { PostService } from '../services/PostService'
 import { LikeService } from '../services/LikeService'
 import { UserService } from '../services/UserService'
 import { CommentService } from '../services/CommentService'
 import { Comment } from './Comment'
-import { api } from '../constants/SETTINGS'
-import { PostEndpoint } from './PostEndpoint'
-import { getAdaptedPost } from '../adapters/getAdaptedPost'
 import { Like } from './Like'
-import { UserEndpoint } from './UserEndpoint'
-import { getAdaptedUser } from '../adapters/getAdaptedUser'
+import { FollowService } from '../services/FollowService'
 
 export class User {
   public id: number
@@ -52,57 +47,62 @@ export class User {
     this.createdAt = createdAt
   }
 
-  public isOwnerOfPost (args: { postUserId: User['id'] }): boolean {
-    return this.id === args.postUserId
+  public isOwnerOfPost (params: { postUserId: User['id'] }): boolean {
+    return this.id === params.postUserId
   }
 
-  public isOwnerOfComment (args: { comment: Comment }): boolean {
-    return this.id === args.comment.userId
+  public isOwnerOfComment (params: { comment: Comment }): boolean {
+    return this.id === params.comment.userId
   }
 
-  public async follow (args: { userId: User['id'] }): Promise<boolean> {
-    const response = await FollowerService.create({
-      followerId: this.id,
-      followingId: args.userId
+  public async follow (params: { userId: User['id'] }): Promise<boolean> {
+    const response = await FollowService.create({ followingId: params.userId })
+
+    return response
+  }
+
+  public async unfollow (params: { userId: User['id'] }): Promise<boolean> {
+    const response = await FollowService.delete({
+      followingId: params.userId
     })
 
     return response
   }
 
-  public async unfollow (args: { userId: User['id'] }): Promise<boolean> {
-    const response = await FollowerService.delete({
+  public async isFollowing (params: { userId: User['id'] }): Promise<boolean> {
+    const following = await FollowService.exists({
       followerId: this.id,
-      followingId: args.userId
-    })
-
-    return response
-  }
-
-  public async isFollowing (args: { userId: User['id'] }): Promise<boolean> {
-    const following = await FollowerService.exists({
-      followerId: this.id,
-      followingId: args.userId
+      followingId: params.userId
     })
 
     return following
   }
 
-  public async hasLikedPost (args: { postId: Post['id'] }): Promise<boolean> {
-    const response = await api.get<boolean>({
-      endpoint: `users/liked?type=post&userId=${this.id}&targetId=${args.postId}`
+  public async hasLikedPost (params: { postId: Post['id'] }): Promise<boolean> {
+    return await UserService.hasLikedPost({
+      userId: this.id,
+      postId: params.postId
     })
-
-    return Boolean(response.value)
   }
 
-  public async hasLikedComment (args: {
+  public async hasLikedComment (params: {
     commentId: Comment['id']
   }): Promise<boolean> {
-    const response = await api.get<boolean>({
-      endpoint: `users/liked?type=comment&userId=${this.id}&targetId=${args.commentId}`
+    return await UserService.hasLikedComment({
+      userId: this.id,
+      commentId: params.commentId
     })
+  }
 
-    return Boolean(response.value)
+  public async saveImage (imageUrl: string | null, publicId: string | null) {
+    console.log('saveImage: ', imageUrl, publicId)
+
+    if (this.imageId) {
+      await UserService.deleteImage({ publicId: this.imageId })
+    }
+
+    await this.changeImageUrl({ newImageUrl: imageUrl })
+    await this.changeImageId({ newImageId: publicId })
   }
 
   public getDate (): string {
@@ -112,127 +112,63 @@ export class User {
     return formattedDate
   }
 
-  public async changeName (args: { newName: User['name'] }): Promise<boolean> {
-    const response = await api.patch<UserEndpoint>({
-      endpoint: `users?id=${this.id}`,
-      body: JSON.stringify({ name: args.newName })
+  public async changeName (params: { newName: User['name'] }): Promise<boolean> {
+    return await UserService.update({
+      body: { name: params.newName },
+      onSuccess: updatedUser => {
+        this.name = updatedUser.name
+      }
     })
-
-    if (!response.success) return false
-
-    const newUser = getAdaptedUser({ userEndpoint: response.value! })
-
-    if (response.success) {
-      this.name = newUser.name
-      return true
-    } else {
-      return false
-    }
   }
 
-  public async changeImageUrl (args: {
+  public async changeImageUrl (params: {
     newImageUrl: User['imageUrl']
   }): Promise<boolean> {
-    const response = await api.patch<UserEndpoint>({
-      endpoint: `users?id=${this.id}`,
-      body: JSON.stringify({ image_url: args.newImageUrl })
+    return await UserService.update({
+      body: { image_url: params.newImageUrl },
+      onSuccess: updatedUser => (this.imageUrl = updatedUser.imageUrl)
     })
-
-    if (!response.success) return false
-
-    const newUser = getAdaptedUser({ userEndpoint: response.value! })
-
-    if (response.success) {
-      this.imageUrl = newUser.imageUrl
-      return true
-    } else {
-      return false
-    }
   }
 
-  public async changeImageId (args: {
+  public async changeImageId (params: {
     newImageId: User['imageId']
   }): Promise<boolean> {
-    const response = await api.patch<UserEndpoint>({
-      endpoint: `users?id=${this.id}`,
-      body: JSON.stringify({ image_id: args.newImageId })
+    return await UserService.update({
+      body: { image_id: params.newImageId },
+      onSuccess: updatedUser => (this.imageId = updatedUser.imageId)
     })
-
-    if (!response.success) return false
-
-    const newUser = getAdaptedUser({ userEndpoint: response.value! })
-
-    if (response.success) {
-      this.imageId = newUser.imageId
-      return true
-    } else {
-      return false
-    }
   }
 
-  public async changePassword (args: {
+  public async changePassword (params: {
     newPassword: User['password']
   }): Promise<boolean> {
-    const response = await api.patch<UserEndpoint>({
-      endpoint: `users?id=${this.id}`,
-      body: JSON.stringify({ password: args.newPassword })
+    return await UserService.update({
+      body: { password: params.newPassword },
+      onSuccess: updatedUser => (this.password = updatedUser.password)
     })
-
-    if (!response.success) return false
-
-    const newUser = getAdaptedUser({ userEndpoint: response.value! })
-
-    if (response.success) {
-      this.password = newUser.password
-      return true
-    } else {
-      return false
-    }
   }
 
-  public async changeDescription (args: {
+  public async changeDescription (params: {
     newDescription: User['description']
   }): Promise<boolean> {
-    const response = await api.patch<UserEndpoint>({
-      endpoint: `users?id=${this.id}`,
-      body: JSON.stringify({ description: args.newDescription })
+    return await UserService.update({
+      body: { description: params.newDescription },
+      onSuccess: updatedUser => (this.description = updatedUser.description)
     })
-
-    if (!response.success) return false
-
-    const newUser = getAdaptedUser({ userEndpoint: response.value! })
-
-    if (response.success) {
-      this.description = newUser.description
-      return true
-    } else {
-      return false
-    }
   }
 
-  public async changeEmail (args: {
+  public async changeEmail (params: {
     newEmail: User['email']
   }): Promise<boolean> {
-    const response = await api.patch<UserEndpoint>({
-      endpoint: `users?id=${this.id}`,
-      body: JSON.stringify({ email: args.newEmail })
+    return await UserService.update({
+      body: { email: params.newEmail },
+      onSuccess: updatedUser => (this.email = updatedUser.email)
     })
-
-    if (!response.success) return false
-
-    const newUser = getAdaptedUser({ userEndpoint: response.value! })
-
-    if (response.success) {
-      this.email = newUser.email
-      return true
-    } else {
-      return false
-    }
   }
 
-  public async getPosts (args: { page?: number } = {}): Promise<Post[]> {
+  public async getPosts (params: { page?: number } = {}): Promise<Post[]> {
     const posts = await PostService.getAll({
-      page: args.page ?? 1,
+      page: params.page ?? 1,
       userId: this.id
     })
 
@@ -240,43 +176,19 @@ export class User {
   }
 
   public async getPostsAmount (): Promise<number> {
-    const response = await api.get<number>({
-      endpoint: `posts/amount?userId=${this.id}`
-    })
-
-    if (response.success) {
-      return response.value!
-    } else {
-      return -1
-    }
+    return await PostService.getAmountOfUser({ userId: this.id })
   }
 
   public async getFollowersAmount (): Promise<number> {
-    const response = await api.get<number>({
-      endpoint: `followers/amount?userId=${this.id}&type=following`
-    })
-
-    if (response.success) {
-      return response.value!
-    } else {
-      return -1
-    }
+    return await FollowService.getFollowersAmount({ userId: this.id })
   }
 
   public async getFollowingAmount (): Promise<number> {
-    const response = await api.get<number>({
-      endpoint: `followers/amount?userId=${this.id}&type=follower`
-    })
-
-    if (response.success) {
-      return response.value!
-    } else {
-      return -1
-    }
+    return await FollowService.getFollowingAmount({ userId: this.id })
   }
 
   public async getFollowers (): Promise<User[]> {
-    const followersIds = await FollowerService.getIdsOfUser({
+    const followersIds = await FollowService.getIdsOfUser({
       userId: this.id
     })
 
@@ -292,25 +204,25 @@ export class User {
     return userFollowers
   }
 
-  public async likePost (args: {
+  public async likePost (params: {
     postId: number
     signal?: AbortSignal
   }): Promise<Like | null> {
     const response = await LikeService.create({
       userId: this.id,
-      targetId: args.postId,
+      targetId: params.postId,
       type: 'post',
-      signal: args.signal
+      signal: params.signal
     })
 
     return response
   }
 
-  public async dislikePost (args: {
+  public async dislikePost (params: {
     postId: number
     signal?: AbortSignal
   }): Promise<boolean> {
-    const post = await PostService.getById({ postId: args.postId })
+    const post = await PostService.getById({ postId: params.postId })
 
     if (!post) return false
 
@@ -324,24 +236,26 @@ export class User {
 
     const deleteSuccessful = await LikeService.delete({
       likeId: likeToDelete.id,
-      signal: args.signal
+      signal: params.signal
     })
 
     return deleteSuccessful
   }
 
-  public async likeComment (args: { commentId: number }): Promise<Like | null> {
+  public async likeComment (params: {
+    commentId: number
+  }): Promise<Like | null> {
     const response = await LikeService.create({
       userId: this.id,
-      targetId: args.commentId,
+      targetId: params.commentId,
       type: 'comment'
     })
 
     return response
   }
 
-  public async dislikeComment (args: { commentId: number }): Promise<boolean> {
-    const post = await CommentService.getById({ commentId: args.commentId })
+  public async dislikeComment (params: { commentId: number }): Promise<boolean> {
+    const post = await CommentService.getById({ commentId: params.commentId })
 
     if (!post) return false
 
@@ -357,19 +271,14 @@ export class User {
     return deleteSuccessful
   }
 
-  public async searchPosts (args: { query: string }): Promise<Post[]> {
-    const response = await api.get<PostEndpoint[]>({
-      endpoint: `posts/search?query=${encodeURIComponent(args.query)}&userId=${
-        this.id
-      }`
+  public async searchPosts (params: {
+    query: string
+    page: number
+  }): Promise<Post[]> {
+    return await PostService.search({
+      query: params.query,
+      userId: this.id,
+      page: params.page
     })
-
-    if (!response.value) return []
-
-    const posts = response.value.map(postEndpoint =>
-      getAdaptedPost({ postEndpoint })
-    )
-
-    return posts
   }
 }

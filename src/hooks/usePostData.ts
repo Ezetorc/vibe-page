@@ -1,7 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { Post } from '../models/Post'
 import { PostData } from '../models/PostData'
-import { UserService } from '../services/UserService'
 import { useUser } from './useUser'
 import { useSettings } from './useSettings'
 import { CommentService } from '../services/CommentService'
@@ -13,31 +12,9 @@ export function usePostData (post: Post) {
   const { openModal, closeModal } = useSettings()
   const queryClient = useQueryClient()
   const queryKey = ['postData', post.id]
-
-  const fetchPostData = async () => {
-    const [newUser, newLikes, newComments, newUserLiked] = await Promise.all([
-      UserService.getById({ userId: post.userId }),
-      post.getLikesAmount(),
-      post.getComments(),
-      user?.hasLikedPost({ postId: post.id })
-    ])
-
-    const newPostData = new PostData({
-      user: newUser,
-      likes: newLikes,
-      comments: newComments,
-      userLiked: Boolean(newUserLiked),
-      id: post.id,
-      date: post.getDate(),
-      content: post.content
-    })
-
-    return newPostData
-  }
-
   const query = useQuery({
     queryKey,
-    queryFn: fetchPostData,
+    queryFn: () => PostData.getFromPost({ post, loggedUser: user }),
     enabled: post.id >= 0
   })
 
@@ -45,36 +22,24 @@ export function usePostData (post: Post) {
     mutationFn: (signal: AbortSignal) =>
       user!.likePost({ postId: post.id, signal }),
     onMutate: () => {
-      queryClient.setQueryData(
-        queryKey,
-        (oldPostData: PostData | undefined) => {
-          if (!oldPostData) return oldPostData
+      queryClient.setQueryData(queryKey, (prevPostData?: PostData) => {
+        if (!prevPostData) return prevPostData
 
-          const updatedPostData = new PostData({
-            ...oldPostData,
-            likes: (oldPostData.likes ?? 0) + 1,
-            userLiked: true
-          })
-
-          return updatedPostData
-        }
-      )
+        return prevPostData.update({
+          likes: (prevPostData.likes ?? 0) + 1,
+          userLiked: true
+        })
+      })
     },
     onError: () => {
-      queryClient.setQueryData(
-        queryKey,
-        (oldPostData: PostData | undefined) => {
-          if (!oldPostData) return oldPostData
+      queryClient.setQueryData(queryKey, (prevPostData?: PostData) => {
+        if (!prevPostData) return prevPostData
 
-          const updatedPostData = new PostData({
-            ...oldPostData,
-            likes: (oldPostData.likes ?? 0) - 1,
-            userLiked: false
-          })
-
-          return updatedPostData
-        }
-      )
+        return prevPostData.update({
+          likes: (prevPostData.likes ?? 0) - 1,
+          userLiked: false
+        })
+      })
 
       openModal('connection')
     }
@@ -86,32 +51,26 @@ export function usePostData (post: Post) {
     onMutate: () => {
       queryClient.setQueryData(
         queryKey,
-        (oldPostData: PostData | undefined) => {
-          if (!oldPostData) return oldPostData
+        (prevPostData: PostData | undefined) => {
+          if (!prevPostData) return prevPostData
 
-          const updatedPostData = new PostData({
-            ...oldPostData,
-            likes: (oldPostData.likes ?? 0) - 1,
+          return prevPostData.update({
+            likes: (prevPostData.likes ?? 0) - 1,
             userLiked: false
           })
-
-          return updatedPostData
         }
       )
     },
     onError: () => {
       queryClient.setQueryData(
         queryKey,
-        (oldPostData: PostData | undefined) => {
-          if (!oldPostData) return oldPostData
+        (prevPostData: PostData | undefined) => {
+          if (!prevPostData) return prevPostData
 
-          const updatedPostData = new PostData({
-            ...oldPostData,
-            likes: (oldPostData.likes ?? 0) + 1,
+          return prevPostData.update({
+            likes: (prevPostData.likes ?? 0) + 1,
             userLiked: true
           })
-
-          return updatedPostData
         }
       )
 
@@ -136,15 +95,12 @@ export function usePostData (post: Post) {
 
       queryClient.setQueryData(
         queryKey,
-        (oldPostData: PostData | undefined) => {
-          if (!oldPostData?.comments) return oldPostData
+        (prevPostData: PostData | undefined) => {
+          if (!prevPostData?.comments) return prevPostData
 
-          const updatedPostData = new PostData({
-            ...oldPostData,
-            comments: [...oldPostData.comments, newComment]
+          return prevPostData.update({
+            comments: [...prevPostData.comments, newComment]
           })
-
-          return updatedPostData
         }
       )
     },
@@ -160,17 +116,14 @@ export function usePostData (post: Post) {
 
       queryClient.setQueryData(
         ['postData', post.id],
-        (oldPostData: PostData | undefined) => {
-          if (!oldPostData?.comments) return oldPostData
+        (prevPostData: PostData | undefined) => {
+          if (!prevPostData?.comments) return prevPostData
 
-          const updatedPostData = new PostData({
-            ...oldPostData,
-            comments: [...oldPostData.comments].filter(
+          return prevPostData.update({
+            comments: [...prevPostData.comments].filter(
               comment => comment.id !== newComment.id
             )
           })
-
-          return updatedPostData
         }
       )
     },

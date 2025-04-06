@@ -6,6 +6,7 @@ import { useSettings } from '../../../hooks/useSettings'
 import { Language } from '../../../models/Language'
 import { Languages } from './Languages'
 import { CloseModalButton } from '../../../components/CloseModalButton'
+import { LanguageService } from '../../../services/LanguageService'
 
 export function ChangeLanguageModal () {
   const { closeModal, language, setLanguage, dictionary } = useSettings()
@@ -20,8 +21,7 @@ export function ChangeLanguageModal () {
 
   const handleChangeLanguage = () => {
     setLanguage(newLanguage)
-
-    localStorage.setItem('language', newLanguage)
+    LanguageService.set(newLanguage)
     closeModal()
   }
 
@@ -31,10 +31,14 @@ export function ChangeLanguageModal () {
         <CloseModalButton />
 
         <h2 className='text-center font-poppins-semibold text-[clamp(20px,7vw,60px)] bg-clip-text text-transparent bg-orange-gradient'>
-          {dictionary.change} {dictionary.language}
+          {dictionary.changeLanguage}
         </h2>
 
-        <Select onInput={handleChangeNewLanguage} defaultValue={language}>
+        <Select
+          title={dictionary.changeLanguage}
+          onInput={handleChangeNewLanguage}
+          defaultValue={language}
+        >
           <Languages />
         </Select>
 

@@ -4,9 +4,9 @@ import { Modal } from '../Modal'
 import { CommentCreator } from './CommentCreator'
 
 export function CommentModal () {
-  const { visibleModal, dictionary } = useSettings()
+  const { activeModal, dictionary } = useSettings()
 
-  if (typeof visibleModal.data !== 'object' || !('postId' in visibleModal.data))
+  if (typeof activeModal.data !== 'object' || !('postId' in activeModal.data))
     return
 
 

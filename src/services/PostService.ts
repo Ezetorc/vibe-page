@@ -1,38 +1,34 @@
 import { getAdaptedPost } from '../adapters/getAdaptedPost'
 import { Post } from '../models/Post'
 import { PostEndpoint } from '../models/PostEndpoint'
-import { api } from '../constants/SETTINGS'
 import { LikeService } from './LikeService'
+import { VIBE } from '../constants/VIBE'
 
 export class PostService {
-  static async create (args: {
+  static async create (params: {
     userId: number
     content: string
   }): Promise<Post | null> {
-    const response = await api.post<PostEndpoint>({
+    const response = await VIBE.post<PostEndpoint>({
       endpoint: 'posts',
-      body: JSON.stringify({ user_id: args.userId, content: args.content })
+      body: JSON.stringify({ content: params.content })
     })
-
-    console.log("create response: ", response)
 
     if (!response.success) return null
 
     const post = getAdaptedPost({ postEndpoint: response.value! })
 
-    console.log("adapted post: ", post)
-
     return post
   }
 
-  static async delete (args: { postId: number }): Promise<number> {
-    const response = await api.delete<boolean>({
-      endpoint: `posts/id?id=${args.postId}`
+  static async delete (params: { postId: number }): Promise<number> {
+    const response = await VIBE.delete<boolean>({
+      endpoint: `posts/${params.postId}`
     })
 
     if (!response.success) return -1
 
-    const postLikes = await LikeService.getAllOfPost({ postId: args.postId })
+    const postLikes = await LikeService.getAllOfPost({ postId: params.postId })
 
     if (!postLikes) return -1
 
@@ -40,22 +36,22 @@ export class PostService {
 
     await Promise.all(likesIds.map(likeId => LikeService.delete({ likeId })))
 
-    return args.postId
+    return params.postId
   }
 
   static async getAll (
-    args: {
+    params: {
       amount?: number
       page?: number
       userId?: number
     } = {}
   ): Promise<Post[]> {
-    const endpoint = args.userId
-      ? `posts/all?amount=${args.amount ?? 6}&page=${args.page ?? 1}&userId=${
-          args.userId
+    const endpoint = params.userId
+      ? `posts/?amount=${params.amount ?? 6}&page=${params.page ?? 1}&userId=${
+          params.userId
         }`
-      : `posts/all?amount=${args.amount ?? 6}&page=${args.page ?? 1}`
-    const response = await api.get<PostEndpoint[]>({ endpoint })
+      : `posts/?amount=${params.amount ?? 6}&page=${params.page ?? 1}`
+    const response = await VIBE.get<PostEndpoint[]>({ endpoint })
 
     if (!response.value) return []
 
@@ -66,9 +62,21 @@ export class PostService {
     return posts
   }
 
-  static async getById (args: { postId: number }): Promise<Post | null> {
-    const response = await api.get<PostEndpoint>({
-      endpoint: `posts/id?id=${args.postId}`
+  static async getAmountOfUser (params: { userId: number }): Promise<number> {
+    const response = await VIBE.get<number>({
+      endpoint: `posts/count?userId=${params.userId}`
+    })
+
+    if (response.success) {
+      return response.value!
+    } else {
+      return -1
+    }
+  }
+
+  static async getById (params: { postId: number }): Promise<Post | null> {
+    const response = await VIBE.get<PostEndpoint>({
+      endpoint: `posts/${params.postId}`
     })
 
     if (!response.success) return null
@@ -78,10 +86,20 @@ export class PostService {
     return post
   }
 
-  static async search (args: { query: string }): Promise<Post[]> {
-    const response = await api.get<PostEndpoint[]>({
-      endpoint: `posts/search?query=${args.query}`
-    })
+  static async search (params: {
+    query: string
+    userId?: number
+    amount?: number
+    page?: number
+  }): Promise<Post[]> {
+    const endpoint = params.userId
+      ? `posts/search/${params.query}?userId=${params.userId}&amount=${
+          params.amount ?? 6
+        }&page=${params.page ?? 1}`
+      : `posts/search/${params.query}?amount=${params.amount ?? 6}&page=${
+          params.page ?? 1
+        }`
+    const response = await VIBE.get<PostEndpoint[]>({ endpoint })
 
     if (!response.success) return []
 

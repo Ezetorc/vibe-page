@@ -1,10 +1,8 @@
 import { CommentData } from './../models/CommentData'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { UserService } from '../services/UserService'
 import { useUser } from './useUser'
 import { useSettings } from './useSettings'
 import { Comment } from '../models/Comment'
-import { useCallback } from 'react'
 
 export function useCommentData (comment: Comment) {
   const { user } = useUser()
@@ -12,62 +10,33 @@ export function useCommentData (comment: Comment) {
   const queryClient = useQueryClient()
   const queryKey = ['commentData', comment.id]
 
-  const fetchCommentData = useCallback(async () => {
-    const [newCommentUser, newLikes, newUserLiked] = await Promise.all([
-      UserService.getById({ userId: comment.userId }),
-      comment.getLikesAmount(),
-      user?.hasLikedComment({ commentId: comment.id })
-    ])
-
-    return new CommentData({
-      user: newCommentUser,
-      likes: newLikes,
-      userLiked: newUserLiked,
-      id: comment.id,
-      date: comment.getDate(),
-      content: comment.content
-    })
-  }, [comment, user])
-
   const query = useQuery({
     queryKey,
-    queryFn: () => fetchCommentData(),
+    queryFn: () => CommentData.getFromComment({ comment, loggedUser: user }),
     enabled: comment.id >= 0
   })
 
   const likeMutation = useMutation({
     mutationFn: () => user!.likeComment({ commentId: comment.id }),
     onMutate: () => {
-      queryClient.setQueryData(
-        queryKey,
-        (oldCommentData: CommentData | undefined) => {
-          if (!oldCommentData) return oldCommentData
+      queryClient.setQueryData(queryKey, (prevCommentData?: CommentData) => {
+        if (!prevCommentData) return prevCommentData
 
-          const updatedCommentData = new CommentData({
-            ...oldCommentData,
-            likes: (oldCommentData.likes ?? 0) + 1,
-            userLiked: true
-          })
-
-          return updatedCommentData
-        }
-      )
+        return prevCommentData.update({
+          likes: (prevCommentData.likes ?? 0) + 1,
+          userLiked: true
+        })
+      })
     },
     onError: () => {
-      queryClient.setQueryData(
-        queryKey,
-        (oldCommentData: CommentData | undefined) => {
-          if (!oldCommentData) return oldCommentData
+      queryClient.setQueryData(queryKey, (prevCommentData?: CommentData) => {
+        if (!prevCommentData) return prevCommentData
 
-          const updatedCommentData = new CommentData({
-            ...oldCommentData,
-            likes: (oldCommentData.likes ?? 0) - 1,
-            userLiked: false
-          })
-
-          return updatedCommentData
-        }
-      )
+        return prevCommentData.update({
+          likes: (prevCommentData.likes ?? 0) - 1,
+          userLiked: false
+        })
+      })
 
       openModal('connection')
     }
@@ -78,32 +47,26 @@ export function useCommentData (comment: Comment) {
     onMutate: () => {
       queryClient.setQueryData(
         queryKey,
-        (oldCommentData: CommentData | undefined) => {
-          if (!oldCommentData) return oldCommentData
+        (prevCommentData: CommentData | undefined) => {
+          if (!prevCommentData) return prevCommentData
 
-          const updatedCommentData = new CommentData({
-            ...oldCommentData,
-            likes: (oldCommentData.likes ?? 0) - 1,
+          return prevCommentData.update({
+            likes: (prevCommentData.likes ?? 0) - 1,
             userLiked: false
           })
-
-          return updatedCommentData
         }
       )
     },
     onError: () => {
       queryClient.setQueryData(
         queryKey,
-        (oldCommentData: CommentData | undefined) => {
-          if (!oldCommentData) return oldCommentData
+        (prevCommentData: CommentData | undefined) => {
+          if (!prevCommentData) return prevCommentData
 
-          const updatedCommentData = new CommentData({
-            ...oldCommentData,
-            likes: (oldCommentData.likes ?? 0) + 1,
+          return prevCommentData.update({
+            likes: (prevCommentData.likes ?? 0) + 1,
             userLiked: true
           })
-
-          return updatedCommentData
         }
       )
 

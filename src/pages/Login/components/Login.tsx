@@ -8,6 +8,8 @@ import { useUser } from '../../../hooks/useUser'
 import { useSettings } from '../../../hooks/useSettings'
 import { Section } from '../../../components/Section'
 import { UserService } from '../../../services/UserService'
+import { Nav } from '../../../components/Nav'
+import { PATHS } from '../../../constants/PATHS'
 
 export default function Login () {
   const { dictionary, openModal } = useSettings()
@@ -22,6 +24,7 @@ export default function Login () {
   const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target
 
+    setErrorMessage(null)
     setFormData(prev => ({ ...prev, [name]: value }))
   }
 
@@ -60,12 +63,11 @@ export default function Login () {
 
     if (logSuccess) {
       const sessionSuccess = await handleSession()
-      console.log("sessionSuccess: ", sessionSuccess)
 
       setIsLoading(false)
 
       if (sessionSuccess) {
-        navigate('/account/me')
+        navigate(PATHS.accountSection)
       } else {
         openModal('connection')
       }
@@ -122,6 +124,8 @@ export default function Login () {
       <Link to='/register' className='text-verdigris underline'>
         {dictionary.iDontHaveAnAccount}
       </Link>
+
+      <Nav />
     </Section>
   )
 }

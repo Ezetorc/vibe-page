@@ -1,7 +1,6 @@
 import { Button } from '../../../components/Button'
 import { useState } from 'react'
 import { Modal } from '../../../components/Modal'
-import { cloudinary } from '../../../constants/SETTINGS'
 import { useSettings } from '../../../hooks/useSettings'
 import { useUser } from '../../../hooks/useUser'
 import { User } from '../../../models/User'
@@ -9,6 +8,7 @@ import { ImageCropper } from './ImageCropper'
 import { useQueryClient } from '@tanstack/react-query'
 import { UserData } from '../models/UserData'
 import { PostData } from '../../../models/PostData'
+import { CLOUDINARY } from '../../../constants/CLOUDINARY'
 
 export function CropImageModal () {
   const queryClient = useQueryClient()
@@ -19,12 +19,11 @@ export function CropImageModal () {
 
   const updateCache = (newPublicId: string, newSecureUrl: string) => {
     queryClient.setQueryData(
-      ['userData', 'me'],
+      ['userData', user?.id],
       (prevUserData: UserData | null) => {
         if (!prevUserData) return prevUserData
 
-        return new UserData({
-          ...prevUserData,
+        return prevUserData.update({
           imageId: newPublicId,
           imageUrl: newSecureUrl
         })
@@ -36,23 +35,18 @@ export function CropImageModal () {
       (prevPostData: PostData) => {
         if (!prevPostData || !prevPostData.user) return prevPostData
 
-        const newUser = new User({
-          id: prevPostData.user.id,
-          name: prevPostData.user.name,
-          email: prevPostData.user.email,
-          password: prevPostData.user.password,
-          description: prevPostData.user.description,
-          createdAt: prevPostData.user.createdAt,
-          imageId: newPublicId,
-          imageUrl: newSecureUrl
+        return prevPostData.update({
+          user: new User({
+            id: prevPostData.user.id,
+            name: prevPostData.user.name,
+            email: prevPostData.user.email,
+            password: prevPostData.user.password,
+            description: prevPostData.user.description,
+            createdAt: prevPostData.user.createdAt,
+            imageId: newPublicId,
+            imageUrl: newSecureUrl
+          })
         })
-
-        const newPostData = new PostData({
-          ...prevPostData,
-          user: newUser
-        })
-
-        return newPostData
       }
     )
   }
@@ -64,18 +58,25 @@ export function CropImageModal () {
 
     try {
       const { secure_url: newSecureUrl, public_id: newPublicId } =
-        await cloudinary.upload({
+        await CLOUDINARY.upload({
           file: croppedImage,
           preset: 'profile_images'
         })
 
-      await saveImageToDatabase(newSecureUrl, newPublicId)
+      await user.saveImage(newSecureUrl, newPublicId)
 
       const newUser = new User({
-        ...user,
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        password: user.password,
+        description: user.description,
+        createdAt: user.createdAt,
         imageId: newPublicId,
         imageUrl: newSecureUrl
       })
+
+      console.log("newUser: ", newUser)
 
       updateCache(newPublicId, newSecureUrl)
       setUser(newUser)
@@ -85,14 +86,6 @@ export function CropImageModal () {
     } finally {
       setIsLoading(false)
     }
-  }
-
-  const saveImageToDatabase = async (imageUrl: string, publicId: string) => {
-    if (!user) return
-
-    await cloudinary.deleteImage({ publicId: user.imageId! })
-    await user.changeImageUrl({ newImageUrl: imageUrl })
-    await user.changeImageId({ newImageId: publicId })
   }
 
   return (

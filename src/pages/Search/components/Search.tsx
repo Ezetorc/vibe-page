@@ -4,7 +4,6 @@ import { SearchBar } from '../../../components/SearchBar'
 import { useSettings } from '../../../hooks/useSettings'
 import { Section } from '../../../components/Section'
 import { ToSearchButton } from './ToSearchButton'
-import { getInMinus } from '../../../utilities/getInMinus'
 import { SearchPosts } from './SearchPosts'
 import { SearchUsers } from './SearchUsers'
 import { ToSearch } from '../models/ToSearch'
@@ -42,9 +41,9 @@ export default function Search () {
 
       <SearchBar
         onSearch={handleSearch}
-        placeholder={`${dictionary.search} ${getInMinus(
-          dictionary[toSearch]
-        )}...`}
+        placeholder={`${dictionary.search} ${dictionary[
+          toSearch
+        ]?.toLowerCase()}...`}
       />
 
       {toSearch === 'posts' ? (

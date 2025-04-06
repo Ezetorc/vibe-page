@@ -1,3 +1,5 @@
+import { UserService } from '../services/UserService'
+import { Comment } from './Comment'
 import { User } from './User'
 
 export class CommentData {
@@ -24,6 +26,37 @@ export class CommentData {
     this.userLiked = props.userLiked ?? null
     this.id = props.id ?? null
     this.content = props.content ?? null
+  }
+
+  static async getFromComment (params: {
+    comment: Comment
+    loggedUser: User | null
+  }): Promise<CommentData> {
+    const [newCommentUser, newLikes, newUserLiked] = await Promise.all([
+      UserService.getById({ userId: params.comment.userId }),
+      params.comment.getLikesAmount(),
+      params.loggedUser?.hasLikedComment({ commentId: params.comment.id })
+    ])
+
+    return new CommentData({
+      user: newCommentUser,
+      likes: newLikes,
+      userLiked: newUserLiked,
+      id: params.comment.id,
+      date: params.comment.getDate(),
+      content: params.comment.content
+    })
+  }
+
+  public update (properties: Partial<CommentData>): CommentData {
+    return new CommentData({
+      user: properties.user ?? this.user,
+      likes: properties.likes ?? this.likes,
+      date: properties.date ?? this.date,
+      userLiked: properties.userLiked ?? this.userLiked,
+      id: properties.id ?? this.id,
+      content: properties.content ?? this.content
+    })
   }
 
   static get default () {

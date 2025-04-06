@@ -1,65 +1,22 @@
-import { EditButton } from './EditButton'
-import { CheckIcon, PencilIcon } from '../../../components/Icons'
 import { useSettings } from '../../../hooks/useSettings'
-import { EditState } from '../models/EditState'
 import { UserData } from '../models/UserData'
 
-export function AccountDescription (props: {
-  userData: UserData
-  edit: EditState
-}) {
+export function AccountDescription (props: { userData: UserData }) {
   const { dictionary } = useSettings()
 
   return (
     <div
-      className={`gap-x-[10px] justify-center w-full h-full grid ${
-        props.userData.isLogged ? 'grid-cols-[auto_1fr]' : 'grid-cols-[1fr]'
-      }`}
+      className={`gap-x-[10px] justify-center w-full h-fit`}
     >
-      {props.edit.field === 'description' ? (
-        <>
-          <EditButton onEdit={props.edit.handle}>
-            <CheckIcon />
-          </EditButton>
-          <textarea
-            minLength={0}
-            maxLength={200}
-            className='mobile:w-full desktop:w-[90%] bg-transparent h-[160px] placeholder:text-caribbean-current resize-none outline-hidden break-words text-white text-[clamp(5px,6vw,20px)] font-poppins-regular'
-            onChange={event =>
-              props.edit.set({
-                field: 'description',
-                value: event.target.value
-              })
-            }
-            placeholder={dictionary.myNewDescription}
-            defaultValue={props.userData.description ?? ''}
-          />
-        </>
-      ) : (
-        <>
-          {props.userData.isLogged && (
-            <EditButton
-              onEdit={() =>
-                props.edit.set({
-                  field: 'description',
-                  value: props.userData.description ?? ''
-                })
-              }
-            >
-              <PencilIcon />
-            </EditButton>
-          )}
-          <p className='h-[clamp(160px,auto,320px)] mobile:w-full desktop:w-[90%] text-white text-[clamp(5px,6vw,20px)] font-poppins-regular break-words whitespace-pre-wrap overflow-hidden overflow-wrap-anywhere'>
-            {props.userData.description ?? (
-              <span className='text-caribbean-current'>
-                {props.userData.isLogged
-                  ? dictionary.youDontHaveDescription
-                  : dictionary.thisUserHasnotDescription}
-              </span>
-            )}
-          </p>
-        </>
-      )}
+      <p className='h-[clamp(160px,auto,320px)] text-center w-full text-white text-[clamp(5px,6vw,20px)]  break-words whitespace-pre-wrap overflow-hidden overflow-wrap-anywhere'>
+        {props.userData.description ?? (
+          <span className='text-caribbean-current'>
+            {props.userData.isLogged
+              ? dictionary.youDontHaveDescription
+              : dictionary.thisUserHasnotDescription}
+          </span>
+        )}
+      </p>
     </div>
   )
 }

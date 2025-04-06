@@ -13,7 +13,7 @@ export function PostComments (props: {
   deleteComment: (commentId: number) => void
 }) {
   const { dictionary, openModal } = useSettings()
-  const { user } = useUser()
+  const { isSessionActive } = useUser()
 
   const handleCommentCreated = useCallback(
     async (event: NewCommentEvent) => {
@@ -39,7 +39,7 @@ export function PostComments (props: {
   }, [handleCommentCreated])
 
   const handleCreateComment = () => {
-    if (!user) {
+    if (!isSessionActive()) {
       openModal('session')
       return
     }

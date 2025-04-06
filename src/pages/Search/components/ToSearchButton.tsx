@@ -1,8 +1,13 @@
 import clsx from 'clsx'
-import { ToSearchButtonProps } from '../models/ToSearchButtonProps'
 import { useSettings } from '../../../hooks/useSettings'
+import { MouseEventHandler } from 'react'
+import { ToSearch } from '../models/ToSearch'
 
-export function ToSearchButton (props: ToSearchButtonProps) {
+export function ToSearchButton (props: {
+  onClick: MouseEventHandler<HTMLButtonElement>
+  type: ToSearch
+  toSearch: ToSearch
+}) {
   const { dictionary } = useSettings()
 
   return (

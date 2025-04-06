@@ -1,6 +1,6 @@
+import { Modal } from './Modal'
 import { Dictionaries } from './Dictionaries'
 import { Language } from './Language'
-import { ModalName } from './ModalName'
 
 export interface SettingsStore {
   dictionaries: Dictionaries | null
@@ -9,12 +9,6 @@ export interface SettingsStore {
   language: Language
   setLanguage: (newLanguage: Language) => void
 
-  visibleModal: {
-    name: ModalName | null
-    data?: object | undefined
-  }
-  setVisibleModal: (newVisibleModal: {
-    name: ModalName | null
-    data?: object | undefined
-  }) => void
+  activeModal: Modal
+  setActiveModal: (newActiveModal: Modal) => void
 }

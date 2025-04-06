@@ -6,10 +6,6 @@ import { CloseModalButton } from './CloseModalButton'
 export function ConnectionModal () {
   const { dictionary } = useSettings()
 
-  const handleRefresh = () => {
-    location.reload()
-  }
-
   return (
     <Modal>
       <article className='p-[clamp(10px,5%,20px)] relative gap-y-[clamp(20px,50%,40px)] flex flex-col rounded-vibe bg-caribbean-current w-[clamp(300px,70%,1000px)] h-fit'>
@@ -19,11 +15,11 @@ export function ConnectionModal () {
           {dictionary.connectionError}
         </h2>
 
-        <span className='text-center font-poppins-regular text-[clamp(20px,7vw,40px)]  '>
+        <span className='text-center  text-[clamp(20px,7vw,40px)]  '>
           {dictionary.solveConnectionError}
         </span>
 
-        <Button onClick={handleRefresh} text={dictionary.refreshPage} />
+        <Button onClick={location.reload} text={dictionary.refreshPage} />
       </article>
     </Modal>
   )

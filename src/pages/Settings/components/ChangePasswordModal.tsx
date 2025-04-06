@@ -1,4 +1,4 @@
-import { useRef } from 'react'
+import { useRef, useState } from 'react'
 import { Button } from '../../../components/Button'
 import { FormInput } from '../../../components/FormInput'
 import { Modal } from '../../../components/Modal'
@@ -11,10 +11,15 @@ export function ChangePasswordModal () {
   const { user } = useUser()
   const { validatePasswords, errorMessage } = useValidation()
   const { openModal, closeModal, dictionary } = useSettings()
+  const [isLoading, setIsLoading] = useState<boolean>(false)
   const newPasswordRef = useRef<HTMLInputElement>(null)
   const confirmedNewPasswordRef = useRef<HTMLInputElement>(null)
 
   const handleChangePassword = async () => {
+    if (isLoading) return
+
+    setIsLoading(true)
+
     const newPassword = newPasswordRef.current?.value
     const confirmedNewPassword = confirmedNewPasswordRef.current?.value
     const isNewPasswordValid = validatePasswords({
@@ -22,7 +27,10 @@ export function ChangePasswordModal () {
       confirmedPassword: confirmedNewPassword
     })
 
-    if (!isNewPasswordValid || !user || !newPassword) return
+    if (!isNewPasswordValid || !user || !newPassword) {
+      setIsLoading(false)
+      return
+    }
 
     const passwordChangeSuccess = await user.changePassword({ newPassword })
 
@@ -31,6 +39,8 @@ export function ChangePasswordModal () {
     } else {
       openModal('connection')
     }
+
+    setIsLoading(false)
   }
 
   return (
@@ -39,7 +49,7 @@ export function ChangePasswordModal () {
         <CloseModalButton />
 
         <h2 className='text-center font-poppins-semibold text-[clamp(20px,7vw,60px)] bg-clip-text text-transparent bg-orange-gradient'>
-          {dictionary.change} {dictionary.password}
+          {dictionary.changePassword}
         </h2>
 
         <FormInput
@@ -61,7 +71,11 @@ export function ChangePasswordModal () {
 
         {errorMessage && <p className='text-red-500'>{errorMessage}</p>}
 
-        <Button text={dictionary.change} onClick={handleChangePassword} />
+        <Button
+          disabled={isLoading}
+          text={dictionary.change}
+          onClick={handleChangePassword}
+        />
       </article>
     </Modal>
   )

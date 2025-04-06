@@ -1,4 +1,4 @@
-import { useRef } from 'react'
+import { useRef, useState } from 'react'
 import { Button } from '../../../components/Button'
 import { FormInput } from '../../../components/FormInput'
 import { Modal } from '../../../components/Modal'
@@ -11,14 +11,21 @@ export function ChangeEmailModal () {
   const { user } = useUser()
   const { validateEmail, errorMessage } = useValidation()
   const { openModal, closeModal, dictionary } = useSettings()
-
+  const [isLoading, setIsLoading] = useState<boolean>(false)
   const newEmailRef = useRef<HTMLInputElement>(null)
 
   const handleChangeEmail = async () => {
+    if (isLoading) return
+
+    setIsLoading(true)
+
     const newEmail: string | undefined = newEmailRef.current?.value
     const isNewEmailValid: boolean = await validateEmail({ email: newEmail })
 
-    if (newEmail === undefined || !user || !isNewEmailValid) return
+    if (newEmail === undefined || !user || !isNewEmailValid) {
+      setIsLoading(false)
+      return
+    }
 
     const emailChangeSuccess = await user.changeEmail({ newEmail })
 
@@ -27,6 +34,8 @@ export function ChangeEmailModal () {
     } else {
       openModal('connection')
     }
+
+    setIsLoading(false)
   }
 
   return (
@@ -35,7 +44,7 @@ export function ChangeEmailModal () {
         <CloseModalButton />
 
         <h2 className='text-center font-poppins-semibold text-[clamp(20px,7vw,60px)] bg-clip-text text-transparent bg-orange-gradient'>
-          {dictionary.change} {dictionary.email}
+          {dictionary.changeEmail}
         </h2>
 
         <FormInput
@@ -49,7 +58,11 @@ export function ChangeEmailModal () {
 
         {errorMessage && <p className='text-red-500'>{errorMessage}</p>}
 
-        <Button text={dictionary.change} onClick={handleChangeEmail} />
+        <Button
+          disabled={isLoading}
+          text={dictionary.change}
+          onClick={handleChangeEmail}
+        />
       </article>
     </Modal>
   )

@@ -1,23 +1,5 @@
-import { IconProps } from '../models/Props/IconProps'
-
-export function ShareIcon () {
-  return (
-    <svg
-      className='w-6 h-6'
-      aria-hidden='true'
-      width='24'
-      height='24'
-      fill='none'
-      viewBox='0 0 24 24'
-    >
-      <path
-        stroke='#63B5B1'
-        strokeLinecap='round'
-        strokeWidth='2'
-        d='M7.926 10.898 15 7.727m-7.074 5.39L15 16.29M8 12a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0Zm12 5.5a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0Zm0-11a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0Z'
-      />
-    </svg>
-  )
+interface IconProps {
+  filled?: boolean
 }
 
 export function CommentIcon (props: IconProps) {
@@ -196,48 +178,6 @@ export function SettingsIcon (props: IconProps) {
         strokeWidth='1.5'
         strokeLinecap='round'
         strokeLinejoin='round'
-      />
-    </svg>
-  )
-}
-
-export function PencilIcon () {
-  return (
-    <svg
-      className='w-6 h-6 text-[#2C6B6C] scale-110'
-      aria-hidden='true'
-      width='24'
-      height='24'
-      fill='none'
-      viewBox='0 0 24 24'
-    >
-      <path
-        stroke='currentColor'
-        strokeLinecap='round'
-        strokeLinejoin='round'
-        strokeWidth='2'
-        d='M10.779 17.779 4.36 19.918 6.5 13.5m4.279 4.279 8.364-8.643a3.027 3.027 0 0 0-2.14-5.165 3.03 3.03 0 0 0-2.14.886L6.5 13.5m4.279 4.279L6.499 13.5m2.14 2.14 6.213-6.504M12.75 7.04 17 11.28'
-      />
-    </svg>
-  )
-}
-
-export function CheckIcon () {
-  return (
-    <svg
-      className='w-6 h-6 text-[#2C6B6C] scale-110'
-      aria-hidden='true'
-      width='24'
-      height='24'
-      fill='none'
-      viewBox='0 0 24 24'
-    >
-      <path
-        stroke='currentColor'
-        strokeLinecap='round'
-        strokeLinejoin='round'
-        strokeWidth='2'
-        d='M5 11.917 9.724 16.5 19 7.5'
       />
     </svg>
   )

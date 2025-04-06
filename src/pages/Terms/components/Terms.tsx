@@ -4,13 +4,14 @@ import remarkGfm from 'remark-gfm'
 import { useSettings } from '../../../hooks/useSettings'
 import { Section } from '../../../components/Section'
 import { Nav } from '../../../components/Nav'
+import { PATHS } from '../../../constants/PATHS'
 
 export default function MarkdownRenderer () {
   const { language } = useSettings()
   const [content, setContent] = useState('')
 
   useEffect(() => {
-    const fileName = `/terms[${language}].md`
+    const fileName = PATHS.termsFile(language)
 
     fetch(fileName)
       .then(res => res.text())

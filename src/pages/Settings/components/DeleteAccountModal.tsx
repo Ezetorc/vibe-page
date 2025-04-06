@@ -7,6 +7,7 @@ import { useValidation } from '../../../hooks/useValidation'
 import { useRef } from 'react'
 import { UserService } from '../../../services/UserService'
 import { useNavigate } from 'react-router'
+import { PATHS } from '../../../constants/PATHS'
 
 export function DeleteAccountModal () {
   const { errorMessage, setErrorMessage } = useValidation()
@@ -35,7 +36,7 @@ export function DeleteAccountModal () {
 
     if (deleteSuccess >= 0) {
       closeModal()
-      navigate('/')
+      navigate(PATHS.homeSection)
     } else {
       openModal('connection')
     }

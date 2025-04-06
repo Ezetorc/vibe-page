@@ -3,86 +3,53 @@ import { Button } from '../../../components/Button'
 import { Nav } from '../../../components/Nav'
 import { Section } from '../../../components/Section'
 import { useSettings } from '../../../hooks/useSettings'
-import { useUser } from '../../../hooks/useUser'
 import { SettingsSection } from './SettingsSection'
+import { SettingsButton } from './SettingsButton'
+import { PATHS } from '../../../constants/PATHS'
 
 export default function Settings () {
   const navigate = useNavigate()
-  const { isSessionActive } = useUser()
-  const { openModal, dictionary } = useSettings()
-
-  const handleChangeEmail = () => {
-    if (!isSessionActive()) {
-      openModal('session')
-      return
-    }
-
-    openModal('email')
-  }
-
-  const handleChangePassword = () => {
-    if (!isSessionActive()) {
-      openModal('session')
-      return
-    }
-
-    openModal('password')
-  }
-
-  const handleChangeLanguage = () => {
-    openModal('language')
-  }
-
-  const handleLogout = () => {
-    if (!isSessionActive()) {
-      openModal('session')
-      return
-    }
-
-    openModal('logout')
-  }
-
-  const handleDeleteAccount = () => {
-    if (!isSessionActive()) {
-      openModal('session')
-      return
-    }
-
-    openModal('deleteAccount')
-  }
-
-  const handleSeeTerms = () => {
-    navigate('/terms')
-  }
+  const { dictionary } = useSettings()
 
   return (
     <Section>
       <SettingsSection name={dictionary.account}>
-        <Button
-          text={`${dictionary.change} ${dictionary.password}`}
-          onClick={handleChangePassword}
-        />
-        <Button
-          text={`${dictionary.change} ${dictionary.email}`}
-          onClick={handleChangeEmail}
-        />
-        <Button text={`${dictionary.logout}`} onClick={handleLogout} />
-        <Button
-          classname='bg-red-500 hover:text-red-500'
-          text={`${dictionary.deleteAccount}`}
-          onClick={handleDeleteAccount}
-        />
+        <SettingsButton modal='name' needsSession>
+          {dictionary.changeName}
+        </SettingsButton>
+
+        <SettingsButton modal='description' needsSession>
+          {dictionary.changeDescription}
+        </SettingsButton>
+
+        <SettingsButton modal='email' needsSession>
+          {dictionary.changeEmail}
+        </SettingsButton>
+
+        <SettingsButton modal='password' needsSession>
+          {dictionary.changePassword}
+        </SettingsButton>
+
+        <SettingsButton modal='logout' needsSession>
+          {dictionary.logout}
+        </SettingsButton>
+
+        <SettingsButton modal='deleteAccount' needsSession dangerous>
+          {dictionary.deleteAccount}
+        </SettingsButton>
       </SettingsSection>
 
       <SettingsSection name={dictionary.display}>
-        <Button
-          text={`${dictionary.change} ${dictionary.language}`}
-          onClick={handleChangeLanguage}
-        />
+        <SettingsButton modal='language'>
+          {dictionary.changeLanguage}
+        </SettingsButton>
       </SettingsSection>
 
       <SettingsSection name={dictionary.policy}>
-        <Button text={`${dictionary.seeTerms}`} onClick={handleSeeTerms} />
+        <Button
+          text={dictionary.seeTerms}
+          onClick={() => navigate(PATHS.termsSection)}
+        />
       </SettingsSection>
 
       <Nav />

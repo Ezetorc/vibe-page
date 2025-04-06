@@ -1,39 +1,29 @@
 import { getAdaptedUser } from '../adapters/getAdaptedUser'
 import { User } from '../models/User'
 import { UserEndpoint } from '../models/UserEndpoint'
-import { api, cloudinary } from '../constants/SETTINGS'
-import { Session } from '../models/Session'
+import { VIBE } from '../constants/VIBE'
+import { SessionService } from './SessionService'
+import { Post } from '../models/Post'
+import { Comment } from '../models/Comment'
 
 export class UserService {
-  static async getByName (args: { name: string }): Promise<User | null> {
-    const response = await api.get<UserEndpoint>({
-      endpoint: `users/name?name=${args.name}`
-    })
-
-    if (!response.success) return null
-
-    const user: User = getAdaptedUser({ userEndpoint: response.value! })
-
-    return user
-  }
-
-  static async delete (args: {
+  static async delete (params: {
     userId: number
     imageId: string | null | undefined
   }): Promise<number> {
-    const response = await api.delete<boolean>({
-      endpoint: `users?id=${args.userId}`
+    const response = await VIBE.delete<boolean>({
+      endpoint: `users`
     })
 
     if (response.success) {
-      if (!args.imageId) return args.userId
+      if (!params.imageId) return params.userId
 
-      const deleteSuccess = await cloudinary.deleteImage({
-        publicId: args.imageId
+      const deleteSuccess = await this.deleteImage({
+        publicId: params.imageId
       })
 
       if (deleteSuccess) {
-        return args.userId
+        return params.userId
       } else {
         return -1
       }
@@ -42,9 +32,9 @@ export class UserService {
     }
   }
 
-  static async getById (args: { userId: number }): Promise<User | null> {
-    const response = await api.get<UserEndpoint>({
-      endpoint: `users/id?id=${args.userId}`
+  static async getById (params: { userId: number }): Promise<User | null> {
+    const response = await VIBE.get<UserEndpoint>({
+      endpoint: `users/${params.userId}`
     })
 
     if (!response.success) return null
@@ -54,18 +44,18 @@ export class UserService {
     return user
   }
 
-  static async register (args: {
+  static async register (params: {
     name: string
     email: string
     password: string
   }): Promise<boolean> {
-    const response = await api.post({
+    const response = await VIBE.post({
       endpoint: `users/register`,
       formatToJson: false,
       body: JSON.stringify({
-        name: args.name,
-        email: args.email,
-        password: args.password
+        name: params.name,
+        email: params.email,
+        password: params.password
       })
     })
 
@@ -73,7 +63,7 @@ export class UserService {
       const authorizationHeader = response.headers.get('Authorization')
 
       if (authorizationHeader) {
-        Session.set(authorizationHeader.split(' ')[1])
+        SessionService.set(authorizationHeader.split(' ')[1])
       }
 
       return true
@@ -82,40 +72,38 @@ export class UserService {
     }
   }
 
-  static async login (args: {
+  static async login (params: {
     name: string
     password: string
   }): Promise<boolean> {
-    const response = await api.post({
+    const response = await VIBE.post({
       endpoint: `users/login`,
-      body: JSON.stringify({ name: args.name, password: args.password }),
+      body: JSON.stringify({ name: params.name, password: params.password }),
       formatToJson: false
     })
 
-    console.log("login: ", response)
-
     if (response.ok) {
       const authorizationHeader = response.headers.get('Authorization')
-      console.log("authorizationHeader: ", authorizationHeader)
 
       if (authorizationHeader) {
-        Session.set(authorizationHeader.split(' ')[1])
+        SessionService.set(authorizationHeader.split(' ')[1])
+        return true
+      } else {
+        return false
       }
-
-      return true
     } else {
       return false
     }
   }
 
   static async getAll (
-    args: {
+    params: {
       amount?: number
       page?: number
     } = {}
   ): Promise<User[]> {
-    const response = await api.get<UserEndpoint[]>({
-      endpoint: `users/all?amount=${args.amount ?? 6}&page=${args.page ?? 1}`
+    const response = await VIBE.get<UserEndpoint[]>({
+      endpoint: `users?amount=${params.amount ?? 6}&page=${params.page ?? 1}`
     })
 
     if (!response.success) return []
@@ -127,25 +115,31 @@ export class UserService {
     return users
   }
 
-  static async emailExists (args: { email: string }): Promise<boolean | null> {
-    const response = await api.get<boolean>({
-      endpoint: `users/exists?email=${args.email}`
+  static async emailExists (params: { email: string }): Promise<boolean | null> {
+    const response = await VIBE.get<boolean>({
+      endpoint: `users/exists?email=${params.email}`
     })
 
     return response.value
   }
 
-  static async nameExists (args: { name: string }): Promise<boolean | null> {
-    const response = await api.get<boolean>({
-      endpoint: `users/exists?name=${args.name}`
+  static async nameExists (params: { name: string }): Promise<boolean | null> {
+    const response = await VIBE.get<boolean>({
+      endpoint: `users/exists?name=${params.name}`
     })
 
     return response.value
   }
 
-  static async search (args: { query: string }): Promise<User[]> {
-    const response = await api.get<UserEndpoint[]>({
-      endpoint: `users/search?query=${encodeURIComponent(args.query)}`
+  static async search (params: {
+    query: string
+    amount?: number
+    page?: number
+  }): Promise<User[]> {
+    const response = await VIBE.get<UserEndpoint[]>({
+      endpoint: `users/search/${params.query}?amount=${
+        params.amount ?? 6
+      }&page=${params.page ?? 1}`
     })
 
     if (!response.success) return []
@@ -155,5 +149,54 @@ export class UserService {
     )
 
     return users
+  }
+
+  static async hasLikedPost (params: {
+    userId: User['id']
+    postId: Post['id']
+  }): Promise<boolean> {
+    const response = await VIBE.get<boolean>({
+      endpoint: `users/${params.userId}/liked?type=post&targetId=${params.postId}`
+    })
+
+    return Boolean(response.value)
+  }
+
+  static async hasLikedComment (params: {
+    userId: User['id']
+    commentId: Comment['id']
+  }): Promise<boolean> {
+    const response = await VIBE.get<boolean>({
+      endpoint: `users/${params.userId}/liked?type=comment&targetId=${params.commentId}`
+    })
+
+    return Boolean(response.value)
+  }
+
+  static async update (params: {
+    body: object
+    onSuccess: (updatedUser: User) => void
+  }): Promise<boolean> {
+    const response = await VIBE.patch<UserEndpoint>({
+      endpoint: `users`,
+      body: JSON.stringify(params.body)
+    })
+
+    if (!response.success) return false
+
+    const updatedUser = getAdaptedUser({ userEndpoint: response.value })
+
+    params.onSuccess(updatedUser)
+    return true
+  }
+
+  static async deleteImage (params: { publicId: string }): Promise<boolean> {
+    console.log('publicId: ', params.publicId)
+
+    const response = await VIBE.delete<boolean>({
+      endpoint: `users/image/${params.publicId}`
+    })
+
+    return response.success
   }
 }

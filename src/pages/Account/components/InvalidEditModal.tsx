@@ -3,7 +3,7 @@ import { Modal } from '../../../components/Modal'
 import { useSettings } from '../../../hooks/useSettings'
 
 export function InvalidEditModal () {
-  const { visibleModal, dictionary } = useSettings()
+  const { activeModal, dictionary } = useSettings()
 
   return (
     <Modal>
@@ -14,11 +14,11 @@ export function InvalidEditModal () {
           {dictionary.errorDuringAccountEditing}
         </h2>
 
-        <span className='text-center font-poppins-regular text-[clamp(20px,7vw,40px)]  '>
-          {'data' in visibleModal &&
-          typeof visibleModal.data === 'object' &&
-          'message' in visibleModal.data
-            ? String(visibleModal.data.message)
+        <span className='text-center  text-[clamp(20px,7vw,40px)]  '>
+          {'data' in activeModal &&
+          typeof activeModal.data === 'object' &&
+          'message' in activeModal.data
+            ? String(activeModal.data.message)
             : 'Error'}
         </span>
       </article>

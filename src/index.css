@@ -15,9 +15,9 @@
   --breakpoint-desktop: 720px;
 
   --radius-vibe: 5px;
+  --radius-user-image: 20%;
 
   --font-poppins-light: poppins-light;
-  --font-poppins-regular: poppins-regular;
   --font-poppins-semibold: poppins-semibold;
 
   --background-image-orange-gradient: linear-gradient(
@@ -39,17 +39,17 @@
 
 @font-face {
   font-family: 'poppins-light';
-  src: url('./assets/fonts/poppins_light.ttf') format('truetype');
+  src: url('/fonts/poppins_light.ttf') format('truetype');
 }
 
 @font-face {
   font-family: 'poppins-regular';
-  src: url('./assets/fonts/poppins_regular.ttf') format('truetype');
+  src: url('/fonts/poppins_regular.ttf') format('truetype');
 }
 
 @font-face {
   font-family: 'poppins-semibold';
-  src: url('./assets/fonts/poppins_semibold.ttf') format('truetype');
+  src: url('/fonts/poppins_semibold.ttf') format('truetype');
 }
 
 .animate-shimmer {
@@ -75,7 +75,7 @@
 }
 
 :root {
-  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  font-family: 'poppins-regular';
   line-height: 1.5;
   font-weight: 400;
 
