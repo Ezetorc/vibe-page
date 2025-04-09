@@ -1,4 +1,4 @@
-import { User } from '../models/User'
+import { User } from '../../../models/User'
 import { UserDisplay } from './UserDisplay'
 
 export function UsersDisplay (props: { users: User[] | null }) {

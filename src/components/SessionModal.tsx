@@ -1,13 +1,13 @@
-import { useNavigate } from 'react-router'
 import { Button } from './Button'
 import { Modal } from './Modal'
 import { useSettings } from '../hooks/useSettings'
 import { CloseModalButton } from './CloseModalButton'
 import { PATHS } from '../constants/PATHS'
+import { useLocation } from 'wouter'
 
-export function SessionModal () {
+export default function SessionModal () {
   const { closeModal, dictionary } = useSettings()
-  const navigate = useNavigate()
+  const [, navigate] = useLocation()
 
   const handleLogin = () => {
     navigate(PATHS.loginSection)

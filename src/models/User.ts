@@ -1,4 +1,3 @@
-import { format } from '@formkit/tempo'
 import { Post } from './Post'
 import { PostService } from '../services/PostService'
 import { LikeService } from '../services/LikeService'
@@ -16,18 +15,12 @@ export class User {
   public imageId: string | null
   public imageUrl: string | null
   public description: string
-  public createdAt: string
+  public date: string
+  public postsAmount: number
+  public followersAmount: number
+  public followingAmount: number
 
-  constructor ({
-    id,
-    name,
-    email,
-    password,
-    imageUrl,
-    imageId,
-    description,
-    createdAt
-  }: {
+  constructor (props: {
     id: number
     name: string
     email: string
@@ -35,24 +28,46 @@ export class User {
     imageId: string | null
     imageUrl: string | null
     description: string
-    createdAt: string
+    date: string
+    postsAmount: number
+    followersAmount: number
+    followingAmount: number
   }) {
-    this.id = id
-    this.name = name
-    this.email = email
-    this.password = password
-    this.imageId = imageId
-    this.imageUrl = imageUrl
-    this.description = description
-    this.createdAt = createdAt
+    this.id = props.id
+    this.name = props.name
+    this.email = props.email
+    this.password = props.password
+    this.imageId = props.imageId
+    this.imageUrl = props.imageUrl
+    this.description = props.description
+    this.date = props.date
+    this.postsAmount = props.postsAmount
+    this.followersAmount = props.followersAmount
+    this.followingAmount = props.followingAmount
   }
 
-  public isOwnerOfPost (params: { postUserId: User['id'] }): boolean {
-    return this.id === params.postUserId
+  public isOwnerOfPost (params: { post: Post }): boolean {
+    return this.id === params.post.user.id
   }
 
   public isOwnerOfComment (params: { comment: Comment }): boolean {
-    return this.id === params.comment.userId
+    return this.id === params.comment.user.id
+  }
+
+  public update (properties: Partial<User>): User {
+    return new User({
+      id: properties.id ?? this.id,
+      email: properties.email ?? this.email,
+      password: properties.password ?? this.password,
+      name: properties.name ?? this.name,
+      imageId: properties.imageId ?? this.imageId,
+      imageUrl: properties.imageUrl ?? this.imageUrl,
+      description: properties.description ?? this.description,
+      date: properties.date ?? this.date,
+      postsAmount: properties.postsAmount ?? this.postsAmount,
+      followersAmount: properties.followersAmount ?? this.followersAmount,
+      followingAmount: properties.followingAmount ?? this.followingAmount
+    })
   }
 
   public async follow (params: { userId: User['id'] }): Promise<boolean> {
@@ -95,21 +110,12 @@ export class User {
   }
 
   public async saveImage (imageUrl: string | null, publicId: string | null) {
-    console.log('saveImage: ', imageUrl, publicId)
-
     if (this.imageId) {
       await UserService.deleteImage({ publicId: this.imageId })
     }
 
     await this.changeImageUrl({ newImageUrl: imageUrl })
     await this.changeImageId({ newImageId: publicId })
-  }
-
-  public getDate (): string {
-    const parsedDate: Date = new Date(this.createdAt.replace(' ', 'T'))
-    const formattedDate: string = format(parsedDate, 'DD/MM/YYYY')
-
-    return formattedDate
   }
 
   public async changeName (params: { newName: User['name'] }): Promise<boolean> {
@@ -166,25 +172,17 @@ export class User {
     })
   }
 
-  public async getPosts (params: { page?: number } = {}): Promise<Post[]> {
+  public async getPosts (params: {
+    page?: number
+    loggedUser: User | null
+  }): Promise<Post[]> {
     const posts = await PostService.getAll({
       page: params.page ?? 1,
-      userId: this.id
+      userId: this.id,
+      loggedUser: params.loggedUser
     })
 
     return posts
-  }
-
-  public async getPostsAmount (): Promise<number> {
-    return await PostService.getAmountOfUser({ userId: this.id })
-  }
-
-  public async getFollowersAmount (): Promise<number> {
-    return await FollowService.getFollowersAmount({ userId: this.id })
-  }
-
-  public async getFollowingAmount (): Promise<number> {
-    return await FollowService.getFollowingAmount({ userId: this.id })
   }
 
   public async getFollowers (): Promise<User[]> {
@@ -221,8 +219,12 @@ export class User {
   public async dislikePost (params: {
     postId: number
     signal?: AbortSignal
+    loggedUser: User | null
   }): Promise<boolean> {
-    const post = await PostService.getById({ postId: params.postId })
+    const post = await PostService.getById({
+      postId: params.postId,
+      loggedUser: params.loggedUser
+    })
 
     if (!post) return false
 
@@ -254,8 +256,14 @@ export class User {
     return response
   }
 
-  public async dislikeComment (params: { commentId: number }): Promise<boolean> {
-    const post = await CommentService.getById({ commentId: params.commentId })
+  public async dislikeComment (params: {
+    commentId: number
+    loggedUser: User | null
+  }): Promise<boolean> {
+    const post = await CommentService.getById({
+      commentId: params.commentId,
+      loggedUser: params.loggedUser
+    })
 
     if (!post) return false
 
@@ -274,11 +282,13 @@ export class User {
   public async searchPosts (params: {
     query: string
     page: number
+    loggedUser: User | null
   }): Promise<Post[]> {
     return await PostService.search({
       query: params.query,
       userId: this.id,
-      page: params.page
+      page: params.page,
+      loggedUser: params.loggedUser
     })
   }
 }

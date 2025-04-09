@@ -1,14 +1,14 @@
 import { useState } from 'react'
 import { Button } from '../../../components/Button'
 import { Modal } from '../../../components/Modal'
-import { Select } from '../../../components/Select'
+import { Select } from './Select'
 import { useSettings } from '../../../hooks/useSettings'
 import { Language } from '../../../models/Language'
 import { Languages } from './Languages'
 import { CloseModalButton } from '../../../components/CloseModalButton'
 import { LanguageService } from '../../../services/LanguageService'
 
-export function ChangeLanguageModal () {
+export default function ChangeLanguageModal () {
   const { closeModal, language, setLanguage, dictionary } = useSettings()
   const [newLanguage, setNewLanguage] = useState<Language>(language)
 

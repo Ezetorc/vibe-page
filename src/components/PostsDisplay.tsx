@@ -1,4 +1,4 @@
-import { Post } from '../../models/Post'
+import { Post } from '../models/Post'
 import { PostDisplay } from './PostDisplay'
 
 export function PostsDisplay ({

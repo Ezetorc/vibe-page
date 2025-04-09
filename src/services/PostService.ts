@@ -3,11 +3,13 @@ import { Post } from '../models/Post'
 import { PostEndpoint } from '../models/PostEndpoint'
 import { LikeService } from './LikeService'
 import { VIBE } from '../constants/VIBE'
+import { User } from '../models/User'
 
 export class PostService {
   static async create (params: {
     userId: number
     content: string
+    loggedUser: User | null
   }): Promise<Post | null> {
     const response = await VIBE.post<PostEndpoint>({
       endpoint: 'posts',
@@ -16,7 +18,10 @@ export class PostService {
 
     if (!response.success) return null
 
-    const post = getAdaptedPost({ postEndpoint: response.value! })
+    const post = getAdaptedPost({
+      postEndpoint: response.value!,
+      loggedUser: params.loggedUser
+    })
 
     return post
   }
@@ -39,13 +44,12 @@ export class PostService {
     return params.postId
   }
 
-  static async getAll (
-    params: {
-      amount?: number
-      page?: number
-      userId?: number
-    } = {}
-  ): Promise<Post[]> {
+  static async getAll (params: {
+    loggedUser: User | null
+    amount?: number
+    page?: number
+    userId?: number
+  }): Promise<Post[]> {
     const endpoint = params.userId
       ? `posts/?amount=${params.amount ?? 6}&page=${params.page ?? 1}&userId=${
           params.userId
@@ -55,8 +59,10 @@ export class PostService {
 
     if (!response.value) return []
 
-    const posts = response.value.map(postEndpoint =>
-      getAdaptedPost({ postEndpoint })
+    const posts = await Promise.all(
+      response.value.map(postEndpoint =>
+        getAdaptedPost({ postEndpoint, loggedUser: params.loggedUser })
+      )
     )
 
     return posts
@@ -74,20 +80,27 @@ export class PostService {
     }
   }
 
-  static async getById (params: { postId: number }): Promise<Post | null> {
+  static async getById (params: {
+    postId: number
+    loggedUser: User | null
+  }): Promise<Post | null> {
     const response = await VIBE.get<PostEndpoint>({
       endpoint: `posts/${params.postId}`
     })
 
     if (!response.success) return null
 
-    const post = getAdaptedPost({ postEndpoint: response.value! })
+    const post = await getAdaptedPost({
+      postEndpoint: response.value!,
+      loggedUser: params.loggedUser
+    })
 
     return post
   }
 
   static async search (params: {
     query: string
+    loggedUser: User | null
     userId?: number
     amount?: number
     page?: number
@@ -103,8 +116,10 @@ export class PostService {
 
     if (!response.success) return []
 
-    const posts = response.value!.map(postEndpoint =>
-      getAdaptedPost({ postEndpoint })
+    const posts = await Promise.all(
+      response.value.map(postEndpoint =>
+        getAdaptedPost({ postEndpoint, loggedUser: params.loggedUser })
+      )
     )
 
     return posts

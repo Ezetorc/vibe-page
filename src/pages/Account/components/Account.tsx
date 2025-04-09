@@ -6,15 +6,13 @@ import { AccountDescription } from './AccountDescription'
 import { AccountDate } from './AccountDate'
 import { AccountInteractions } from './AccountInteractions'
 import { AccountPicture } from './AccountPicture'
-import { useParams } from 'react-router'
 import { AccountPosts } from './AccountPosts'
 import { AccountInfo } from './AccountInfo'
-import { useUserData } from '../../../hooks/useUserData'
+import { useUser } from '../hooks/useUser'
 
-export default function Account () {
-  const { userId } = useParams<{ userId: string | undefined }>()
+export default function Account (props: { userId?: string | number }) {
   const { dictionary } = useSettings()
-  const { userData, isLoading, isError } = useUserData(userId)
+  const { user, isLoading, isError } = useUser(props.userId)
 
   return (
     <>
@@ -27,18 +25,20 @@ export default function Account () {
           {dictionary.userNotFound}
         </h3>
       ) : (
-        <Section>
-          <article className='gap-y-[10px] flex flex-col items-center w-[clamp(300px,100%,700px)] h-[clamp(400px,auto,600px)] p-[20px] rounded-vibe border-vibe border-caribbean-current overflow-hidden'>
-            <AccountPicture userData={userData} />
-            <AccountName userData={userData} />
-            <AccountDescription userData={userData} />
-            <AccountDate userData={userData} />
-            <AccountInfo userData={userData} />
-            <AccountInteractions userData={userData} />
-          </article>
+        user && (
+          <Section>
+            <article className='gap-y-[10px] flex flex-col items-center w-[clamp(300px,100%,700px)] h-[clamp(400px,auto,600px)] p-[20px] rounded-vibe border-vibe border-caribbean-current overflow-hidden'>
+              <AccountPicture user={user} />
+              <AccountName user={user} />
+              <AccountDescription user={user} />
+              <AccountDate user={user} />
+              <AccountInfo user={user} />
+              <AccountInteractions user={user} />
+            </article>
 
-          <AccountPosts userData={userData} />
-        </Section>
+            <AccountPosts user={user} />
+          </Section>
+        )
       )}
 
       <Nav />

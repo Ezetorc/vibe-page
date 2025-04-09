@@ -2,7 +2,7 @@ import { CloseModalButton } from '../../../components/CloseModalButton'
 import { Modal } from '../../../components/Modal'
 import { useSettings } from '../../../hooks/useSettings'
 
-export function InvalidEditModal () {
+export default function InvalidEditModal () {
   const { activeModal, dictionary } = useSettings()
 
   return (

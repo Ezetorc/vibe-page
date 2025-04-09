@@ -2,18 +2,18 @@ import { Button } from '../../../components/Button'
 import { Modal } from '../../../components/Modal'
 import { CloseModalButton } from '../../../components/CloseModalButton'
 import { useSettings } from '../../../hooks/useSettings'
-import { useUser } from '../../../hooks/useUser'
+import { useLoggedUser } from '../../../hooks/useLoggedUser'
 import { useValidation } from '../../../hooks/useValidation'
 import { useRef } from 'react'
 import { UserService } from '../../../services/UserService'
-import { useNavigate } from 'react-router'
 import { PATHS } from '../../../constants/PATHS'
+import { useLocation } from 'wouter'
 
-export function DeleteAccountModal () {
+export default function DeleteAccountModal () {
   const { errorMessage, setErrorMessage } = useValidation()
-  const { isSessionActive, user } = useUser()
+  const { isSessionActive, loggedUser } = useLoggedUser()
   const { dictionary, openModal, closeModal } = useSettings()
-  const navigate = useNavigate()
+  const [, navigate] = useLocation()
   const irreversibleActionRef = useRef<HTMLInputElement | null>(null)
 
   const handleDeleteAccount = async () => {
@@ -30,8 +30,8 @@ export function DeleteAccountModal () {
     }
 
     const deleteSuccess = await UserService.delete({
-      userId: user!.id,
-      imageId: user?.imageId
+      userId: loggedUser!.id,
+      imageId: loggedUser?.imageId
     })
 
     if (deleteSuccess >= 0) {

@@ -1,10 +1,11 @@
-import { Link } from 'react-router'
 import { useSettings } from '../../../hooks/useSettings'
-import { useUser } from '../../../hooks/useUser'
+import { useLoggedUser } from '../../../hooks/useLoggedUser'
+import { Link } from 'wouter'
+import { PATHS } from '../../../constants/PATHS'
 
 export function FirstPosterMessage () {
   const { dictionary, openModal } = useSettings()
-  const { isSessionActive } = useUser()
+  const { isSessionActive } = useLoggedUser()
 
   const handleClick = (event: React.MouseEvent<HTMLAnchorElement>): void => {
     if (!isSessionActive()) {
@@ -19,7 +20,7 @@ export function FirstPosterMessage () {
       <Link
         onClick={handleClick}
         className='text-verdigris font-poppins-semibold underline'
-        to='/create'
+        to={PATHS.createSection}
       >
         {dictionary.post}
       </Link>

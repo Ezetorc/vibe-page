@@ -1,15 +1,15 @@
 import { LoadSpinner } from '../../../components/LoadSpinner'
-import { UsersDisplay } from '../../../components/UsersDisplay'
+import { UsersDisplay } from './UsersDisplay'
+import { useLoggedUser } from '../../../hooks/useLoggedUser'
 import { useSettings } from '../../../hooks/useSettings'
-import { useUser } from '../../../hooks/useUser'
 import { useUsers } from '../hooks/useUsers'
 
 export function SearchUsers (props: { searchQuery: string | undefined }) {
-  const { user } = useUser()
+  const { loggedUser } = useLoggedUser()
   const { dictionary } = useSettings()
   const { users, ref, hasMore, success } = useUsers(props.searchQuery)
   const filteredUsers = users.filter(
-    paginationUser => paginationUser.id !== user?.id
+    paginationUser => paginationUser.id !== loggedUser?.id
   )
   const isEmpty = filteredUsers.length === 0
 

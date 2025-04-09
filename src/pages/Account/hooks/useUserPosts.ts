@@ -6,27 +6,30 @@ import {
 } from '@tanstack/react-query'
 import { useEffect } from 'react'
 import { useInView } from 'react-intersection-observer'
-import { PostData } from '../../../models/PostData'
 import { PostService } from '../../../services/PostService'
-import { UserData } from '../models/UserData'
 import { Post } from '../../../models/Post'
+import { User } from '../../../models/User'
+import { useLoggedUser } from '../../../hooks/useLoggedUser'
+import { QUERY_KEYS } from '../../../constants/QUERY_KEYS'
 
-export function useUserPosts (userData: UserData, searchQuery?: string) {
+export function useUserPosts (user: User, searchQuery?: string) {
   const queryClient = useQueryClient()
   const view = useInView()
-  const queryKey = ['posts', 'user', userData.id]
+  const { loggedUser } = useLoggedUser()
+  const queryKey = [QUERY_KEYS.Posts, QUERY_KEYS.User, user.id]
   const pagination = useInfiniteQuery({
     queryKey,
     queryFn: async ({ pageParam = 1 }) => {
-      if (!userData.id) return [] as Post[]
+      if (!user.id) return [] as Post[]
 
       if (searchQuery) {
-        return userData.user?.searchPosts({
+        return user.searchPosts({
           query: searchQuery,
-          page: pageParam
+          page: pageParam,
+          loggedUser
         })
       } else {
-        return userData.user?.getPosts({ page: pageParam })
+        return user.getPosts({ page: pageParam, loggedUser })
       }
     },
     initialPageParam: 1,
@@ -37,26 +40,23 @@ export function useUserPosts (userData: UserData, searchQuery?: string) {
   const onDeleteMutationSuccess = (postId: number) => {
     queryClient.setQueryData(
       queryKey,
-      (oldPostsData: InfiniteData<PostData[], unknown> | undefined) => {
-        if (!oldPostsData) return oldPostsData
+      (oldPosts: InfiniteData<Post[], unknown> | undefined) => {
+        if (!oldPosts) return oldPosts
 
         return {
-          ...oldPostsData,
-          pages: oldPostsData.pages.map(posts =>
+          ...oldPosts,
+          pages: oldPosts.pages.map(posts =>
             posts.filter(post => post.id !== postId)
           )
         }
       }
     )
 
-    queryClient.setQueryData(
-      ['userData', userData.id],
-      (prevUserData: UserData | null) => {
-        if (!prevUserData?.postsAmount) return prevUserData
+    queryClient.setQueryData([QUERY_KEYS.User, user.id], (prevUserData?: User) => {
+      if (!prevUserData?.postsAmount) return prevUserData
 
-        return prevUserData.update({ postsAmount: prevUserData.postsAmount - 1 })
-      }
-    )
+      return prevUserData.update({ postsAmount: prevUserData.postsAmount - 1 })
+    })
   }
 
   const deleteMutation = useMutation({

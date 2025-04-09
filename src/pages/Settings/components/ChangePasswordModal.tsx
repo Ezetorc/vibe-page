@@ -3,12 +3,12 @@ import { Button } from '../../../components/Button'
 import { FormInput } from '../../../components/FormInput'
 import { Modal } from '../../../components/Modal'
 import { useSettings } from '../../../hooks/useSettings'
-import { useUser } from '../../../hooks/useUser'
 import { useValidation } from '../../../hooks/useValidation'
 import { CloseModalButton } from '../../../components/CloseModalButton'
+import { useLoggedUser } from '../../../hooks/useLoggedUser'
 
-export function ChangePasswordModal () {
-  const { user } = useUser()
+export default function ChangePasswordModal () {
+  const { loggedUser } = useLoggedUser()
   const { validatePasswords, errorMessage } = useValidation()
   const { openModal, closeModal, dictionary } = useSettings()
   const [isLoading, setIsLoading] = useState<boolean>(false)
@@ -27,12 +27,12 @@ export function ChangePasswordModal () {
       confirmedPassword: confirmedNewPassword
     })
 
-    if (!isNewPasswordValid || !user || !newPassword) {
+    if (!isNewPasswordValid || !loggedUser || !newPassword) {
       setIsLoading(false)
       return
     }
 
-    const passwordChangeSuccess = await user.changePassword({ newPassword })
+    const passwordChangeSuccess = await loggedUser.changePassword({ newPassword })
 
     if (passwordChangeSuccess) {
       closeModal()

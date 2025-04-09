@@ -1,4 +1,3 @@
-import { useNavigate } from 'react-router'
 import { Button } from '../../../components/Button'
 import { Nav } from '../../../components/Nav'
 import { Section } from '../../../components/Section'
@@ -6,9 +5,10 @@ import { useSettings } from '../../../hooks/useSettings'
 import { SettingsSection } from './SettingsSection'
 import { SettingsButton } from './SettingsButton'
 import { PATHS } from '../../../constants/PATHS'
+import { useLocation } from 'wouter'
 
 export default function Settings () {
-  const navigate = useNavigate()
+  const [, navigate] = useLocation()
   const { dictionary } = useSettings()
 
   return (

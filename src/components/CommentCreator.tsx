@@ -1,14 +1,14 @@
 import { useState, useRef, FormEvent } from 'react'
-import { useSettings } from '../../hooks/useSettings'
-import { useUser } from '../../hooks/useUser'
-import { useValidation } from '../../hooks/useValidation'
-import { getRandomNumber } from '../../pages/Create/utilities/getRandomNumber'
-import { Button } from '../Button'
-import eventEmitter from '../../constants/EVENT_EMITTER'
-import { NewCommentEvent } from '../../models/NewCommentEvent'
+import { useSettings } from '../hooks/useSettings'
+import { useValidation } from '../hooks/useValidation'
+import { getRandomNumber } from '../pages/Create/utilities/getRandomNumber'
+import { Button } from './Button'
+import eventEmitter from '../constants/EVENT_EMITTER'
+import { NewCommentEvent } from '../models/NewCommentEvent'
+import { useLoggedUser } from '../hooks/useLoggedUser'
 
 export function CommentCreator () {
-  const { isSessionActive } = useUser()
+  const { isSessionActive } = useLoggedUser()
   const { dictionary, openModal, activeModal } = useSettings()
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const { validateComment, errorMessage, setErrorMessage } = useValidation()

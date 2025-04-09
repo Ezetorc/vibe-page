@@ -3,16 +3,16 @@ import { Button } from '../../../components/Button'
 import { FormInput } from '../../../components/FormInput'
 import { Modal } from '../../../components/Modal'
 import { useSettings } from '../../../hooks/useSettings'
-import { useUser } from '../../../hooks/useUser'
 import { useValidation } from '../../../hooks/useValidation'
 import { CloseModalButton } from '../../../components/CloseModalButton'
 import { useQueryClient } from '@tanstack/react-query'
-import { UserData } from '../../Account/models/UserData'
 import { User } from '../../../models/User'
+import { useLoggedUser } from '../../../hooks/useLoggedUser'
+import { QUERY_KEYS } from '../../../constants/QUERY_KEYS'
 
-export function ChangeNameModal () {
+export default function ChangeNameModal () {
   const queryClient = useQueryClient()
-  const { user, setUser } = useUser()
+  const { loggedUser, setLoggedUser } = useLoggedUser()
   const { validateName, errorMessage } = useValidation()
   const { openModal, closeModal, dictionary } = useSettings()
   const [isLoading, setIsLoading] = useState<boolean>(false)
@@ -25,7 +25,7 @@ export function ChangeNameModal () {
 
     const newName: string | undefined = newNameRef.current?.value
 
-    if (newName === user?.name) {
+    if (newName === loggedUser?.name) {
       closeModal()
       return
     }
@@ -35,35 +35,26 @@ export function ChangeNameModal () {
       unique: true
     })
 
-    if (newName === undefined || !user || !isNewNameValid) {
+    if (newName === undefined || !loggedUser || !isNewNameValid) {
       setIsLoading(false)
       return
     }
 
-    const nameChangeSuccess = await user.changeName({ newName })
+    const nameChangeSuccess = await loggedUser.changeName({ newName })
 
     if (nameChangeSuccess) {
       queryClient.setQueryData(
-        ['userData', user.id],
-        (prevUserData: UserData | null) => {
-          if (!prevUserData) return prevUserData
+        [QUERY_KEYS.User, loggedUser.id],
+        (prevUser?: User) => {
+          if (!prevUser) return prevUser
 
-          return prevUserData.update({ name: newName })
+          return prevUser.update({ name: newName })
         }
       )
 
-      const newUser = new User({
-        id: user.id,
-        name: newName,
-        email: user.email,
-        password: user.password,
-        imageId: user.imageId,
-        imageUrl: user.imageUrl,
-        description: user.description,
-        createdAt: user.createdAt
-      })
+      const newLoggedUser = loggedUser.update({ name: newName })
 
-      setUser(newUser)
+      setLoggedUser(newLoggedUser)
       closeModal()
     } else {
       openModal('connection')

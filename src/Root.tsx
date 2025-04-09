@@ -1,15 +1,14 @@
 import { useState, useEffect, Suspense } from 'react'
-import { HashRouter as Router } from 'react-router'
 import App from './App'
 import { Loading } from './components/Loading'
 import { useSettings } from './hooks/useSettings'
-import { useUser } from './hooks/useUser'
 import eruda from 'eruda'
+import { useLoggedUser } from './hooks/useLoggedUser'
 
 export function Root () {
   const { loadDictionaries, dictionaries } = useSettings()
   const [loading, setLoading] = useState(true)
-  const { handleSession } = useUser()
+  const { handleSession } = useLoggedUser()
 
   useEffect(() => {
     eruda.init()
@@ -31,9 +30,7 @@ export function Root () {
 
   return (
     <Suspense fallback={<Loading />}>
-      <Router>
-        <App />
-      </Router>
+      <App />
     </Suspense>
   )
 }

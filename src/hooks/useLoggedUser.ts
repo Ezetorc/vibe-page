@@ -6,31 +6,34 @@ import { UserService } from '../services/UserService'
 import { SessionItem } from '../models/SessionItem'
 import { SessionService } from '../services/SessionService'
 import { useQueryClient } from '@tanstack/react-query'
+import { QUERY_KEYS } from '../constants/QUERY_KEYS'
 
-export function useUser () {
+export function useLoggedUser () {
   const userStore: UserStore = getUserStore()
   const queryClient = useQueryClient()
-  const { user, setUser } = userStore
+  const { loggedUser, setLoggedUser } = userStore
 
   const updateUser = useCallback(
     async (userId: number): Promise<boolean> => {
-      const newUser = await UserService.getById({ userId })
+      const newLoggedUser = await UserService.getById({ userId })
 
-      if (newUser) {
-        setUser(newUser)
+      if (newLoggedUser) {
+        setLoggedUser(newLoggedUser)
         return true
       } else {
         return false
       }
     },
-    [setUser]
+    [setLoggedUser]
   )
 
   const logout = () => {
-    queryClient.resetQueries({ queryKey: ['userData', user?.id] })
-    queryClient.removeQueries({ queryKey: ['userData', user?.id] })
+    if (!loggedUser) return
+
+    queryClient.resetQueries({ queryKey: [QUERY_KEYS.User, loggedUser.id] })
+    queryClient.removeQueries({ queryKey: [QUERY_KEYS.User, loggedUser.id] })
     SessionService.remove()
-    setUser(null)
+    setLoggedUser(null)
   }
 
   const handleSession = useCallback(async (): Promise<boolean> => {
@@ -44,11 +47,11 @@ export function useUser () {
       if (session.isExpired) {
         SessionService.remove()
         return false
+      } else {
+        const userUpdate = await updateUser(Number(session.userId))
+
+        return userUpdate
       }
-
-      const userUpdate = await updateUser(Number(session.userId))
-
-      return userUpdate
     } catch {
       SessionService.remove()
       return false
@@ -56,7 +59,7 @@ export function useUser () {
   }, [updateUser])
 
   const isSessionActive = (): boolean => {
-    return Boolean(user)
+    return Boolean(loggedUser)
   }
 
   return { ...userStore, isSessionActive, handleSession, updateUser, logout }

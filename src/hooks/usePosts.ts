@@ -6,13 +6,16 @@ import {
   InfiniteData
 } from '@tanstack/react-query'
 import { useInView } from 'react-intersection-observer'
-import { PostData } from '../models/PostData'
 import { PostService } from '../services/PostService'
+import { useLoggedUser } from './useLoggedUser'
+import { Post } from '../models/Post'
+import { QUERY_KEYS } from '../constants/QUERY_KEYS'
 
 export function usePosts (searchQuery?: string) {
   const queryClient = useQueryClient()
   const view = useInView()
-  const queryKey = searchQuery ? ['posts', searchQuery] : ['posts']
+  const { loggedUser } = useLoggedUser()
+  const queryKey = searchQuery ? [QUERY_KEYS.Posts, searchQuery] : [QUERY_KEYS.Posts]
 
   const pagination = useInfiniteQuery({
     queryKey,
@@ -20,10 +23,11 @@ export function usePosts (searchQuery?: string) {
       if (searchQuery) {
         return await PostService.search({
           page: pageParam,
-          query: searchQuery
+          query: searchQuery,
+          loggedUser
         })
       } else {
-        return await PostService.getAll({ page: pageParam })
+        return await PostService.getAll({ page: pageParam, loggedUser })
       }
     },
     initialPageParam: 1,
@@ -36,12 +40,12 @@ export function usePosts (searchQuery?: string) {
     onSuccess: (postId: number) => {
       queryClient.setQueryData(
         queryKey,
-        (oldPostData: InfiniteData<PostData[]>) => {
-          if (!oldPostData) return oldPostData
+        (oldPosts: InfiniteData<Post[]>) => {
+          if (!oldPosts) return oldPosts
 
           return {
-            ...oldPostData,
-            pages: oldPostData.pages.map(posts =>
+            ...oldPosts,
+            pages: oldPosts.pages.map(posts =>
               posts.filter(post => post.id !== postId)
             )
           }

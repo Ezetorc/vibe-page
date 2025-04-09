@@ -1,8 +1,8 @@
 import { UserImage } from '../../../components/UserImage'
 import { useSettings } from '../../../hooks/useSettings'
-import { UserData } from '../models/UserData'
+import { User } from '../../../models/User'
 
-export function AccountPicture (props: { userData: UserData }) {
+export function AccountPicture (props: { user: User }) {
   const { openModal, dictionary } = useSettings()
 
   const handleClick = () => {
@@ -17,7 +17,7 @@ export function AccountPicture (props: { userData: UserData }) {
       <UserImage
         title={dictionary.changeProfileImage}
         className='absolute w-full h-full rounded-none aspect-auto border-none'
-        user={props.userData.user}
+        user={props.user}
       />
     </button>
   )

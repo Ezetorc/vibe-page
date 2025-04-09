@@ -2,10 +2,10 @@ import { Button } from '../../../components/Button'
 import { Modal } from '../../../components/Modal'
 import { CloseModalButton } from '../../../components/CloseModalButton'
 import { useSettings } from '../../../hooks/useSettings'
-import { useUser } from '../../../hooks/useUser'
+import { useLoggedUser } from '../../../hooks/useLoggedUser'
 
-export function LogoutModal () {
-  const { isSessionActive, logout } = useUser()
+export default function LogoutModal () {
+  const { isSessionActive, logout } = useLoggedUser()
   const { dictionary, openModal, closeModal } = useSettings()
 
   const handleLogout = async () => {

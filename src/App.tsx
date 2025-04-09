@@ -1,36 +1,44 @@
-import { Routes, Route } from 'react-router'
+import { Route, Switch } from 'wouter'
 import { lazy } from 'react'
-import { useSettings } from './hooks/useSettings'
-import { MODALS } from './constants/MODALS'
 import { PATHS } from './constants/PATHS'
+import { ModalRenderer } from './components/ModalRenderer.tsx'
 
-const LazyHome = lazy(() => import(PATHS.homeElement))
-const LazyLogin = lazy(() => import(PATHS.loginElement))
-const LazySearch = lazy(() => import(PATHS.searchElement))
-const LazyCreate = lazy(() => import(PATHS.createElement))
-const LazyAccount = lazy(() => import(PATHS.accountElement))
-const LazyTerms = lazy(() => import(PATHS.termsElement))
-const LazySettings = lazy(() => import(PATHS.settingsElement))
-const LazyRegister = lazy(() => import(PATHS.registerElement))
+const LazyHome = lazy(() => import('./pages/Home/components/Home.tsx'))
+const LazyLogin = lazy(() => import('./pages/Login/components/Login.tsx'))
+const LazySearch = lazy(() => import('./pages/Search/components/Search.tsx'))
+const LazyCreate = lazy(() => import('./pages/Create/components/Create.tsx'))
+const LazyAccount = lazy(() => import('./pages/Account/components/Account.tsx'))
+const LazyTerms = lazy(() => import('./pages/Terms/components/Terms.tsx'))
+const LazySettings = lazy(
+  () => import('./pages/Settings/components/Settings.tsx')
+)
+const LazyRegister = lazy(
+  () => import('./pages/Register/components/Register.tsx')
+)
 
 export default function App () {
-  const { activeModal } = useSettings()
-
   return (
     <>
-      {activeModal.name && MODALS[activeModal.name]}
+      <ModalRenderer />
 
-      <Routes>
-        <Route path={PATHS.homeSection} element={<LazyHome />} />
-        <Route path={PATHS.registerSection} element={<LazyRegister />} />
-        <Route path={PATHS.loginSection} element={<LazyLogin />} />
-        <Route path={PATHS.searchSection} element={<LazySearch />} />
-        <Route path={PATHS.createSection} element={<LazyCreate />} />
-        <Route path={PATHS.accountIdSection} element={<LazyAccount />} />
-        <Route path={PATHS.accountSection} element={<LazyAccount />} />
-        <Route path={PATHS.settingsSection} element={<LazySettings />} />
-        <Route path={PATHS.termsSection} element={<LazyTerms />} />
-      </Routes>
+      <Route path={PATHS.homeSection} component={LazyHome} />
+      <Route path={PATHS.registerSection} component={LazyRegister} />
+      <Route path={PATHS.loginSection} component={LazyLogin} />
+      <Route path={PATHS.searchSection} component={LazySearch} />
+      <Route path={PATHS.createSection} component={LazyCreate} />
+      <Route path={PATHS.settingsSection} component={LazySettings} />
+      <Route path={PATHS.termsSection} component={LazyTerms} />
+
+      <Switch>
+        <Route path={PATHS.accountSection}>
+          <LazyAccount />
+        </Route>
+        <Route path={PATHS.accountIdSection}>
+          {(params: { userId?: string }) => (
+            <LazyAccount userId={params.userId} />
+          )}
+        </Route>
+      </Switch>
     </>
   )
 }

@@ -3,7 +3,7 @@ import { useSettings } from '../hooks/useSettings'
 import { Button } from './Button'
 import { CloseModalButton } from './CloseModalButton'
 
-export function ConnectionModal () {
+export default function ConnectionModal () {
   const { dictionary } = useSettings()
 
   return (

@@ -2,18 +2,19 @@ import { FormEvent, useRef, useState } from 'react'
 import { getRandomNumber } from '../utilities/getRandomNumber'
 import { useSettings } from '../../../hooks/useSettings'
 import { Button } from '../../../components/Button'
-import { useNavigate } from 'react-router'
-import { useUser } from '../../../hooks/useUser'
 import { useValidation } from '../../../hooks/useValidation'
 import { PostService } from '../../../services/PostService'
 import { InfiniteData, useQueryClient } from '@tanstack/react-query'
 import { Post } from '../../../models/Post'
-import { UserData } from '../../Account/models/UserData'
 import { PATHS } from '../../../constants/PATHS'
+import { User } from '../../../models/User'
+import { useLoggedUser } from '../../../hooks/useLoggedUser'
+import { QUERY_KEYS } from '../../../constants/QUERY_KEYS'
+import { useLocation } from 'wouter'
 
 export function PostCreator () {
-  const navigate = useNavigate()
-  const { user } = useUser()
+  const [, navigate] = useLocation()
+  const { loggedUser } = useLoggedUser()
   const queryClient = useQueryClient()
   const { dictionary, openModal } = useSettings()
   const { validatePost, errorMessage, setErrorMessage } = useValidation()
@@ -26,7 +27,7 @@ export function PostCreator () {
 
   const updateQueryData = (postCreated: Post | null) => {
     queryClient.setQueriesData(
-      { queryKey: ['posts'] },
+      { queryKey: [QUERY_KEYS.Posts] },
       (data: InfiniteData<Post[]> | undefined) => {
         if (!data) return data
 
@@ -39,11 +40,11 @@ export function PostCreator () {
     )
 
     queryClient.setQueryData(
-      ['userData', user?.id],
-      (prevUserData: UserData) => {
-        if (!prevUserData?.postsAmount) return prevUserData
+      [QUERY_KEYS.User, loggedUser?.id],
+      (prevUser?: User) => {
+        if (!prevUser?.postsAmount) return prevUser
 
-        return prevUserData.update({ postsAmount: prevUserData.postsAmount + 1 })
+        return prevUser.update({ postsAmount: prevUser.postsAmount + 1 })
       }
     )
   }
@@ -53,7 +54,7 @@ export function PostCreator () {
 
     setIsLoading(true)
 
-    if (!user) {
+    if (!loggedUser) {
       openModal('session')
       setIsLoading(false)
       return
@@ -67,8 +68,9 @@ export function PostCreator () {
     }
 
     const postCreated = await PostService.create({
-      userId: user.id,
-      content: postContent
+      userId: loggedUser.id,
+      content: postContent,
+      loggedUser
     })
 
     if (postCreated !== null) {

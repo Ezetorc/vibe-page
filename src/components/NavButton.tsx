@@ -1,6 +1,6 @@
-import { Link, useLocation } from 'react-router'
-import { useUser } from '../hooks/useUser'
+import { Link, useLocation } from 'wouter'
 import { useSettings } from '../hooks/useSettings'
+import { useLoggedUser } from '../hooks/useLoggedUser'
 
 export function NavButton (props: {
   icon: JSX.Element
@@ -8,8 +8,8 @@ export function NavButton (props: {
   needsSession?: boolean
   title: string
 }) {
-  const location = useLocation()
-  const { isSessionActive } = useUser()
+  const [location] = useLocation()
+  const { isSessionActive } = useLoggedUser()
   const { openModal } = useSettings()
 
   const handleClick = (event: React.MouseEvent<HTMLAnchorElement>): void => {
@@ -28,7 +28,7 @@ export function NavButton (props: {
       title={props.title}
       to={props.to}
     >
-      {<props.icon.type filled={location.pathname === props.to} />}
+      {<props.icon.type filled={location === props.to} />}
     </Link>
   )
 }

@@ -1,5 +1,5 @@
 import { Nav } from '../../../components/Nav'
-import { PostsDisplay } from '../../../components/Posts/PostsDisplay'
+import { PostsDisplay } from '../../../components/PostsDisplay'
 import { LoadSpinner } from '../../../components/LoadSpinner'
 import { useSettings } from '../../../hooks/useSettings'
 import { usePosts } from '../../../hooks/usePosts'

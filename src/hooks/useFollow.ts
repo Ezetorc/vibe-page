@@ -1,14 +1,14 @@
 import { useQueryClient, useQuery, useMutation } from '@tanstack/react-query'
-import { UserData } from '../pages/Account/models/UserData'
 import { useSettings } from './useSettings'
-import { useUser } from './useUser'
 import { User } from '../models/User'
+import { useLoggedUser } from './useLoggedUser'
+import { QUERY_KEYS } from '../constants/QUERY_KEYS'
 
 export function useFollow (following: User | null) {
   const queryClient = useQueryClient()
   const { openModal } = useSettings()
-  const { user: follower } = useUser()
-  const queryKey = ['isFollowing', follower?.id, following?.id]
+  const { loggedUser: follower } = useLoggedUser()
+  const queryKey = [QUERY_KEYS.Follow, follower?.id, following?.id]
 
   const isFollowingQuery = useQuery({
     queryKey,
@@ -41,23 +41,23 @@ export function useFollow (following: User | null) {
       queryClient.invalidateQueries({ queryKey })
 
       queryClient.setQueryData(
-        ['userData', follower?.id],
-        (prevUserData?: UserData) => {
-          if (!prevUserData) return prevUserData
+        [QUERY_KEYS.User, follower?.id],
+        (prevUser?: User) => {
+          if (!prevUser) return prevUser
 
-          return prevUserData.update({
-            followingAmount: (prevUserData.followingAmount ?? 0) + 1
+          return prevUser.update({
+            followingAmount: (prevUser.followingAmount ?? 0) + 1
           })
         }
       )
 
       queryClient.setQueryData(
-        ['userData', following?.id],
-        (prevUserData?: UserData) => {
-          if (!prevUserData) return prevUserData
+        [QUERY_KEYS.User, following?.id],
+        (prevUser?: User) => {
+          if (!prevUser) return prevUser
 
-          return prevUserData.update({
-            followersAmount: (prevUserData.followersAmount ?? 0) + 1
+          return prevUser.update({
+            followersAmount: (prevUser.followersAmount ?? 0) + 1
           })
         }
       )
@@ -79,29 +79,23 @@ export function useFollow (following: User | null) {
       queryClient.invalidateQueries({ queryKey })
 
       queryClient.setQueryData(
-        ['userData', follower?.id],
-        (prevUserData?: UserData) => {
-          if (!prevUserData) return prevUserData
+        [QUERY_KEYS.User, follower?.id],
+        (prevUser?: User) => {
+          if (!prevUser) return prevUser
 
-          return prevUserData.update({
-            followingAmount: Math.max(
-              (prevUserData.followingAmount ?? 0) - 1,
-              0
-            )
+          return prevUser.update({
+            followingAmount: Math.max((prevUser.followingAmount ?? 0) - 1, 0)
           })
         }
       )
 
       queryClient.setQueryData(
-        ['userData', following?.id],
-        (prevUserData?: UserData) => {
-          if (!prevUserData) return prevUserData
+        [QUERY_KEYS.User, following?.id],
+        (prevUser?: User) => {
+          if (!prevUser) return prevUser
 
-          return prevUserData.update({
-            followersAmount: Math.max(
-              (prevUserData.followersAmount ?? 0) - 1,
-              0
-            )
+          return prevUser.update({
+            followersAmount: Math.max((prevUser.followersAmount ?? 0) - 1, 0)
           })
         }
       )

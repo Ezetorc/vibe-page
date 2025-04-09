@@ -52,25 +52,18 @@
   src: url('/fonts/poppins_semibold.ttf') format('truetype');
 }
 
-.animate-shimmer {
-  animation: shimmer 1.5s infinite linear;
+.animate-appear-from-top {
+  animation: appear-from-top 0.3s forwards ease-in-out;
 }
 
-.bg-shimmer {
-  background: linear-gradient(
-    90deg,
-    transparent 0%,
-    rgba(255, 255, 255, 0.2) 50%,
-    transparent 100%
-  );
-}
-
-@keyframes shimmer {
+@keyframes appear-from-top {
   0% {
-    transform: translateX(0%);
+    opacity: 0;
+    transform: translateY(-5%);
   }
   100% {
-    transform: translateX(900%);
+    opacity: 1;
+    transform: translateY(0%);
   }
 }
 

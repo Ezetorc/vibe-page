@@ -12,13 +12,5 @@ export const PATHS = {
   accountIdSection: '/account/:userId',
   accountSection: '/account',
   settingsSection: '/settings',
-  termsSection: '/terms',
-  homeElement: './pages/Home/components/Home.tsx',
-  loginElement: './pages/Login/components/Login.tsx',
-  searchElement: './pages/Search/components/Search.tsx',
-  createElement: './pages/Create/components/Create.tsx',
-  accountElement: './pages/Account/components/Account.tsx',
-  termsElement: './pages/Terms/components/Terms.tsx',
-  settingsElement: './pages/Settings/components/Settings.tsx',
-  registerElement: './pages/Register/components/Register.tsx'
+  termsSection: '/terms'
 }

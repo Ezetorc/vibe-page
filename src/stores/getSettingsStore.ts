@@ -9,13 +9,13 @@ import { Modal } from '../models/Modal'
 export const getSettingsStore = create<SettingsStore>(set => ({
   dictionaries: null,
   loadDictionaries: async () => {
-    const data: Dictionaries = await getDictionaries()
+    const dictionaries: Dictionaries = await getDictionaries()
 
-    if (!data) {
-      return false
-    } else {
-      set({ dictionaries: data })
+    if (dictionaries) {
+      set({ dictionaries })
       return true
+    } else {
+      return false
     }
   },
 

@@ -1,15 +1,15 @@
-import { Link, useNavigate } from 'react-router'
 import { useState, useCallback, ChangeEvent } from 'react'
 import { useValidation } from '../../../hooks/useValidation'
 import { FormInput } from '../../../components/FormInput'
 import { WelcomeToVibe } from '../../../components/WelcomeToVibe'
 import { Button } from '../../../components/Button'
-import { useUser } from '../../../hooks/useUser'
 import { useSettings } from '../../../hooks/useSettings'
 import { Section } from '../../../components/Section'
 import { UserService } from '../../../services/UserService'
 import { Nav } from '../../../components/Nav'
 import { PATHS } from '../../../constants/PATHS'
+import { useLoggedUser } from '../../../hooks/useLoggedUser'
+import { Link, useLocation } from 'wouter'
 
 export default function Register () {
   const {
@@ -21,8 +21,8 @@ export default function Register () {
     validateAgreeWithTerms
   } = useValidation()
   const { dictionary } = useSettings()
-  const { handleSession } = useUser()
-  const navigate = useNavigate()
+  const { handleSession } = useLoggedUser()
+  const [, navigate] = useLocation()
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const [formData, setFormData] = useState({
     name: '',
@@ -172,7 +172,7 @@ export default function Register () {
           <label className='font-poppins-light' htmlFor='agree-with-terms'>
             {dictionary.iAgreeWith}{' '}
             <Link
-              to='/terms'
+              to={PATHS.termsSection}
               className='border-b-2 border-b-white hover:border-b-orange-crayola hover:text-orange-crayola'
             >
               {dictionary.termsAndConditions}
@@ -191,7 +191,7 @@ export default function Register () {
         />
       </form>
 
-      <Link to='/login' className='text-verdigris underline'>
+      <Link to={PATHS.loginSection} className='text-verdigris underline'>
         {dictionary.iHaveAnAccount}
       </Link>
 

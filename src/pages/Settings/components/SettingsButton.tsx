@@ -1,6 +1,6 @@
 import { Button } from '../../../components/Button'
 import { useSettings } from '../../../hooks/useSettings'
-import { useUser } from '../../../hooks/useUser'
+import { useLoggedUser } from '../../../hooks/useLoggedUser'
 import { ReactNode, useCallback } from 'react'
 import { ModalName } from '../../../models/ModalName'
 
@@ -12,7 +12,7 @@ export function SettingsButton (props: {
   dangerous?: boolean
 }) {
   const { openModal } = useSettings()
-  const { isSessionActive } = useUser()
+  const { isSessionActive } = useLoggedUser()
 
   const handleClick = useCallback(() => {
     openModal(

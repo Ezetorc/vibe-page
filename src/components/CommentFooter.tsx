@@ -1,17 +1,15 @@
 import { useState } from 'react'
-import { LikeIcon } from '../Icons'
-import { useSettings } from '../../hooks/useSettings'
-import { useUser } from '../../hooks/useUser'
-import { CommentData } from '../../models/CommentData'
+import { LikeIcon } from './Icons'
+import { useSettings } from '../hooks/useSettings'
+import { useLoggedUser } from '../hooks/useLoggedUser'
+import { Comment } from '../models/Comment'
+import { useLike } from '../hooks/useLike'
 
-export function CommentFooter (props: {
-  commentData: CommentData
-  likeComment: () => void
-  dislikeComment: () => void
-}) {
+export function CommentFooter (props: { comment: Comment }) {
   const { dictionary, openModal } = useSettings()
   const [loading, setLoading] = useState<boolean>(false)
-  const { isSessionActive } = useUser()
+  const { isSessionActive } = useLoggedUser()
+  const { like, dislike } = useLike(props.comment)
 
   const handleLike = async () => {
     if (!isSessionActive()) {
@@ -22,10 +20,10 @@ export function CommentFooter (props: {
     setLoading(true)
 
     try {
-      if (props.commentData.userLiked === true) {
-        props.dislikeComment()
-      } else if (props.commentData.userLiked === false) {
-        props.likeComment()
+      if (props.comment.userLiked === true) {
+        dislike()
+      } else if (props.comment.userLiked === false) {
+        like()
       }
     } finally {
       setLoading(false)
@@ -41,12 +39,12 @@ export function CommentFooter (props: {
           disabled={loading}
           title='Like'
         >
-          <LikeIcon filled={props.commentData.userLiked ?? false} />
+          <LikeIcon filled={props.comment.userLiked ?? false} />
         </button>
         <span className='text-verdigris font-poppins-semibold'>
-          {props.commentData.likes === null
+          {props.comment.likes === null
             ? dictionary.loading
-            : props.commentData.likes}
+            : props.comment.likes}
         </span>
       </div>
     </footer>

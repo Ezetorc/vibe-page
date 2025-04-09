@@ -3,10 +3,10 @@ import { Slider } from '@mui/material'
 import { getCroppedImage } from '../utilities/getCroppedImage'
 import { useEffect, useState } from 'react'
 import { useSettings } from '../../../hooks/useSettings'
-import { useUser } from '../../../hooks/useUser'
+import { useLoggedUser } from '../../../hooks/useLoggedUser'
 
 export function ImageCropper (props: { onCropComplete: (file: File) => void }) {
-  const { user } = useUser()
+  const { loggedUser } = useLoggedUser()
   const { activeModal } = useSettings()
   const [crop, setCrop] = useState<Point>({ x: 0, y: 0 })
   const [zoom, setZoom] = useState<number>(1)
@@ -32,7 +32,7 @@ export function ImageCropper (props: { onCropComplete: (file: File) => void }) {
     const file = await getCroppedImage(
       newImage,
       croppedAreaPixels,
-      String(user?.id)
+      String(loggedUser?.id)
     )
 
     if (file) {

@@ -1,9 +1,9 @@
-import { useSettings } from '../../hooks/useSettings'
-import { CloseModalButton } from '../CloseModalButton'
-import { Modal } from '../Modal'
+import { useSettings } from '../hooks/useSettings'
+import { CloseModalButton } from './CloseModalButton'
+import { Modal } from './Modal'
 import { CommentCreator } from './CommentCreator'
 
-export function CommentModal () {
+export default function CommentModal () {
   const { activeModal, dictionary } = useSettings()
 
   if (typeof activeModal.data !== 'object' || !('postId' in activeModal.data))

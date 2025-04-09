@@ -2,23 +2,22 @@ import { FormInput } from '../../../components/FormInput'
 import { useState, useCallback, ChangeEvent } from 'react'
 import { useValidation } from '../../../hooks/useValidation'
 import { WelcomeToVibe } from '../../../components/WelcomeToVibe'
-import { Link, useNavigate } from 'react-router'
 import { Button } from '../../../components/Button'
-import { useUser } from '../../../hooks/useUser'
 import { useSettings } from '../../../hooks/useSettings'
 import { Section } from '../../../components/Section'
 import { UserService } from '../../../services/UserService'
 import { Nav } from '../../../components/Nav'
 import { PATHS } from '../../../constants/PATHS'
+import { useLoggedUser } from '../../../hooks/useLoggedUser'
+import { Link, useLocation } from 'wouter'
 
 export default function Login () {
   const { dictionary, openModal } = useSettings()
   const { errorMessage, validateName, validatePassword, setErrorMessage } =
     useValidation()
   const [isLoading, setIsLoading] = useState<boolean>(false)
-  const { handleSession } = useUser()
-  const navigate = useNavigate()
-
+  const { handleSession } = useLoggedUser()
+  const [, navigate] = useLocation()
   const [formData, setFormData] = useState({ name: '', password: '' })
 
   const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -121,7 +120,7 @@ export default function Login () {
         />
       </form>
 
-      <Link to='/register' className='text-verdigris underline'>
+      <Link to={PATHS.registerSection} className='text-verdigris underline'>
         {dictionary.iDontHaveAnAccount}
       </Link>
 

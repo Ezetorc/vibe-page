@@ -1,11 +1,11 @@
 import { Button } from './Button'
 import { useSettings } from '../hooks/useSettings'
 import { useFollow } from '../hooks/useFollow'
-import { useUser } from '../hooks/useUser'
 import { User } from '../models/User'
+import { useLoggedUser } from '../hooks/useLoggedUser'
 
 export function FollowButton (props: { following: User | null }) {
-  const { isSessionActive } = useUser()
+  const { isSessionActive } = useLoggedUser()
   const { dictionary, openModal } = useSettings()
   const { isFollowing, follow, unfollow } = useFollow(props.following)
 

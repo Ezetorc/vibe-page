@@ -3,12 +3,12 @@ import { Button } from '../../../components/Button'
 import { FormInput } from '../../../components/FormInput'
 import { Modal } from '../../../components/Modal'
 import { useSettings } from '../../../hooks/useSettings'
-import { useUser } from '../../../hooks/useUser'
 import { useValidation } from '../../../hooks/useValidation'
 import { CloseModalButton } from '../../../components/CloseModalButton'
+import { useLoggedUser } from '../../../hooks/useLoggedUser'
 
-export function ChangeEmailModal () {
-  const { user } = useUser()
+export default function ChangeEmailModal () {
+  const { loggedUser } = useLoggedUser()
   const { validateEmail, errorMessage } = useValidation()
   const { openModal, closeModal, dictionary } = useSettings()
   const [isLoading, setIsLoading] = useState<boolean>(false)
@@ -22,12 +22,12 @@ export function ChangeEmailModal () {
     const newEmail: string | undefined = newEmailRef.current?.value
     const isNewEmailValid: boolean = await validateEmail({ email: newEmail })
 
-    if (newEmail === undefined || !user || !isNewEmailValid) {
+    if (newEmail === undefined || !loggedUser || !isNewEmailValid) {
       setIsLoading(false)
       return
     }
 
-    const emailChangeSuccess = await user.changeEmail({ newEmail })
+    const emailChangeSuccess = await loggedUser.changeEmail({ newEmail })
 
     if (emailChangeSuccess) {
       closeModal()

@@ -2,14 +2,13 @@ import { Button } from '../../../components/Button'
 import { CloseModalButton } from '../../../components/CloseModalButton'
 import { Modal } from '../../../components/Modal'
 import { ChangeEvent } from 'react'
-import { useUser } from '../../../hooks/useUser'
-import { User } from '../../../models/User'
 import { useSettings } from '../../../hooks/useSettings'
 import { UserImage } from '../../../components/UserImage'
 import { PATHS } from '../../../constants/PATHS'
+import { useLoggedUser } from '../../../hooks/useLoggedUser'
 
-export function ChangePictureModal () {
-  const { user, isSessionActive, setUser } = useUser()
+export default function ChangePictureModal () {
+  const { loggedUser, isSessionActive, setLoggedUser } = useLoggedUser()
   const { openModal, dictionary, closeModal } = useSettings()
 
   if (!isSessionActive()) return
@@ -23,23 +22,14 @@ export function ChangePictureModal () {
   }
 
   const handleRemoveImage = async () => {
-    if (!user) return
+    if (!loggedUser) return
 
     try {
-      user.saveImage(null, null)
+      loggedUser.saveImage(null, null)
 
-      const newUser = new User({
-        id: user.id,
-        name: user.name,
-        email: user.email,
-        password: user.password,
-        description: user.description,
-        createdAt: user.createdAt,
-        imageId: null,
-        imageUrl: null
-      })
+      const newLoggedUser = loggedUser.update({ imageId: null, imageUrl: null })
 
-      setUser(newUser)
+      setLoggedUser(newLoggedUser)
       closeModal()
     } catch {
       openModal('connection')
@@ -59,7 +49,7 @@ export function ChangePictureModal () {
           <div className='flex flex-col justify-center gap-y-[30px] items-center'>
             <UserImage
               className='border-verdigris desktop:w-[clamp(40px,30vw,300px)] mobile:w-[clamp(40px,30vw,90px)]'
-              user={user}
+              user={loggedUser}
             />
 
             <label className='cursor-pointer text-center hover:bg-white hover:text-orange-crayola p-[10px] w-full h-[50px] bg-orange-crayola  rounded-vibe flex items-center justify-center'>
@@ -73,7 +63,7 @@ export function ChangePictureModal () {
             </label>
           </div>
 
-          {user!.imageUrl && (
+          {loggedUser!.imageUrl && (
             <div className='flex flex-col justify-center gap-y-[30px] items-center'>
               <UserImage
                 className='border-verdigris desktop:w-[clamp(40px,30vw,300px)] mobile:w-[clamp(40px,30vw,90px)]'

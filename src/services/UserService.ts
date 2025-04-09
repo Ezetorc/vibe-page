@@ -39,7 +39,7 @@ export class UserService {
 
     if (!response.success) return null
 
-    const user: User = getAdaptedUser({ userEndpoint: response.value! })
+    const user: User = await getAdaptedUser({ userEndpoint: response.value! })
 
     return user
   }
@@ -108,8 +108,8 @@ export class UserService {
 
     if (!response.success) return []
 
-    const users: User[] = response.value!.map(userEndpoint =>
-      getAdaptedUser({ userEndpoint })
+    const users: User[] = await Promise.all(
+      response.value.map(userEndpoint => getAdaptedUser({ userEndpoint }))
     )
 
     return users
@@ -144,8 +144,8 @@ export class UserService {
 
     if (!response.success) return []
 
-    const users: User[] = response.value!.map(userEndpoint =>
-      getAdaptedUser({ userEndpoint })
+    const users: User[] = await Promise.all(
+      response.value.map(userEndpoint => getAdaptedUser({ userEndpoint }))
     )
 
     return users
@@ -184,15 +184,13 @@ export class UserService {
 
     if (!response.success) return false
 
-    const updatedUser = getAdaptedUser({ userEndpoint: response.value })
+    const updatedUser = await getAdaptedUser({ userEndpoint: response.value })
 
     params.onSuccess(updatedUser)
     return true
   }
 
   static async deleteImage (params: { publicId: string }): Promise<boolean> {
-    console.log('publicId: ', params.publicId)
-
     const response = await VIBE.delete<boolean>({
       endpoint: `users/image/${params.publicId}`
     })

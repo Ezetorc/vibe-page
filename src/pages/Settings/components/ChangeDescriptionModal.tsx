@@ -3,16 +3,16 @@ import { Button } from '../../../components/Button'
 import { FormInput } from '../../../components/FormInput'
 import { Modal } from '../../../components/Modal'
 import { useSettings } from '../../../hooks/useSettings'
-import { useUser } from '../../../hooks/useUser'
 import { useValidation } from '../../../hooks/useValidation'
 import { CloseModalButton } from '../../../components/CloseModalButton'
 import { useQueryClient } from '@tanstack/react-query'
-import { UserData } from '../../Account/models/UserData'
 import { User } from '../../../models/User'
+import { useLoggedUser } from '../../../hooks/useLoggedUser'
+import { QUERY_KEYS } from '../../../constants/QUERY_KEYS'
 
-export function ChangeDescriptionModal () {
+export default function ChangeDescriptionModal () {
   const queryClient = useQueryClient()
-  const { user, setUser } = useUser()
+  const { loggedUser, setLoggedUser } = useLoggedUser()
   const { validateDescription, errorMessage } = useValidation()
   const { openModal, closeModal, dictionary } = useSettings()
   const [isLoading, setIsLoading] = useState<boolean>(false)
@@ -27,7 +27,7 @@ export function ChangeDescriptionModal () {
 
     if (
       newDescription &&
-      newDescription.trim() !== user?.description?.trim() &&
+      newDescription.trim() !== loggedUser?.description?.trim() &&
       newDescription.trim() !== ''
     ) {
       closeModal()
@@ -38,37 +38,25 @@ export function ChangeDescriptionModal () {
       description: newDescription
     })
 
-    if (newDescription === undefined || !user || !isNewDescriptionValid) {
+    if (newDescription === undefined || !loggedUser || !isNewDescriptionValid) {
       setIsLoading(false)
       return
     }
 
-    const descriptionChangeSuccess = await user.changeDescription({
+    const descriptionChangeSuccess = await loggedUser.changeDescription({
       newDescription
     })
 
     if (descriptionChangeSuccess) {
-      queryClient.setQueryData(
-        ['userData', user.id],
-        (prevUserData: UserData | null) => {
-          if (!prevUserData) return prevUserData
+      queryClient.setQueryData([QUERY_KEYS.User, loggedUser.id], (prevUser?: User) => {
+        if (!prevUser) return prevUser
 
-          return prevUserData.update({ description: newDescription })
-        }
-      )
-
-      const newUser = new User({
-        id: user.id,
-        name: user.name,
-        email: user.email,
-        password: user.password,
-        imageId: user.imageId,
-        imageUrl: user.imageUrl,
-        description: newDescription,
-        createdAt: user.createdAt
+        return prevUser.update({ description: newDescription })
       })
 
-      setUser(newUser)
+      const newLoggedUser = loggedUser.update({ description: newDescription })
+
+      setLoggedUser(newLoggedUser)
       closeModal()
     } else {
       openModal('connection')

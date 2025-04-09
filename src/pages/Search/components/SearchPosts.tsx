@@ -1,5 +1,5 @@
 import { LoadSpinner } from '../../../components/LoadSpinner'
-import { PostsDisplay } from '../../../components/Posts/PostsDisplay'
+import { PostsDisplay } from '../../../components/PostsDisplay'
 import { usePosts } from '../../../hooks/usePosts'
 import { useSettings } from '../../../hooks/useSettings'
 

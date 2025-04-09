@@ -1,15 +1,17 @@
-import { DotsIcon } from '../Icons'
-import { useSettings } from '../../hooks/useSettings'
+import { DotsIcon } from './Icons'
+import { useSettings } from '../hooks/useSettings'
 import { Content, Item, Root, Trigger } from '@radix-ui/react-dropdown-menu'
 
-export function PostMenu (props: { onDelete: () => void }) {
+export function CommentMenu (props: {
+  onDelete: () => void
+}) {
   const { dictionary } = useSettings()
 
   return (
     <Root>
       <Trigger
-        title='Post Menu'
-        className='p-2 m-[5px] cursor-pointer rounded-vibe hover:bg-gray-700'
+        title='Comment Menu'
+        className='desktop:p-2 mobile:p-1 cursor-pointer rounded-vibe hover:bg-gray-700'
       >
         <DotsIcon />
       </Trigger>

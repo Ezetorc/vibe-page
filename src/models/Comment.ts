@@ -1,48 +1,54 @@
-import { format } from '@formkit/tempo'
 import { Like } from './Like'
 import { LikeService } from '../services/LikeService'
 import { CommentService } from '../services/CommentService'
+import { User } from './User'
 
 export class Comment {
-  constructor ({
-    id,
-    userId,
-    postId,
-    content,
-    createdAt
-  }: {
-    id: number
-    userId: number
-    postId: number
-    content: string
-    createdAt: string
-  }) {
-    this.id = id
-    this.userId = userId
-    this.postId = postId
-    this.content = content
-    this.createdAt = createdAt
-  }
-
   public id: number
-  public userId: number
   public postId: number
   public content: string
-  public createdAt: string
+  public user: User
+  public likes: number
+  public date: string
+  public userLiked: boolean
 
-  public getDate (): string {
-    const parsedDate: Date = new Date(this.createdAt.replace(' ', 'T'))
-    const formattedDate: string = format(parsedDate, 'DD/MM/YYYY')
-
-    return formattedDate
+  constructor (props: {
+    id: number
+    postId: number
+    content: string
+    date: string
+    user: User
+    likes: number
+    userLiked: boolean
+  }) {
+    this.id = props.id
+    this.postId = props.postId
+    this.content = props.content
+    this.user = props.user
+    this.date = props.date
+    this.likes = props.likes
+    this.userLiked = props.userLiked
   }
 
-  public async delete (): Promise<Comment | null> {
-    return await CommentService.delete({ commentId: this.id })
+  public update (properties: Partial<Comment>): Comment {
+    return new Comment({
+      user: properties.user ?? this.user,
+      likes: properties.likes ?? this.likes,
+      date: properties.date ?? this.date,
+      userLiked: properties.userLiked ?? this.userLiked,
+      id: properties.id ?? this.id,
+      content: properties.content ?? this.content,
+      postId: properties.postId ?? this.postId
+    })
   }
 
-  public async getLikesAmount (): Promise<number> {
-    return await LikeService.getAmountOfComment({ commentId: this.id })
+  public async delete (params: {
+    loggedUser: User | null
+  }): Promise<Comment | null> {
+    return await CommentService.delete({
+      commentId: this.id,
+      loggedUser: params.loggedUser
+    })
   }
 
   public async getLikes (): Promise<Like[]> {
