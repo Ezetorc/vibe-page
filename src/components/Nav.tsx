@@ -19,7 +19,7 @@ export function Nav () {
         icon={<SearchIcon />}
       />
       <NavButton
-        title={dictionary.create}
+        title={dictionary.post}
         to={PATHS.createSection}
         icon={<PlusIcon />}
         needsSession

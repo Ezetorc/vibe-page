@@ -6,6 +6,7 @@ import { Comment } from '../models/Comment'
 import { NewCommentEvent } from '../models/NewCommentEvent'
 import { useLoggedUser } from './useLoggedUser'
 import { QUERY_KEYS } from '../constants/QUERY_KEYS'
+import { User } from '../models/User'
 
 export function useComment (post: Post) {
   const { loggedUser, isSessionActive } = useLoggedUser()
@@ -20,6 +21,22 @@ export function useComment (post: Post) {
       return prevPost.update({
         comments: updater(prevPost.comments)
       })
+    })
+  }
+
+  const updatePostsAmount = (type: 'create' | 'delete') => {
+    queryClient.setQueryData(['user', post.user.id], (prevUser?: User) => {
+      if (!prevUser) return prevUser
+
+      if (type == 'create') {
+        return prevUser.update({
+          postsAmount: prevUser.postsAmount + 1
+        })
+      } else {
+        return prevUser.update({
+          postsAmount: prevUser.postsAmount - 1
+        })
+      }
     })
   }
 
@@ -43,6 +60,7 @@ export function useComment (post: Post) {
       post.comments = [...post.comments, newComment]
       closeModal()
       updateComments(comments => [...comments, newComment])
+      updatePostsAmount('create')
     },
     onError: () => openModal('connection')
   })
@@ -60,6 +78,7 @@ export function useComment (post: Post) {
       updateComments(comments =>
         comments.filter(comment => comment.id !== deletedComment.id)
       )
+      updatePostsAmount('delete')
     },
     onError: () => openModal('connection')
   })
