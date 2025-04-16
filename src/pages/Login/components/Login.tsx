@@ -1,5 +1,4 @@
-import { FormInput } from '../../../components/FormInput'
-import { useState, useCallback, ChangeEvent } from 'react'
+import { useState, ChangeEvent, FormEvent } from 'react'
 import { useValidation } from '../../../hooks/useValidation'
 import { WelcomeToVibe } from '../../../components/WelcomeToVibe'
 import { Button } from '../../../components/Button'
@@ -7,122 +6,75 @@ import { useSettings } from '../../../hooks/useSettings'
 import { Section } from '../../../components/Section'
 import { UserService } from '../../../services/UserService'
 import { Nav } from '../../../components/Nav'
-import { PATHS } from '../../../constants/PATHS'
-import { useLoggedUser } from '../../../hooks/useLoggedUser'
-import { Link, useLocation } from 'wouter'
+import { useSession } from '../../../hooks/useSession'
+import { ErrorMessage } from '../../../components/ErrorMessage'
+import { LoginData } from '../models/LoginData'
+import { RegisterLink } from './RegisterLink'
+import { NameInput } from '../../../components/NameInput'
+import { PasswordInput } from '../../../components/PasswordInput'
 
 export default function Login () {
-  const { dictionary, openModal } = useSettings()
-  const { errorMessage, validateName, validatePassword, setErrorMessage } =
-    useValidation()
-  const [isLoading, setIsLoading] = useState<boolean>(false)
-  const { handleSession } = useLoggedUser()
-  const [, navigate] = useLocation()
-  const [formData, setFormData] = useState({ name: '', password: '' })
+  const { dictionary } = useSettings()
+  const { error, isValid, setError } = useValidation()
+  const [isLoading, setLoading] = useState<boolean>(false)
+  const { handleSessionSuccess } = useSession()
+  const [loginData, setLoginData] = useState<LoginData>(
+    new LoginData({ name: '', password: '' })
+  )
 
-  const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = event.target
+  const handleValidation = async (event: FormEvent) => {
+    event.preventDefault()
 
-    setErrorMessage(null)
-    setFormData(prev => ({ ...prev, [name]: value }))
-  }
-
-  const isFormDataValid = useCallback(async () => {
-    const { name, password } = formData
-
-    const isPasswordValid = validatePassword({ password })
-
-    if (!isPasswordValid) {
-      setIsLoading(false)
-      return false
-    }
-
-    const isNameValid = await validateName({ name })
-
-    if (!isNameValid) {
-      setIsLoading(false)
-      return false
-    }
-
-    return true
-  }, [formData, validateName, validatePassword])
-
-  const handleLogin = useCallback(async () => {
     if (isLoading) return
-    setIsLoading(true)
 
-    const formDataValid = await isFormDataValid()
+    setLoading(true)
 
-    if (!formDataValid) return
-
-    const logSuccess = await UserService.login({
-      name: formData.name,
-      password: formData.password
+    const isDataValid = await isValid({
+      name: loginData.name,
+      password: loginData.password
     })
 
-    if (logSuccess) {
-      const sessionSuccess = await handleSession()
-
-      setIsLoading(false)
-
-      if (sessionSuccess) {
-        navigate(PATHS.accountSection)
-      } else {
-        openModal('connection')
-      }
+    if (!isDataValid) {
+      setLoading(false)
     } else {
-      setIsLoading(false)
-      setErrorMessage(dictionary.nameOrPasswordWrong)
+      handleLogin()
     }
-  }, [
-    dictionary.nameOrPasswordWrong,
-    formData,
-    handleSession,
-    isFormDataValid,
-    isLoading,
-    navigate,
-    openModal,
-    setErrorMessage
-  ])
+  }
+
+  const handleLogin = async () => {
+    const loginSuccess = await UserService.login({
+      name: loginData.name,
+      password: loginData.password
+    })
+
+    if (loginSuccess) {
+      handleSessionSuccess()
+    } else {
+      setError(dictionary.nameOrPasswordWrong)
+    }
+
+    setLoading(false)
+  }
+
+  const handleInputChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const newLoginData = loginData.update(event)
+
+    setError(null)
+    setLoginData(newLoginData)
+  }
 
   return (
     <Section className='h-full gap-y-[50px]'>
       <WelcomeToVibe />
 
       <form className='w-full flex flex-col gap-y-[30px]'>
-        <FormInput
-          min={3}
-          max={20}
-          name='name'
-          type='text'
-          value={formData.name}
-          onChange={handleChange}
-          placeholder={dictionary.name}
-        />
-        <FormInput
-          min={6}
-          max={30}
-          name='password'
-          type='password'
-          value={formData.password}
-          onChange={handleChange}
-          placeholder={dictionary.password}
-        />
-
-        {errorMessage && <p className='text-red-500'>{errorMessage}</p>}
-
-        <Button
-          onClick={event => {
-            event.preventDefault()
-            handleLogin()
-          }}
-          text={dictionary.login}
-        />
+        <NameInput data={loginData} onChange={handleInputChange} />
+        <PasswordInput data={loginData} onChange={handleInputChange} />
+        <ErrorMessage value={error} />
+        <Button loading={isLoading} onClick={handleValidation} text={dictionary.login} />
       </form>
 
-      <Link to={PATHS.registerSection} className='text-verdigris underline'>
-        {dictionary.iDontHaveAnAccount}
-      </Link>
+      <RegisterLink />
 
       <Nav />
     </Section>

@@ -1,9 +1,9 @@
 import { Link } from 'wouter'
-import { useLoggedUser } from '../hooks/useLoggedUser'
+import { useSession } from '../hooks/useSession'
 import { User } from '../models/User'
 
 export function Username (props: { user: User | null; className?: string }) {
-  const { loggedUser } = useLoggedUser()
+  const { loggedUser } = useSession()
   const userName = props.user?.name
   const to: string =
     loggedUser?.name === userName ? `/account` : `/account/${props.user?.id}`

@@ -4,7 +4,7 @@ import { useSettings } from './useSettings'
 
 export function useValidation () {
   const { dictionary, openModal } = useSettings()
-  const [errorMessage, setErrorMessage] = useState<string | null>(null)
+  const [error, setError] = useState<string | null>(null)
 
   const validateName = async ({
     name,
@@ -14,12 +14,12 @@ export function useValidation () {
     unique?: boolean
   }): Promise<boolean> => {
     if (!name) {
-      setErrorMessage(dictionary.emptyNameError)
+      setError(dictionary.emptyNameError)
       return false
     }
 
     if (name.length > 20 || name.length < 3) {
-      setErrorMessage(dictionary.nameLengthError)
+      setError(dictionary.nameLengthError)
       return false
     }
 
@@ -32,11 +32,11 @@ export function useValidation () {
         return true
       }
 
-      setErrorMessage(dictionary.nameInUse)
+      setError(dictionary.nameInUse)
       return false
     }
 
-    setErrorMessage(null)
+    setError(null)
     return true
   }
 
@@ -46,16 +46,16 @@ export function useValidation () {
     description: string | undefined | null
   }) => {
     if (description == null || description == undefined) {
-      setErrorMessage(dictionary.emptyDescriptionError)
+      setError(dictionary.emptyDescriptionError)
       return false
     }
 
     if (description.length > 200) {
-      setErrorMessage(dictionary.descriptionLengthError)
+      setError(dictionary.descriptionLengthError)
       return false
     }
 
-    setErrorMessage(null)
+    setError(null)
     return true
   }
 
@@ -67,12 +67,12 @@ export function useValidation () {
     unique?: boolean
   }) => {
     if (!email) {
-      setErrorMessage(dictionary.emptyEmailError)
+      setError(dictionary.emptyEmailError)
       return false
     }
 
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      setErrorMessage(dictionary.invalidEmailError)
+      setError(dictionary.invalidEmailError)
       return false
     }
 
@@ -85,26 +85,26 @@ export function useValidation () {
         return true
       }
 
-      setErrorMessage(dictionary.emailInUse)
+      setError(dictionary.emailInUse)
       return false
     }
 
-    setErrorMessage(null)
+    setError(null)
     return true
   }
 
   const validatePassword = ({ password }: { password: string | undefined }) => {
     if (!password) {
-      setErrorMessage(dictionary.emptyPasswordError)
+      setError(dictionary.emptyPasswordError)
       return false
     }
 
     if (password.length < 6 || password.length > 30) {
-      setErrorMessage(dictionary.passwordLengthError)
+      setError(dictionary.passwordLengthError)
       return false
     }
 
-    setErrorMessage(null)
+    setError(null)
     return true
   }
 
@@ -125,16 +125,16 @@ export function useValidation () {
     }
 
     if (!confirmedPassword) {
-      setErrorMessage(dictionary.confirmPassword)
+      setError(dictionary.confirmPassword)
       return false
     }
 
     if (password !== confirmedPassword) {
-      setErrorMessage(dictionary.passwordsDontMatch)
+      setError(dictionary.passwordsDontMatch)
       return false
     }
 
-    setErrorMessage(null)
+    setError(null)
     return true
   }
 
@@ -144,47 +144,100 @@ export function useValidation () {
     agreeWithTerms: boolean | undefined
   }) => {
     if (!agreeWithTerms) {
-      setErrorMessage(dictionary.youMustAgreeWithTerms)
+      setError(dictionary.youMustAgreeWithTerms)
       return false
     }
 
-    setErrorMessage(null)
+    setError(null)
     return true
   }
 
   const validatePost = ({ post }: { post: string }) => {
     if (post.length === 0) {
-      setErrorMessage(dictionary.emptyPostError)
+      setError(dictionary.emptyPostError)
       return false
     }
 
     if (post.length > 200) {
-      setErrorMessage(dictionary.postLengthError)
+      setError(dictionary.postLengthError)
       return false
     }
 
-    setErrorMessage(null)
+    setError(null)
     return true
   }
 
   const validateComment = ({ comment }: { comment: string }) => {
     if (comment.length === 0) {
-      setErrorMessage(dictionary.emptyPostError)
+      setError(dictionary.emptyPostError)
       return false
     }
 
     if (comment.length > 200) {
-      setErrorMessage(dictionary.commentLengthError)
+      setError(dictionary.commentLengthError)
       return false
     }
 
-    setErrorMessage(null)
+    setError(null)
+    return true
+  }
+
+  const isValid = async (params: {
+    name?: string
+    email?: string
+    password?: string
+    confirmedPassword?: string
+    agreeWithTerms?: boolean
+    nameUnique?: boolean
+    emailUnique?: boolean
+  }): Promise<boolean> => {
+    if (
+      params.password !== undefined ||
+      params.confirmedPassword !== undefined
+    ) {
+      if (params.confirmedPassword) {
+        const result = validatePasswords({
+          password: params.password,
+          confirmedPassword: params.confirmedPassword
+        })
+
+        if (!result) return false
+      } else {
+        const result = validatePassword({ password: params.password })
+
+        if (!result) return false
+      }
+    }
+
+    if (params.agreeWithTerms !== undefined) {
+      const result = validateAgreeWithTerms({
+        agreeWithTerms: params.agreeWithTerms
+      })
+      if (!result) return false
+    }
+
+    if (params.name !== undefined) {
+      const result = await validateName({
+        name: params.name,
+        unique: params.nameUnique ?? false
+      })
+      if (!result) return false
+    }
+
+    if (params.email !== undefined) {
+      const result = await validateEmail({
+        email: params.email,
+        unique: params.emailUnique ?? false
+      })
+      if (!result) return false
+    }
+
     return true
   }
 
   return {
-    errorMessage,
-    setErrorMessage,
+    error,
+    setError,
     validateName,
     validateEmail,
     validatePasswords,
@@ -192,6 +245,7 @@ export function useValidation () {
     validatePassword,
     validatePost,
     validateDescription,
-    validateComment
+    validateComment,
+    isValid
   }
 }

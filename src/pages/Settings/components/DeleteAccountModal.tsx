@@ -2,22 +2,23 @@ import { Button } from '../../../components/Button'
 import { Modal } from '../../../components/Modal'
 import { CloseModalButton } from '../../../components/CloseModalButton'
 import { useSettings } from '../../../hooks/useSettings'
-import { useLoggedUser } from '../../../hooks/useLoggedUser'
+import { useSession } from '../../../hooks/useSession'
 import { useValidation } from '../../../hooks/useValidation'
 import { useRef } from 'react'
 import { UserService } from '../../../services/UserService'
 import { PATHS } from '../../../constants/PATHS'
 import { useLocation } from 'wouter'
+import { ErrorMessage } from '../../../components/ErrorMessage'
 
 export default function DeleteAccountModal () {
-  const { errorMessage, setErrorMessage } = useValidation()
-  const { isSessionActive, loggedUser } = useLoggedUser()
+  const { error, setError } = useValidation()
+  const { loggedUser, isSessionActive } = useSession()
   const { dictionary, openModal, closeModal } = useSettings()
   const [, navigate] = useLocation()
   const irreversibleActionRef = useRef<HTMLInputElement | null>(null)
 
   const handleDeleteAccount = async () => {
-    if (!isSessionActive()) {
+    if (!isSessionActive) {
       openModal('session')
       return
     }
@@ -25,7 +26,7 @@ export default function DeleteAccountModal () {
     const understoodAction = irreversibleActionRef.current?.checked
 
     if (!understoodAction) {
-      setErrorMessage(dictionary.youMustUnderstandAction)
+      setError(dictionary.youMustUnderstandAction)
       return
     }
 
@@ -70,7 +71,8 @@ export default function DeleteAccountModal () {
             </label>
           </div>
 
-          {errorMessage && <p className='text-red-500'>{errorMessage}</p>}
+          <ErrorMessage value={error} />
+
           <Button
             text={dictionary.deleteAccount}
             onClick={handleDeleteAccount}

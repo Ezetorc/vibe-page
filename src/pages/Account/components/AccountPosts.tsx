@@ -9,7 +9,8 @@ import { User } from '../../../models/User'
 export function AccountPosts (props: { user: User }) {
   const { dictionary } = useSettings()
   const [searchQuery, setSearchQuery] = useState<string | undefined>(undefined)
-  const { deletePost, posts, hasMore, ref } = useUserPosts(props.user, searchQuery)
+  const { deletePost, posts, hasMore, ref, failed, success, isEmpty } =
+    useUserPosts(props.user, searchQuery)
 
   const handleSearch = (query: string) => {
     setSearchQuery(query)
@@ -19,6 +20,13 @@ export function AccountPosts (props: { user: User }) {
     deletePost(postId)
   }
 
+  if (failed)
+    return (
+      <p className='font-poppins-light text-caribbean-current'>
+        {dictionary.error}
+      </p>
+    )
+
   return (
     <>
       <SearchBar
@@ -26,7 +34,16 @@ export function AccountPosts (props: { user: User }) {
         placeholder={dictionary.searchMyPosts}
       />
 
-      <PostsDisplay onPostDelete={handlePostDelete} posts={posts} />
+      {success ? (
+        isEmpty ? (
+          dictionary.noPosts
+        ) : (
+          <PostsDisplay onPostDelete={handlePostDelete} posts={posts} />
+        )
+      ) : (
+        <LoadSpinner />
+      )}
+
       {hasMore && <LoadSpinner reference={ref} />}
     </>
   )

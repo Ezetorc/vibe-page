@@ -2,14 +2,14 @@ import { Button } from '../../../components/Button'
 import { Modal } from '../../../components/Modal'
 import { CloseModalButton } from '../../../components/CloseModalButton'
 import { useSettings } from '../../../hooks/useSettings'
-import { useLoggedUser } from '../../../hooks/useLoggedUser'
+import { useSession } from '../../../hooks/useSession'
 
 export default function LogoutModal () {
-  const { isSessionActive, logout } = useLoggedUser()
+  const { logout, isSessionActive } = useSession()
   const { dictionary, openModal, closeModal } = useSettings()
 
   const handleLogout = async () => {
-    if (!isSessionActive()) {
+    if (!isSessionActive) {
       openModal('session')
       return
     }

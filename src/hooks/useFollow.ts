@@ -1,13 +1,13 @@
 import { useQueryClient, useQuery, useMutation } from '@tanstack/react-query'
 import { useSettings } from './useSettings'
 import { User } from '../models/User'
-import { useLoggedUser } from './useLoggedUser'
+import { useSession } from './useSession'
 import { QUERY_KEYS } from '../constants/QUERY_KEYS'
 
 export function useFollow (following: User | null) {
   const queryClient = useQueryClient()
   const { openModal } = useSettings()
-  const { loggedUser: follower } = useLoggedUser()
+  const { loggedUser: follower } = useSession()
   const queryKey = [QUERY_KEYS.Follow, follower?.id, following?.id]
 
   const isFollowingQuery = useQuery({

@@ -73,7 +73,7 @@ noPosts,No hay posts...,No posts...
 noUsers,No hay usuarios...,No users...
 login,Iniciar sesión,Login
 register,Registrarse,Register
-beTheFirstPoster,¡Sé el primero en ,Be the first to ,
+beTheFirstPoster,¡Sé el primero en ,Be the first to 
 name,Nombre,Name
 today,Hoy,Today
 yesterday,Ayer,Yesterday
@@ -100,3 +100,7 @@ unfollow,Dejar de seguir,Unfollow
 connectionError,Error de conexión,Conexion error
 solveConnectionError,Refresca la página y vuelve a intentar,Refresh the page and try again
 refreshPage,Refrescar página,Refresh page
+commentsTitle,Comentarios,Comments
+writeComment,Escribí tu comentario...,Write your comment...
+sendComment,Enviar comentario,Send comment
+noComments,Aún no hay comentarios,No comments yet

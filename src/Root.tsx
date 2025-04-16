@@ -3,28 +3,32 @@ import App from './App'
 import { Loading } from './components/Loading'
 import { useSettings } from './hooks/useSettings'
 import eruda from 'eruda'
-import { useLoggedUser } from './hooks/useLoggedUser'
+import { useSession } from './hooks/useSession'
 
 export function Root () {
-  const { loadDictionaries, dictionaries } = useSettings()
+  const { loadDictionaries } = useSettings()
   const [loading, setLoading] = useState(true)
-  const { handleSession } = useLoggedUser()
+  const { handleSession } = useSession()
 
   useEffect(() => {
     eruda.init()
 
     const initApp = async () => {
-      await Promise.all([loadDictionaries(), handleSession()])
+      const [dictionariesLoaded] = await Promise.all([
+        loadDictionaries(),
+        handleSession()
+      ])
 
-      setLoading(false)
+      if (dictionariesLoaded) {
+        setLoading(false)
+      }
     }
 
     initApp()
-  }, [handleSession, loadDictionaries])
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
-  const dictionariesAreReady = Object.keys(dictionaries ?? {}).length > 0
-
-  if (loading || !dictionariesAreReady) {
+  if (loading) {
     return <Loading />
   }
 

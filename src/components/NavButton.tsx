@@ -1,6 +1,6 @@
 import { Link, useLocation } from 'wouter'
 import { useSettings } from '../hooks/useSettings'
-import { useLoggedUser } from '../hooks/useLoggedUser'
+import { useSession } from '../hooks/useSession'
 
 export function NavButton (props: {
   icon: JSX.Element
@@ -9,13 +9,13 @@ export function NavButton (props: {
   title: string
 }) {
   const [location] = useLocation()
-  const { isSessionActive } = useLoggedUser()
   const { openModal } = useSettings()
+  const { isSessionActive } = useSession()
 
   const handleClick = (event: React.MouseEvent<HTMLAnchorElement>): void => {
     if (!(props.needsSession ?? false)) return
 
-    if (!isSessionActive()) {
+    if (!isSessionActive) {
       event.preventDefault()
       openModal('session')
     }

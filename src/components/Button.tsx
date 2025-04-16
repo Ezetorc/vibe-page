@@ -1,4 +1,5 @@
 import { ReactNode } from 'react'
+import { useSettings } from '../hooks/useSettings'
 
 export function Button (props: {
   onClick: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void
@@ -6,10 +7,11 @@ export function Button (props: {
   text?: string
   type?: 'filled' | 'outline'
   classname?: string
-  disabled?: boolean
+  loading?: boolean
 }) {
+  const { dictionary } = useSettings()
   const type: 'filled' | 'outline' = props.type ?? 'filled'
-  
+
   const className =
     type === 'filled'
       ? `${props.classname} cursor-pointer hover:bg-white hover:text-orange-crayola w-full h-[50px] bg-orange-crayola rounded-vibe`
@@ -18,10 +20,10 @@ export function Button (props: {
   return (
     <button
       onClick={props.onClick}
-      disabled={props.disabled}
+      disabled={props.loading}
       className={className}
     >
-      {props.text}
+      {props.loading ? `${dictionary.loading}...` : props.text}
       {props.children}
     </button>
   )

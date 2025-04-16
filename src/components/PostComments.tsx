@@ -4,14 +4,14 @@ import { Button } from './Button'
 import eventEmitter from '../constants/EVENT_EMITTER'
 import { CommentDisplay } from './CommentDisplay'
 import { NewCommentEvent } from '../models/NewCommentEvent'
-import { useLoggedUser } from '../hooks/useLoggedUser'
 import { Post } from '../models/Post'
 import { useComment } from '../hooks/useComment'
 import { LoadSpinner } from './LoadSpinner'
+import { useSession } from '../hooks/useSession'
 
 export function PostComments (props: { post: Post }) {
   const { dictionary, openModal } = useSettings()
-  const { isSessionActive } = useLoggedUser()
+  const { isSessionActive } = useSession()
   const { createComment, deleteComment, isCreating } = useComment(props.post)
 
   const handleCommentDelete = async (commentId: number) => {
@@ -31,7 +31,7 @@ export function PostComments (props: { post: Post }) {
   }, [createComment])
 
   const handleCreateComment = () => {
-    if (!isSessionActive()) {
+    if (!isSessionActive) {
       openModal('session')
       return
     }

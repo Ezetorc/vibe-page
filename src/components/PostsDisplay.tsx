@@ -9,7 +9,7 @@ export function PostsDisplay ({
   onPostDelete: (postId: number) => void
 }) {
   return (
-    <div className='w-full flex flex-col items-center gap-y-[20px]'>
+    <div className='w-full flex animate-appear-from-top flex-col items-center gap-y-[20px]'>
       {posts?.map((post, index) => (
         <PostDisplay onDelete={onPostDelete} key={index} post={post} />
       ))}

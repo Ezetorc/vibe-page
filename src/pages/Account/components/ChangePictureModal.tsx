@@ -5,13 +5,13 @@ import { ChangeEvent } from 'react'
 import { useSettings } from '../../../hooks/useSettings'
 import { UserImage } from '../../../components/UserImage'
 import { PATHS } from '../../../constants/PATHS'
-import { useLoggedUser } from '../../../hooks/useLoggedUser'
+import { useSession } from '../../../hooks/useSession'
 
 export default function ChangePictureModal () {
-  const { loggedUser, isSessionActive, setLoggedUser } = useLoggedUser()
+  const { loggedUser, setLoggedUser, isSessionActive } = useSession()
   const { openModal, dictionary, closeModal } = useSettings()
 
-  if (!isSessionActive()) return
+  if (!isSessionActive) return
 
   const handleUploadImage = (event: ChangeEvent<HTMLInputElement>) => {
     const newImage = event.target.files?.[0]

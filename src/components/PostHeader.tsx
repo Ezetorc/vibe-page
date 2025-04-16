@@ -1,7 +1,6 @@
-import { useLoggedUser } from '../hooks/useLoggedUser'
+import { useSession } from '../hooks/useSession'
 import { useSettings } from '../hooks/useSettings'
 import { Post } from '../models/Post'
-import { getDateMessage } from '../utilities/getDateMessage'
 import { UserImage } from './UserImage'
 import { Username } from './Username'
 import { PostMenu } from './PostMenu'
@@ -10,8 +9,8 @@ export function PostHeader (props: {
   post: Post
   onDelete: (postId: number) => void
 }) {
-  const { loggedUser } = useLoggedUser()
-  const { dictionary } = useSettings()
+  const { loggedUser } = useSession()
+  const { getMessage } = useSettings()
 
   const handleDelete = async () => {
     props.onDelete(props.post.id)
@@ -33,7 +32,7 @@ export function PostHeader (props: {
         </div>
 
         <span className='text-caribbean-current font-poppins-light mobile:text-[clamp(5px,5vw,15px)] desktop:text-[clamp(5px,5vw,18px)]'>
-          {dictionary[getDateMessage(props.post.date)]}
+          {getMessage(props.post.date)}
         </span>
       </div>
 

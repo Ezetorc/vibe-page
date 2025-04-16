@@ -1,199 +1,101 @@
-import { useState, useCallback, ChangeEvent } from 'react'
+import { useState, FormEvent, ChangeEvent } from 'react'
 import { useValidation } from '../../../hooks/useValidation'
-import { FormInput } from '../../../components/FormInput'
 import { WelcomeToVibe } from '../../../components/WelcomeToVibe'
 import { Button } from '../../../components/Button'
 import { useSettings } from '../../../hooks/useSettings'
 import { Section } from '../../../components/Section'
 import { UserService } from '../../../services/UserService'
 import { Nav } from '../../../components/Nav'
-import { PATHS } from '../../../constants/PATHS'
-import { useLoggedUser } from '../../../hooks/useLoggedUser'
-import { Link, useLocation } from 'wouter'
+import { ErrorMessage } from '../../../components/ErrorMessage'
+import { RegisterData } from '../models/RegisterData'
+import { NameInput } from '../../../components/NameInput'
+import { EmailInput } from './EmailInput'
+import { TermsInput } from './TermsInput'
+import { LoginLink } from './LoginLink'
+import { PasswordInput } from '../../../components/PasswordInput'
+import { ConfirmPasswordInput } from './ConfirmPassword'
+import { useSession } from '../../../hooks/useSession'
 
 export default function Register () {
-  const {
-    errorMessage,
-    setErrorMessage,
-    validateName,
-    validateEmail,
-    validatePasswords,
-    validateAgreeWithTerms
-  } = useValidation()
+  const { error, setError, isValid } = useValidation()
   const { dictionary } = useSettings()
-  const { handleSession } = useLoggedUser()
-  const [, navigate] = useLocation()
-  const [isLoading, setIsLoading] = useState<boolean>(false)
-  const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    password: '',
-    confirmedPassword: '',
-    agreeWithTerms: false
-  })
+  const { handleSessionSuccess } = useSession()
+  const [isLoading, setLoading] = useState<boolean>(false)
+  const [registerData, setRegisterData] = useState<RegisterData>(
+    new RegisterData({
+      name: '',
+      email: '',
+      password: '',
+      confirmedPassword: '',
+      agreeWithTerms: false
+    })
+  )
 
-  const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
-    const { name, value, type, checked } = event.target
+  const handleValidation = async (event: FormEvent) => {
+    event.preventDefault()
 
-    setFormData(prev => ({
-      ...prev,
-      [name]: type === 'checkbox' ? checked : value
-    }))
+    if (isLoading) return
+
+    setLoading(true)
+
+    const isDataValid = await isValid({
+      name: registerData.name,
+      email: registerData.email,
+      password: registerData.password,
+      confirmedPassword: registerData.confirmedPassword,
+      agreeWithTerms: registerData.agreeWithTerms,
+      nameUnique: true,
+      emailUnique: true
+    })
+
+    if (!isDataValid) {
+      setLoading(false)
+    } else {
+      handleRegister()
+    }
   }
 
-  const isFormDataValid = useCallback(async () => {
-    const { name, email, password, confirmedPassword, agreeWithTerms } =
-      formData
-    const hasAgreedWithTerms = validateAgreeWithTerms({ agreeWithTerms })
-
-    if (!hasAgreedWithTerms) {
-      setIsLoading(false)
-      return
-    }
-
-    const isPasswordValid = validatePasswords({ password, confirmedPassword })
-    if (!isPasswordValid) {
-      setIsLoading(false)
-      return
-    }
-
-    const isNameValid = await validateName({ name, unique: true })
-    if (!isNameValid) {
-      setIsLoading(false)
-      return
-    }
-
-    const isEmailValid = await validateEmail({ email, unique: true })
-    if (!isEmailValid) {
-      setIsLoading(false)
-      return
-    }
-
-    return true
-  }, [
-    formData,
-    validateAgreeWithTerms,
-    validateEmail,
-    validateName,
-    validatePasswords
-  ])
-
-  const handleRegister = useCallback(async () => {
-    if (isLoading) return
-    setIsLoading(true)
-
-    const formDataValid = await isFormDataValid()
-
-    if (!formDataValid) return
-
+  const handleRegister = async () => {
     const registerSuccess = await UserService.register({
-      name: formData.name,
-      email: formData.email,
-      password: formData.password
+      name: registerData.name,
+      email: registerData.email,
+      password: registerData.password
     })
 
     if (registerSuccess) {
-      const sessionSuccess = await handleSession()
-
-      if (sessionSuccess) {
-        navigate(PATHS.accountSection)
-      } else {
-        navigate(PATHS.homeSection)
-      }
+      handleSessionSuccess()
     } else {
-      setErrorMessage(dictionary.userAlreadyExists)
+      setError(dictionary.userAlreadyExists)
     }
 
-    setIsLoading(false)
-  }, [
-    dictionary.userAlreadyExists,
-    formData,
-    handleSession,
-    isFormDataValid,
-    isLoading,
-    navigate,
-    setErrorMessage
-  ])
+    setLoading(false)
+  }
+
+  const handleInputChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const newRegisterData = registerData.update(event)
+
+    setError(null)
+    setRegisterData(newRegisterData)
+  }
 
   return (
     <Section className='h-full gap-y-[50px]'>
       <WelcomeToVibe />
 
       <form className='w-full flex flex-col gap-y-[30px]'>
-        <FormInput
-          min={3}
-          max={20}
-          name='name'
-          value={formData.name}
-          onChange={handleChange}
-          placeholder={dictionary.name}
+        <NameInput data={registerData} onChange={handleInputChange} />
+        <EmailInput data={registerData} onChange={handleInputChange} />
+        <PasswordInput data={registerData} onChange={handleInputChange} />
+        <ConfirmPasswordInput
+          data={registerData}
+          onChange={handleInputChange}
         />
-        <FormInput
-          name='email'
-          type='email'
-          value={formData.email}
-          onChange={handleChange}
-          placeholder={dictionary.email}
-        />
-        <FormInput
-          min={6}
-          max={30}
-          name='password'
-          type='password'
-          value={formData.password}
-          onChange={handleChange}
-          placeholder={dictionary.password}
-        />
-        <FormInput
-          min={6}
-          max={30}
-          name='confirmedPassword'
-          type='password'
-          value={formData.confirmedPassword}
-          onChange={handleChange}
-          placeholder={dictionary.confirmPassword}
-        />
-
-        <div className='flex gap-x-5 items-center'>
-          <input
-            name='agreeWithTerms'
-            type='checkbox'
-            id='agree-with-terms'
-            checked={formData.agreeWithTerms}
-            onChange={handleChange}
-            className='peer hidden'
-          />
-          <label
-            htmlFor='agree-with-terms'
-            className='relative w-6 h-6 flex items-center justify-center border-2 border-white rounded-full cursor-pointer peer-checked:bg-orange-crayola peer-checked:border-orange-crayola'
-          >
-            <span className='absolute w-3 h-3 bg-white rounded-full opacity-0 scale-0 peer-checked:opacity-100 peer-checked:scale-100'></span>
-          </label>
-          <label className='font-poppins-light' htmlFor='agree-with-terms'>
-            {dictionary.iAgreeWith}{' '}
-            <Link
-              to={PATHS.termsSection}
-              className='border-b-2 border-b-white hover:border-b-orange-crayola hover:text-orange-crayola'
-            >
-              {dictionary.termsAndConditions}
-            </Link>
-          </label>
-        </div>
-
-        {errorMessage && <p className='text-red-500'>{errorMessage}</p>}
-
-        <Button
-          onClick={e => {
-            e.preventDefault()
-            handleRegister()
-          }}
-          text={dictionary.register}
-        />
+        <TermsInput data={registerData} onChange={handleInputChange} />
+        <ErrorMessage value={error} />
+        <Button onClick={handleValidation} text={dictionary.register} />
       </form>
 
-      <Link to={PATHS.loginSection} className='text-verdigris underline'>
-        {dictionary.iHaveAnAccount}
-      </Link>
+      <LoginLink />
 
       <Nav />
     </Section>

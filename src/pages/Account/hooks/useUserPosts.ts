@@ -9,18 +9,19 @@ import { useInView } from 'react-intersection-observer'
 import { PostService } from '../../../services/PostService'
 import { Post } from '../../../models/Post'
 import { User } from '../../../models/User'
-import { useLoggedUser } from '../../../hooks/useLoggedUser'
+import { useSession } from '../../../hooks/useSession'
 import { QUERY_KEYS } from '../../../constants/QUERY_KEYS'
 
 export function useUserPosts (user: User, searchQuery?: string) {
   const queryClient = useQueryClient()
   const view = useInView()
-  const { loggedUser } = useLoggedUser()
+  const { loggedUser } = useSession()
   const queryKey = [QUERY_KEYS.Posts, QUERY_KEYS.User, user.id]
+
   const pagination = useInfiniteQuery({
     queryKey,
     queryFn: async ({ pageParam = 1 }) => {
-      if (!user.id) return [] as Post[]
+      if (!user.id) return []
 
       if (searchQuery) {
         return user.searchPosts({
@@ -52,11 +53,16 @@ export function useUserPosts (user: User, searchQuery?: string) {
       }
     )
 
-    queryClient.setQueryData([QUERY_KEYS.User, user.id], (prevUserData?: User) => {
-      if (!prevUserData?.postsAmount) return prevUserData
+    queryClient.setQueryData(
+      [QUERY_KEYS.User, user.id],
+      (prevUserData?: User) => {
+        if (!prevUserData?.postsAmount) return prevUserData
 
-      return prevUserData.update({ postsAmount: prevUserData.postsAmount - 1 })
-    })
+        return prevUserData.update({
+          postsAmount: prevUserData.postsAmount - 1
+        })
+      }
+    )
   }
 
   const deleteMutation = useMutation({
@@ -76,10 +82,12 @@ export function useUserPosts (user: User, searchQuery?: string) {
 
   return {
     status: pagination.status,
-    posts:
-      pagination.data?.pages.flat().filter(post => post !== undefined) ?? [],
+    posts: pagination.data?.pages.flat() ?? [],
     hasMore: pagination.hasNextPage,
     ref: view.ref,
-    deletePost
+    deletePost,
+    isEmpty: (pagination.data?.pages.flat() ?? []).length === 0,
+    success: pagination.status === 'success',
+    failed: pagination.status === 'error'
   }
 }

@@ -2,7 +2,7 @@ import { useQueryClient, useMutation } from '@tanstack/react-query'
 import { QUERY_KEYS } from '../constants/QUERY_KEYS'
 import { Comment } from '../models/Comment'
 import { Post } from '../models/Post'
-import { useLoggedUser } from './useLoggedUser'
+import { useSession } from './useSession'
 import { useSettings } from './useSettings'
 import { LikeType } from '../models/LikeType'
 
@@ -15,7 +15,7 @@ export function useLike(target: Comment): UseLikeReturnType
 export function useLike(target: Post): UseLikeReturnType
 
 export function useLike (target: Comment | Post): UseLikeReturnType {
-  const { loggedUser } = useLoggedUser()
+  const { loggedUser } = useSession()
   const { openModal } = useSettings()
   const queryClient = useQueryClient()
   const type: LikeType = target instanceof Comment ? 'comment' : 'post'

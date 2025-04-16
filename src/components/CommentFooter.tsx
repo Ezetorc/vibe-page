@@ -1,18 +1,18 @@
 import { useState } from 'react'
 import { LikeIcon } from './Icons'
 import { useSettings } from '../hooks/useSettings'
-import { useLoggedUser } from '../hooks/useLoggedUser'
 import { Comment } from '../models/Comment'
 import { useLike } from '../hooks/useLike'
+import { useSession } from '../hooks/useSession'
 
 export function CommentFooter (props: { comment: Comment }) {
   const { dictionary, openModal } = useSettings()
   const [loading, setLoading] = useState<boolean>(false)
-  const { isSessionActive } = useLoggedUser()
+  const { isSessionActive } = useSession()
   const { like, dislike } = useLike(props.comment)
 
   const handleLike = async () => {
-    if (!isSessionActive()) {
+    if (!isSessionActive) {
       openModal('session')
       return
     }

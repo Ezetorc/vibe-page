@@ -4,12 +4,12 @@ import { useSettings } from './useSettings'
 import { CommentService } from '../services/CommentService'
 import { Comment } from '../models/Comment'
 import { NewCommentEvent } from '../models/NewCommentEvent'
-import { useLoggedUser } from './useLoggedUser'
+import { useSession } from './useSession'
 import { QUERY_KEYS } from '../constants/QUERY_KEYS'
 import { User } from '../models/User'
 
 export function useComment (post: Post) {
-  const { loggedUser, isSessionActive } = useLoggedUser()
+  const { loggedUser, isSessionActive } = useSession()
   const { openModal, closeModal } = useSettings()
   const queryClient = useQueryClient()
   const queryKey = [QUERY_KEYS.Post, post.id]
@@ -42,7 +42,7 @@ export function useComment (post: Post) {
 
   const createComment = useMutation({
     mutationFn: async (event: NewCommentEvent) => {
-      if (!isSessionActive()) return null
+      if (!isSessionActive) return null
 
       return await CommentService.create({
         userId: loggedUser!.id,

@@ -5,13 +5,14 @@ import { getRandomNumber } from '../pages/Create/utilities/getRandomNumber'
 import { Button } from './Button'
 import eventEmitter from '../constants/EVENT_EMITTER'
 import { NewCommentEvent } from '../models/NewCommentEvent'
-import { useLoggedUser } from '../hooks/useLoggedUser'
+import { ErrorMessage } from './ErrorMessage'
+import { useSession } from '../hooks/useSession'
 
 export function CommentCreator () {
-  const { isSessionActive } = useLoggedUser()
   const { dictionary, openModal, activeModal } = useSettings()
   const [isLoading, setIsLoading] = useState<boolean>(false)
-  const { validateComment, errorMessage, setErrorMessage } = useValidation()
+  const { validateComment, error, setError } = useValidation()
+  const { isSessionActive } = useSession()
   const [commentContent, setCommentContent] = useState<string>('')
   const randomPlaceholderIndex = useRef<number>(getRandomNumber(0, 10))
   const spanRef = useRef<HTMLSpanElement>(null)
@@ -21,7 +22,7 @@ export function CommentCreator () {
   const handleCreateComment = async () => {
     if (isLoading) return
 
-    if (!isSessionActive()) {
+    if (!isSessionActive) {
       openModal('session')
       return
     }
@@ -46,7 +47,7 @@ export function CommentCreator () {
     const newCommentContent = event.currentTarget.value.slice(0, 200)
     spanRef.current!.textContent = `${newCommentContent.length}/200`
 
-    setErrorMessage(null)
+    setError(null)
     setCommentContent(newCommentContent)
   }
 
@@ -68,13 +69,11 @@ export function CommentCreator () {
         </span>
       </div>
 
-      <div className='text-red-500 font-poppins-light w-full h-[30px]'>
-        {errorMessage}
-      </div>
+      <ErrorMessage value={error} />
 
       <Button
         onClick={handleCreateComment}
-        disabled={isLoading}
+        loading={isLoading}
         text={dictionary.comment}
       />
     </article>

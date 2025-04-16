@@ -1,9 +1,9 @@
 import { UserImage } from '../../../components/UserImage'
 import { Username } from '../../../components/Username'
-import { useLoggedUser } from '../../../hooks/useLoggedUser'
+import { useSession } from '../../../hooks/useSession'
 
 export function PostOwner () {
-  const { loggedUser } = useLoggedUser()
+  const { loggedUser } = useSession()
 
   return (
     <header className='w-full flex mobile:flex desktop:flex-row items-center gap-x-[10px] my-[20px]'>

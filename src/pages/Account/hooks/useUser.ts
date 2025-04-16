@@ -1,10 +1,10 @@
 import { useQuery } from '@tanstack/react-query'
 import { UserService } from '../../../services/UserService'
-import { useLoggedUser } from '../../../hooks/useLoggedUser'
+import { useSession } from '../../../hooks/useSession'
 import { QUERY_KEYS } from '../../../constants/QUERY_KEYS'
 
 export function useUser (userId?: string | number) {
-  const { loggedUser } = useLoggedUser()
+  const { loggedUser } = useSession()
   const queryKey = [QUERY_KEYS.User, userId ?? loggedUser?.id]
 
   const query = useQuery({

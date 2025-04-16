@@ -7,13 +7,14 @@ import { useValidation } from '../../../hooks/useValidation'
 import { CloseModalButton } from '../../../components/CloseModalButton'
 import { useQueryClient } from '@tanstack/react-query'
 import { User } from '../../../models/User'
-import { useLoggedUser } from '../../../hooks/useLoggedUser'
+import { useSession } from '../../../hooks/useSession'
 import { QUERY_KEYS } from '../../../constants/QUERY_KEYS'
+import { ErrorMessage } from '../../../components/ErrorMessage'
 
 export default function ChangeNameModal () {
   const queryClient = useQueryClient()
-  const { loggedUser, setLoggedUser } = useLoggedUser()
-  const { validateName, errorMessage } = useValidation()
+  const { loggedUser, setLoggedUser } = useSession()
+  const { validateName, error } = useValidation()
   const { openModal, closeModal, dictionary } = useSettings()
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const newNameRef = useRef<HTMLInputElement>(null)
@@ -81,10 +82,10 @@ export default function ChangeNameModal () {
           className='placeholder:text-verdigris p-[5px]'
         />
 
-        {errorMessage && <p className='text-red-500'>{errorMessage}</p>}
+        <ErrorMessage value={error} />
 
         <Button
-          disabled={isLoading}
+          loading={isLoading}
           text={dictionary.change}
           onClick={handleChangeName}
         />

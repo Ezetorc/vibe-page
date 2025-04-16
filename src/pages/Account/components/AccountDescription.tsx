@@ -1,10 +1,10 @@
-import { useLoggedUser } from '../../../hooks/useLoggedUser'
+import { useSession } from '../../../hooks/useSession'
 import { useSettings } from '../../../hooks/useSettings'
 import { User } from '../../../models/User'
 
 export function AccountDescription (props: { user: User }) {
   const { dictionary } = useSettings()
-  const { loggedUser } = useLoggedUser()
+  const { loggedUser } = useSession()
   const isLogged = loggedUser?.id === props.user.id
 
   return (

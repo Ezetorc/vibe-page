@@ -20,6 +20,25 @@ export function useSettings () {
     updateDictionary()
   }, [dictionaries, language, updateDictionary])
 
+  const getMessage = (date: string | null | undefined) => {
+    if (!date) return ''
+
+    const [day, month, year] = date.split('/').map(Number)
+    const fullYear = year < 100 ? 2000 + year : year
+    const inputDate = new Date(fullYear, month - 1, day)
+    const today = new Date()
+
+    inputDate.setHours(0, 0, 0, 0)
+    today.setHours(0, 0, 0, 0)
+
+    const timeDiff = inputDate.getTime() - today.getTime()
+    const dayDiff = timeDiff / (1000 * 60 * 60 * 24)
+
+    if (dayDiff === 0) return dictionary.today
+    if (dayDiff === -1) return dictionary.yesterday
+    return date
+  }
+
   const openModal = useCallback(
     (name: ModalName, data: Modal['data'] = {}) => {
       setActiveModal({ name, data })
@@ -34,5 +53,5 @@ export function useSettings () {
     [setActiveModal]
   )
 
-  return { ...settingsStore, dictionary, openModal, closeModal }
+  return { ...settingsStore, dictionary, openModal, closeModal, getMessage }
 }

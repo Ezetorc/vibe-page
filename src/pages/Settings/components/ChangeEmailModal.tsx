@@ -5,11 +5,12 @@ import { Modal } from '../../../components/Modal'
 import { useSettings } from '../../../hooks/useSettings'
 import { useValidation } from '../../../hooks/useValidation'
 import { CloseModalButton } from '../../../components/CloseModalButton'
-import { useLoggedUser } from '../../../hooks/useLoggedUser'
+import { useSession } from '../../../hooks/useSession'
+import { ErrorMessage } from '../../../components/ErrorMessage'
 
 export default function ChangeEmailModal () {
-  const { loggedUser } = useLoggedUser()
-  const { validateEmail, errorMessage } = useValidation()
+  const { loggedUser } = useSession()
+  const { validateEmail, error } = useValidation()
   const { openModal, closeModal, dictionary } = useSettings()
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const newEmailRef = useRef<HTMLInputElement>(null)
@@ -56,10 +57,10 @@ export default function ChangeEmailModal () {
           className='placeholder:text-verdigris p-[5px]'
         />
 
-        {errorMessage && <p className='text-red-500'>{errorMessage}</p>}
+        <ErrorMessage value={error} />
 
         <Button
-          disabled={isLoading}
+          loading={isLoading}
           text={dictionary.change}
           onClick={handleChangeEmail}
         />

@@ -7,10 +7,10 @@ import { FirstPosterMessage } from './FirstPosterMessage'
 
 export default function Home () {
   const { dictionary } = useSettings()
-  const { status, posts, ref, deletePost, hasMore, isEmpty, success } =
+  const { failed, posts, ref, deletePost, hasMore, isEmpty, success } =
     usePosts()
 
-  if (status === 'error')
+  if (failed)
     return (
       <p className='font-poppins-light text-caribbean-current'>
         {dictionary.error}

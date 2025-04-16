@@ -1,9 +1,9 @@
 import { Dispatch } from 'react'
 import { LikeIcon, CommentIcon } from './Icons'
 import { useSettings } from '../hooks/useSettings'
-import { useLoggedUser } from '../hooks/useLoggedUser'
 import { Post } from '../models/Post'
 import { useLike } from '../hooks/useLike'
+import { useSession } from '../hooks/useSession'
 
 export function PostFooter (props: {
   post: Post
@@ -11,11 +11,11 @@ export function PostFooter (props: {
   setCommentsOpened: Dispatch<React.SetStateAction<boolean>>
 }) {
   const { openModal, dictionary } = useSettings()
-  const { isSessionActive } = useLoggedUser()
   const { like, dislike } = useLike(props.post)
+  const { isSessionActive } = useSession()
 
   const handleClickLike = async () => {
-    if (!isSessionActive()) {
+    if (!isSessionActive) {
       openModal('session')
       return
     }

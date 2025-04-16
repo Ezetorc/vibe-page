@@ -7,14 +7,14 @@ import {
 } from '@tanstack/react-query'
 import { useInView } from 'react-intersection-observer'
 import { PostService } from '../services/PostService'
-import { useLoggedUser } from './useLoggedUser'
+import { useSession } from './useSession'
 import { Post } from '../models/Post'
 import { QUERY_KEYS } from '../constants/QUERY_KEYS'
 
 export function usePosts (searchQuery?: string) {
   const queryClient = useQueryClient()
   const view = useInView()
-  const { loggedUser } = useLoggedUser()
+  const { loggedUser } = useSession()
   const queryKey = searchQuery ? [QUERY_KEYS.Posts, searchQuery] : [QUERY_KEYS.Posts]
 
   const pagination = useInfiniteQuery({
@@ -67,6 +67,7 @@ export function usePosts (searchQuery?: string) {
     ref: view.ref,
     deletePost: (postId: number) => deleteMutation.mutate(postId),
     isEmpty: (pagination.data?.pages.flat() ?? []).length === 0,
-    success: pagination.status === 'success'
+    success: pagination.status === 'success',
+    failed: pagination.status === 'error'
   }
 }

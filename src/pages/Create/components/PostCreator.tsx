@@ -8,16 +8,17 @@ import { InfiniteData, useQueryClient } from '@tanstack/react-query'
 import { Post } from '../../../models/Post'
 import { PATHS } from '../../../constants/PATHS'
 import { User } from '../../../models/User'
-import { useLoggedUser } from '../../../hooks/useLoggedUser'
+import { useSession } from '../../../hooks/useSession'
 import { QUERY_KEYS } from '../../../constants/QUERY_KEYS'
 import { useLocation } from 'wouter'
+import { ErrorMessage } from '../../../components/ErrorMessage'
 
 export function PostCreator () {
   const [, navigate] = useLocation()
-  const { loggedUser } = useLoggedUser()
+  const { loggedUser } = useSession()
   const queryClient = useQueryClient()
   const { dictionary, openModal } = useSettings()
-  const { validatePost, errorMessage, setErrorMessage } = useValidation()
+  const { validatePost, error, setError } = useValidation()
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const [postContent, setPostContent] = useState<string>('')
   const randomPlaceholderIndex = useRef<number>(getRandomNumber(0, 10))
@@ -78,7 +79,7 @@ export function PostCreator () {
       setPostContent('')
       navigate(PATHS.homeSection)
     } else {
-      setErrorMessage(dictionary.somethingWentWrong)
+      setError(dictionary.somethingWentWrong)
     }
 
     setIsLoading(false)
@@ -88,7 +89,7 @@ export function PostCreator () {
     const newPostContent = event.currentTarget.value.slice(0, 200)
     spanRef.current!.textContent = `${newPostContent.length}/200`
 
-    setErrorMessage(null)
+    setError(null)
     setPostContent(newPostContent)
   }
 
@@ -107,9 +108,7 @@ export function PostCreator () {
         0/200
       </span>
 
-      <div className='text-red-400 font-poppins-light w-full h-[30px]'>
-        {errorMessage}
-      </div>
+      <ErrorMessage value={error} />
 
       <Button onClick={handleCreatePost} text={dictionary.post} />
     </article>

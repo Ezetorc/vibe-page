@@ -5,11 +5,12 @@ import { Modal } from '../../../components/Modal'
 import { useSettings } from '../../../hooks/useSettings'
 import { useValidation } from '../../../hooks/useValidation'
 import { CloseModalButton } from '../../../components/CloseModalButton'
-import { useLoggedUser } from '../../../hooks/useLoggedUser'
+import { useSession } from '../../../hooks/useSession'
+import { ErrorMessage } from '../../../components/ErrorMessage'
 
 export default function ChangePasswordModal () {
-  const { loggedUser } = useLoggedUser()
-  const { validatePasswords, errorMessage } = useValidation()
+  const { loggedUser } = useSession()
+  const { validatePasswords, error } = useValidation()
   const { openModal, closeModal, dictionary } = useSettings()
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const newPasswordRef = useRef<HTMLInputElement>(null)
@@ -32,7 +33,9 @@ export default function ChangePasswordModal () {
       return
     }
 
-    const passwordChangeSuccess = await loggedUser.changePassword({ newPassword })
+    const passwordChangeSuccess = await loggedUser.changePassword({
+      newPassword
+    })
 
     if (passwordChangeSuccess) {
       closeModal()
@@ -69,10 +72,10 @@ export default function ChangePasswordModal () {
           className='placeholder:text-verdigris p-[5px]'
         />
 
-        {errorMessage && <p className='text-red-500'>{errorMessage}</p>}
+        <ErrorMessage value={error} />
 
         <Button
-          disabled={isLoading}
+          loading={isLoading}
           text={dictionary.change}
           onClick={handleChangePassword}
         />

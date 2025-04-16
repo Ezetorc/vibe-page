@@ -6,13 +6,13 @@ import { User } from '../../../models/User'
 import { ImageCropper } from './ImageCropper'
 import { useQueryClient } from '@tanstack/react-query'
 import { CLOUDINARY } from '../../../constants/CLOUDINARY'
-import { useLoggedUser } from '../../../hooks/useLoggedUser'
+import { useSession } from '../../../hooks/useSession'
 import { Post } from '../../../models/Post'
 import { QUERY_KEYS } from '../../../constants/QUERY_KEYS'
 
 export default function CropImageModal () {
   const queryClient = useQueryClient()
-  const { loggedUser, setLoggedUser } = useLoggedUser()
+  const { loggedUser, setLoggedUser } = useSession()
   const { openModal, closeModal, dictionary } = useSettings()
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const [croppedImage, setCroppedImage] = useState<File | null>(null)
@@ -78,7 +78,7 @@ export default function CropImageModal () {
 
         {croppedImage && (
           <Button
-            disabled={isLoading}
+          loading={isLoading}
             text={
               isLoading ? `${dictionary.loading}...` : dictionary.uploadImage
             }
@@ -88,7 +88,7 @@ export default function CropImageModal () {
 
         <Button
           type='outline'
-          disabled={isLoading}
+          loading={isLoading}
           classname={isLoading ? 'opacity-0' : ''}
           text={dictionary.cancel}
           onClick={closeModal}

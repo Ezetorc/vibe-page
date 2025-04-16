@@ -1,17 +1,16 @@
-import { useLoggedUser } from '../hooks/useLoggedUser'
+import { useSession } from '../hooks/useSession'
 import { Comment } from '../models/Comment'
 import { UserImage } from './UserImage'
 import { Username } from './Username'
 import { CommentMenu } from './CommentMenu'
-import { getDateMessage } from '../utilities/getDateMessage'
 import { useSettings } from '../hooks/useSettings'
 
 export function CommentHeader (props: {
   comment: Comment
   onDelete: (commentId: number) => void
 }) {
-  const { loggedUser } = useLoggedUser()
-  const { dictionary } = useSettings()
+  const { loggedUser } = useSession()
+  const { getMessage } = useSettings()
 
   const handleDelete = async () => {
     if (!props.comment.id) return
@@ -37,7 +36,7 @@ export function CommentHeader (props: {
         </div>
 
         <span className='text-caribbean-current font-poppins-light mobile:text-[clamp(5px,5vw,15px)] desktop:text-[clamp(5px,5vw,18px)]'>
-          {dictionary[getDateMessage(props.comment.date)]}
+          {getMessage(props.comment.date)}
         </span>
       </div>
 

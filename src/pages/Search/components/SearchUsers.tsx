@@ -1,11 +1,11 @@
 import { LoadSpinner } from '../../../components/LoadSpinner'
 import { UsersDisplay } from './UsersDisplay'
-import { useLoggedUser } from '../../../hooks/useLoggedUser'
+import { useSession } from '../../../hooks/useSession'
 import { useSettings } from '../../../hooks/useSettings'
 import { useUsers } from '../hooks/useUsers'
 
 export function SearchUsers (props: { searchQuery: string | undefined }) {
-  const { loggedUser } = useLoggedUser()
+  const { loggedUser } = useSession()
   const { dictionary } = useSettings()
   const { users, ref, hasMore, success } = useUsers(props.searchQuery)
   const filteredUsers = users.filter(

@@ -1,14 +1,14 @@
 import { useSettings } from '../../../hooks/useSettings'
-import { useLoggedUser } from '../../../hooks/useLoggedUser'
 import { Link } from 'wouter'
 import { PATHS } from '../../../constants/PATHS'
+import { useSession } from '../../../hooks/useSession'
 
 export function FirstPosterMessage () {
   const { dictionary, openModal } = useSettings()
-  const { isSessionActive } = useLoggedUser()
+  const { isSessionActive } = useSession()
 
   const handleClick = (event: React.MouseEvent<HTMLAnchorElement>): void => {
-    if (!isSessionActive()) {
+    if (!isSessionActive) {
       event.preventDefault()
       openModal('session')
     }

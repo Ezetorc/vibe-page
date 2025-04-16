@@ -1,5 +1,5 @@
 export class SessionService {
-  private static _key: string = 'session'
+  private static _key: string = 'vibe_session'
 
   static get () {
     return localStorage.getItem(this._key)

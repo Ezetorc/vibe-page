@@ -7,13 +7,14 @@ import { useValidation } from '../../../hooks/useValidation'
 import { CloseModalButton } from '../../../components/CloseModalButton'
 import { useQueryClient } from '@tanstack/react-query'
 import { User } from '../../../models/User'
-import { useLoggedUser } from '../../../hooks/useLoggedUser'
+import { useSession } from '../../../hooks/useSession'
 import { QUERY_KEYS } from '../../../constants/QUERY_KEYS'
+import { ErrorMessage } from '../../../components/ErrorMessage'
 
 export default function ChangeDescriptionModal () {
   const queryClient = useQueryClient()
-  const { loggedUser, setLoggedUser } = useLoggedUser()
-  const { validateDescription, errorMessage } = useValidation()
+  const { loggedUser, setLoggedUser } = useSession()
+  const { validateDescription, error } = useValidation()
   const { openModal, closeModal, dictionary } = useSettings()
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const newDescriptionRef = useRef<HTMLInputElement>(null)
@@ -48,11 +49,14 @@ export default function ChangeDescriptionModal () {
     })
 
     if (descriptionChangeSuccess) {
-      queryClient.setQueryData([QUERY_KEYS.User, loggedUser.id], (prevUser?: User) => {
-        if (!prevUser) return prevUser
+      queryClient.setQueryData(
+        [QUERY_KEYS.User, loggedUser.id],
+        (prevUser?: User) => {
+          if (!prevUser) return prevUser
 
-        return prevUser.update({ description: newDescription })
-      })
+          return prevUser.update({ description: newDescription })
+        }
+      )
 
       const newLoggedUser = loggedUser.update({ description: newDescription })
 
@@ -83,10 +87,10 @@ export default function ChangeDescriptionModal () {
           className='placeholder:text-verdigris p-[5px]'
         />
 
-        {errorMessage && <p className='text-red-500'>{errorMessage}</p>}
+        <ErrorMessage value={error} />
 
         <Button
-          disabled={isLoading}
+          loading={isLoading}
           text={dictionary.change}
           onClick={handleChangeDescription}
         />
