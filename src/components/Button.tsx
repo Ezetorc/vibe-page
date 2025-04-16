@@ -12,6 +12,7 @@ export function Button (props: {
   const { dictionary } = useSettings()
   const type: 'filled' | 'outline' = props.type ?? 'filled'
 
+  
   const className =
     type === 'filled'
       ? `${props.classname} cursor-pointer hover:bg-white hover:text-orange-crayola w-full h-[50px] bg-orange-crayola rounded-vibe`
