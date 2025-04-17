@@ -17,8 +17,8 @@ export class API {
   public url: string
   public abortSeconds: number
   public formatToJson: boolean
-  private headers: HeadersInit = {}
-  private options: RequestInit = {}
+  public headers: HeadersInit = {}
+  public options: RequestInit = {}
 
   constructor ({
     url,

@@ -8,11 +8,8 @@ const defaultHeaders: Record<string, string> = {
 }
 
 if (session) {
-  console.log('session: ', session)
   defaultHeaders['Authorization'] = `Bearer ${session}`
 }
-
-console.log(defaultHeaders)
 
 export const VIBE = new API({ url: VIBE_API_URL, formatToJson: true })
   .setDefaultHeaders(defaultHeaders)
