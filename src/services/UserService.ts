@@ -1,12 +1,38 @@
-import { getAdaptedUser } from '../adapters/getAdaptedUser'
 import { User } from '../models/User'
 import { UserEndpoint } from '../models/UserEndpoint'
 import { VIBE } from '../constants/VIBE'
 import { SessionService } from './SessionService'
 import { Post } from '../models/Post'
 import { Comment } from '../models/Comment'
+import { getDate } from '../utilities/getDate'
+import { FollowService } from './FollowService'
+import { PostService } from './PostService'
 
 export class UserService {
+  static async getFromEndpoint (params: {
+    userEndpoint: UserEndpoint
+  }): Promise<User> {
+    const userId = params.userEndpoint.id
+    const date = getDate(params.userEndpoint.created_at)
+    const postsAmount = await PostService.getAmountOfUser({ userId })
+    const followersAmount = await FollowService.getFollowersAmount({ userId })
+    const followingAmount = await FollowService.getFollowingAmount({ userId })
+
+    return new User({
+      id: params.userEndpoint.id,
+      name: params.userEndpoint.name,
+      email: params.userEndpoint.email,
+      password: params.userEndpoint.password,
+      imageId: params.userEndpoint.image_id,
+      imageUrl: params.userEndpoint.image_url,
+      description: params.userEndpoint.description,
+      date,
+      postsAmount,
+      followersAmount,
+      followingAmount
+    })
+  }
+
   static async delete (params: {
     userId: number
     imageId: string | null | undefined
@@ -39,7 +65,9 @@ export class UserService {
 
     if (!response.success) return null
 
-    const user: User = await getAdaptedUser({ userEndpoint: response.value! })
+    const user: User = await this.getFromEndpoint({
+      userEndpoint: response.value!
+    })
 
     return user
   }
@@ -109,7 +137,7 @@ export class UserService {
     if (!response.success) return []
 
     const users: User[] = await Promise.all(
-      response.value.map(userEndpoint => getAdaptedUser({ userEndpoint }))
+      response.value.map(userEndpoint => this.getFromEndpoint({ userEndpoint }))
     )
 
     return users
@@ -145,7 +173,7 @@ export class UserService {
     if (!response.success) return []
 
     const users: User[] = await Promise.all(
-      response.value.map(userEndpoint => getAdaptedUser({ userEndpoint }))
+      response.value.map(userEndpoint => this.getFromEndpoint({ userEndpoint }))
     )
 
     return users
@@ -184,7 +212,9 @@ export class UserService {
 
     if (!response.success) return false
 
-    const updatedUser = await getAdaptedUser({ userEndpoint: response.value })
+    const updatedUser = await this.getFromEndpoint({
+      userEndpoint: response.value
+    })
 
     params.onSuccess(updatedUser)
     return true

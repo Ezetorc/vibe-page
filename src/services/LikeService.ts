@@ -1,10 +1,18 @@
-import { getAdaptedLike } from '../adapters/getAdaptedLike'
 import { VIBE } from '../constants/VIBE'
 import { Like } from '../models/Like'
 import { LikeEndpoint } from '../models/LikeEndpoint'
 import { LikeType } from '../models/LikeType'
 
 export class LikeService {
+  static getFromEndpoint (params: { likeEndpoint: LikeEndpoint }): Like {
+    return new Like({
+      id: params.likeEndpoint.id,
+      type: params.likeEndpoint.type as LikeType,
+      targetId: params.likeEndpoint.target_id,
+      userId: params.likeEndpoint.user_id
+    })
+  }
+
   static async getAllOfPost (params: { postId: number }): Promise<Like[]> {
     const response = await VIBE.get<LikeEndpoint[]>({
       endpoint: `likes/?type=post&targetId=${params.postId}`
@@ -13,7 +21,7 @@ export class LikeService {
     if (!response.success) return []
 
     const likes = response.value!.map(likeEndpoint =>
-      getAdaptedLike({ likeEndpoint })
+      this.getFromEndpoint({ likeEndpoint })
     )
 
     return likes
@@ -27,7 +35,7 @@ export class LikeService {
     if (!response.success) return []
 
     const likes = response.value!.map(likeEndpoint =>
-      getAdaptedLike({ likeEndpoint })
+      this.getFromEndpoint({ likeEndpoint })
     )
 
     return likes
@@ -88,7 +96,7 @@ export class LikeService {
 
     if (!response.success) return null
 
-    const like = getAdaptedLike({ likeEndpoint: response.value })
+    const like = this.getFromEndpoint({ likeEndpoint: response.value })
 
     return like
   }

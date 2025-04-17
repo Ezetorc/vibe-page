@@ -1,11 +1,39 @@
-import { getAdaptedPost } from '../adapters/getAdaptedPost'
 import { Post } from '../models/Post'
 import { PostEndpoint } from '../models/PostEndpoint'
 import { LikeService } from './LikeService'
 import { VIBE } from '../constants/VIBE'
 import { User } from '../models/User'
+import { getDate } from '../utilities/getDate'
+import { CommentService } from './CommentService'
+import { UserService } from './UserService'
 
 export class PostService {
+  static async getFromEndpoint (params: {
+    postEndpoint: PostEndpoint
+    loggedUser: User | null
+  }): Promise<Post> {
+    const date = getDate(params.postEndpoint.created_at)
+    const [user, likes, comments, userLiked] = await Promise.all([
+      UserService.getById({ userId: params.postEndpoint.user_id }),
+      LikeService.getAmountOfPost({ postId: params.postEndpoint.id }),
+      CommentService.getAllOfPost({
+        postId: params.postEndpoint.id,
+        loggedUser: params.loggedUser
+      }),
+      params.loggedUser?.hasLikedPost({ postId: params.postEndpoint.id })
+    ])
+
+    return new Post({
+      id: params.postEndpoint.id,
+      content: params.postEndpoint.content,
+      user: user!,
+      date,
+      likes,
+      comments,
+      userLiked: Boolean(userLiked)
+    })
+  }
+
   static async create (params: {
     userId: number
     content: string
@@ -18,7 +46,7 @@ export class PostService {
 
     if (!response.success) return null
 
-    const post = getAdaptedPost({
+    const post = this.getFromEndpoint({
       postEndpoint: response.value!,
       loggedUser: params.loggedUser
     })
@@ -61,7 +89,7 @@ export class PostService {
 
     const posts = await Promise.all(
       response.value.map(postEndpoint =>
-        getAdaptedPost({ postEndpoint, loggedUser: params.loggedUser })
+        this.getFromEndpoint({ postEndpoint, loggedUser: params.loggedUser })
       )
     )
 
@@ -90,7 +118,7 @@ export class PostService {
 
     if (!response.success) return null
 
-    const post = await getAdaptedPost({
+    const post = await this.getFromEndpoint({
       postEndpoint: response.value!,
       loggedUser: params.loggedUser
     })
@@ -118,7 +146,7 @@ export class PostService {
 
     const posts = await Promise.all(
       response.value.map(postEndpoint =>
-        getAdaptedPost({ postEndpoint, loggedUser: params.loggedUser })
+        this.getFromEndpoint({ postEndpoint, loggedUser: params.loggedUser })
       )
     )
 

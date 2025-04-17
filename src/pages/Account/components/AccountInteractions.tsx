@@ -7,7 +7,7 @@ export function AccountInteractions (props: { user: User }) {
   const isLogged = loggedUser?.id == props.user.id
 
   return (
-    <div className='flex gap-x-[20px]'>
+    <div className='flex w-full gap-x-[20px]'>
       {!isLogged && (
         <>
           <FollowButton following={props.user} />

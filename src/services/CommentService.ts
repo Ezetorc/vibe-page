@@ -1,11 +1,36 @@
-import { getAdaptedComment } from '../adapters/getAdaptedComment'
 import { VIBE } from '../constants/VIBE'
 import { Comment } from '../models/Comment'
 import { CommentEndpoint } from '../models/CommentEndpoint'
 import { User } from '../models/User'
+import { getDate } from '../utilities/getDate'
 import { LikeService } from './LikeService'
+import { UserService } from './UserService'
 
 export class CommentService {
+  static async getFromEndpoint (params: {
+    commentEndpoint: CommentEndpoint
+    loggedUser: User | null
+  }): Promise<Comment> {
+    const date = getDate(params.commentEndpoint.created_at)
+    const [user, likes, userLiked] = await Promise.all([
+      UserService.getById({ userId: params.commentEndpoint.user_id }),
+      LikeService.getAmountOfComment({ commentId: params.commentEndpoint.id }),
+      params.loggedUser?.hasLikedComment({
+        commentId: params.commentEndpoint.id
+      })
+    ])
+
+    return new Comment({
+      user: user!,
+      likes,
+      userLiked: Boolean(userLiked),
+      id: params.commentEndpoint.id,
+      date,
+      postId: params.commentEndpoint.post_id,
+      content: params.commentEndpoint.content
+    })
+  }
+
   static async getAllOfPost (params: {
     postId: number
     amount?: number
@@ -22,7 +47,7 @@ export class CommentService {
 
     const comments = await Promise.all(
       response.value.map(commentEndpoint =>
-        getAdaptedComment({ commentEndpoint, loggedUser: params.loggedUser })
+        this.getFromEndpoint({ commentEndpoint, loggedUser: params.loggedUser })
       )
     )
 
@@ -45,7 +70,7 @@ export class CommentService {
 
     if (!response.success) return null
 
-    const comment = await getAdaptedComment({
+    const comment = await this.getFromEndpoint({
       commentEndpoint: response.value!,
       loggedUser: params.loggedUser
     })
@@ -70,7 +95,7 @@ export class CommentService {
 
     await Promise.all(likesIds.map(likeId => LikeService.delete({ likeId })))
 
-    const comment = await getAdaptedComment({
+    const comment = await this.getFromEndpoint({
       commentEndpoint: response.value!,
       loggedUser: params.loggedUser
     })
@@ -88,7 +113,7 @@ export class CommentService {
 
     if (!response.success) return null
 
-    const comment = await getAdaptedComment({
+    const comment = await this.getFromEndpoint({
       commentEndpoint: response.value!,
       loggedUser: params.loggedUser
     })
