@@ -11,6 +11,10 @@ if (session) {
   defaultHeaders['Authorization'] = `Bearer ${session}`
 }
 
-export const VIBE = new API({ url: VIBE_API_URL, formatToJson: true })
+export const VIBE = new API({
+  url: VIBE_API_URL,
+  formatToJson: true,
+  abortSeconds: 60
+})
   .setDefaultHeaders(defaultHeaders)
   .setDefaultOptions({ credentials: 'include' })
