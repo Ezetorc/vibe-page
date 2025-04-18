@@ -2,7 +2,6 @@ import { useState, useEffect, Suspense } from 'react'
 import App from './App'
 import { Loading } from './components/Loading'
 import { useSettings } from './hooks/useSettings'
-import eruda from 'eruda'
 import { useSession } from './hooks/useSession'
 
 export function Root () {
@@ -10,22 +9,20 @@ export function Root () {
   const [loading, setLoading] = useState(true)
   const { handleSession } = useSession()
 
-  useEffect(() => {
-    eruda.init()
+  const initApp = async () => {
+    const [dictionariesLoaded] = await Promise.all([
+      loadDictionaries(),
+      handleSession()
+    ])
 
-    const initApp = async () => {
-      const [dictionariesLoaded] = await Promise.all([
-        loadDictionaries(),
-        handleSession()
-      ])
-
-      if (dictionariesLoaded) {
-        setLoading(false)
-      }
+    if (dictionariesLoaded) {
+      setLoading(false)
     }
+  }
 
+  useEffect(() => {
     initApp()
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   if (loading) {
