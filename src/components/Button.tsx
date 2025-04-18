@@ -15,8 +15,8 @@ export function Button (props: {
   
   const className =
     type === 'filled'
-      ? `${props.classname} cursor-pointer hover:bg-white hover:text-orange-crayola w-full h-[50px] bg-orange-crayola rounded-vibe`
-      : `${props.classname} cursor-pointer text-orange-crayola hover:bg-white hover:border-white w-full h-[50px] bg-transparent border-orange-crayola border-vibe  rounded-vibe`
+      ? `${props.classname} cursor-pointer desktop:hover:bg-white desktop:hover:text-orange-crayola w-full h-[50px] bg-orange-crayola rounded-vibe`
+      : `${props.classname} cursor-pointer text-orange-crayola desktop:hover:bg-white desktop:hover:border-white w-full h-[50px] bg-transparent border-orange-crayola border-vibe  rounded-vibe`
 
   return (
     <button

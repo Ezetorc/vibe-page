@@ -14,7 +14,7 @@ export function PostOwner () {
 
       <Username
         user={loggedUser}
-        className='mobile:text-[clamp(10px,1.5rem,17px)] mobile:text-center desktop:text-left desktop:text-[clamp(10px,1.5rem,30px)]'
+        className='mobile:text-[clamp(10px,1.5rem,17px)] desktop:text-[clamp(10px,1.5rem,30px)]'
       />
     </header>
   )

@@ -65,7 +65,7 @@ export default function Register () {
     if (registerSuccess) {
       handleSessionSuccess()
     } else {
-      setError(dictionary.userAlreadyExists)
+      setError(dictionary.somethingWentWrong)
     }
 
     setLoading(false)

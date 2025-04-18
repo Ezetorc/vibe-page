@@ -8,7 +8,7 @@ export function useFollow (following: User | null) {
   const queryClient = useQueryClient()
   const { openModal } = useSettings()
   const { loggedUser: follower } = useSession()
-  const queryKey = [QUERY_KEYS.Follow, follower?.id, following?.id]
+  const queryKey = [follower?.id, QUERY_KEYS.Follow, following?.id]
 
   const isFollowingQuery = useQuery({
     queryKey,
@@ -21,13 +21,6 @@ export function useFollow (following: User | null) {
     }
   })
 
-  const onMutate = () => {
-    queryClient.setQueryData(
-      queryKey,
-      (oldIsFollowingData: boolean | undefined) => !oldIsFollowingData
-    )
-  }
-
   const follow = useMutation({
     mutationFn: async () => {
       if (follower && following && following.id) {
@@ -36,9 +29,13 @@ export function useFollow (following: User | null) {
         return false
       }
     },
-    onMutate,
-    onSuccess: () => {
+    onMutate: () => {
       queryClient.invalidateQueries({ queryKey })
+
+      queryClient.setQueryData(
+        queryKey,
+        (oldIsFollowing?: boolean) => !oldIsFollowing
+      )
 
       queryClient.setQueryData(
         [QUERY_KEYS.User, follower?.id],
@@ -74,9 +71,13 @@ export function useFollow (following: User | null) {
         return false
       }
     },
-    onMutate,
-    onSuccess: () => {
+    onMutate: () => {
       queryClient.invalidateQueries({ queryKey })
+
+      queryClient.setQueryData(
+        queryKey,
+        (oldIsFollowing?: boolean) => !oldIsFollowing
+      )
 
       queryClient.setQueryData(
         [QUERY_KEYS.User, follower?.id],

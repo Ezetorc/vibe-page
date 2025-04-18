@@ -36,7 +36,7 @@ export function AccountPosts (props: { user: User }) {
 
       {success ? (
         isEmpty ? (
-          dictionary.noPosts
+          <span className='text-caribbean-current '>{dictionary.noPosts}</span>
         ) : (
           <PostsDisplay onPostDelete={handlePostDelete} posts={posts} />
         )

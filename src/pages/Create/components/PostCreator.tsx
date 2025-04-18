@@ -85,7 +85,7 @@ export function PostCreator () {
     setIsLoading(false)
   }
 
-  const handleWrite = (event: FormEvent<HTMLTextAreaElement>) => {
+  const handleInput = (event: FormEvent<HTMLTextAreaElement>) => {
     const newPostContent = event.currentTarget.value.slice(0, 200)
     spanRef.current!.textContent = `${newPostContent.length}/200`
 
@@ -96,7 +96,7 @@ export function PostCreator () {
   return (
     <article className='relative w-full mobile:h-[clamp(200px,50%,300px)] desktop:h-[clamp(400px,100%,600px)] border-vibe border-caribbean-current rounded-vibe'>
       <textarea
-        onInput={handleWrite}
+        onInput={handleInput}
         maxLength={200}
         placeholder={placeholder}
         className='p-[10px] text-[clamp(25px,7vw,30px)] outline-hidden resize-none w-full h-full bg-transparent '
