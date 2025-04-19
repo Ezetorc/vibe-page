@@ -62,7 +62,7 @@ export function usePosts (searchQuery?: string) {
 
   return {
     status: pagination.status,
-    posts: pagination.data?.pages.flat() ?? [],
+    posts: pagination.data?.pages.flat().toReversed() ?? [],
     hasMore: pagination.hasNextPage,
     ref: view.ref,
     deletePost: (postId: number) => deleteMutation.mutate(postId),
