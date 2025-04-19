@@ -8,7 +8,7 @@ export function AccountPicture (props: { user: User }) {
   return (
     <UserImage
       title={dictionary.changePicture}
-      className='relative cursor-pointer grid place-items-center w-[clamp(40px,25vw,100px)] overflow-hidden rounded-user-image aspect-square border-vibe border-caribbean-current h-full border-none'
+      className='grid place-items-center w-[clamp(40px,25vw,100px)] overflow-hidden rounded-user-image aspect-square border-vibe border-caribbean-current h-full'
       user={props.user}
     />
   )

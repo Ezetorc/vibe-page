@@ -6,15 +6,12 @@ import { useSession } from '../../../hooks/useSession'
 import { useValidation } from '../../../hooks/useValidation'
 import { useRef } from 'react'
 import { UserService } from '../../../services/UserService'
-import { PATHS } from '../../../constants/PATHS'
-import { useLocation } from 'wouter'
 import { ErrorMessage } from '../../../components/ErrorMessage'
 
 export default function DeleteAccountModal () {
   const { error, setError } = useValidation()
   const { loggedUser, isSessionActive } = useSession()
   const { dictionary, openModal, closeModal } = useSettings()
-  const [, navigate] = useLocation()
   const irreversibleActionRef = useRef<HTMLInputElement | null>(null)
 
   const handleDeleteAccount = async () => {
@@ -37,7 +34,7 @@ export default function DeleteAccountModal () {
 
     if (deleteSuccess >= 0) {
       closeModal()
-      navigate(PATHS.homeSection)
+      location.reload()
     } else {
       openModal('connection')
     }
