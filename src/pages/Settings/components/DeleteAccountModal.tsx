@@ -7,10 +7,14 @@ import { useValidation } from '../../../hooks/useValidation'
 import { useRef } from 'react'
 import { UserService } from '../../../services/UserService'
 import { ErrorMessage } from '../../../components/ErrorMessage'
+import { SessionService } from '../../../services/SessionService'
+import { useQueryClient } from '@tanstack/react-query'
+import { QUERY_KEYS } from '../../../constants/QUERY_KEYS'
 
 export default function DeleteAccountModal () {
   const { error, setError } = useValidation()
   const { loggedUser, isSessionActive } = useSession()
+  const queryClient = useQueryClient()
   const { dictionary, openModal, closeModal } = useSettings()
   const irreversibleActionRef = useRef<HTMLInputElement | null>(null)
 
@@ -34,6 +38,10 @@ export default function DeleteAccountModal () {
 
     if (deleteSuccess >= 0) {
       closeModal()
+      SessionService.remove()
+      queryClient.removeQueries({
+        queryKey: [QUERY_KEYS.User, loggedUser?.id]
+      })
       location.reload()
     } else {
       openModal('connection')
