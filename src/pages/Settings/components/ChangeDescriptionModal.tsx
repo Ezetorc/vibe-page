@@ -27,9 +27,9 @@ export default function ChangeDescriptionModal () {
     const newDescription: string | undefined = newDescriptionRef.current?.value
 
     if (
-      newDescription &&
-      newDescription.trim() !== loggedUser?.description?.trim() &&
-      newDescription.trim() !== ''
+      !newDescription ||
+      newDescription.trim() === '' ||
+      newDescription.trim() === loggedUser?.description.trim()
     ) {
       closeModal()
       return
