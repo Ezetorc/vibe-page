@@ -53,7 +53,7 @@ export default function ChangeEmailModal () {
           reference={newEmailRef}
           min={1}
           max={31}
-          placeholder={dictionary.emailPlaceholder}
+          placeholder={loggedUser?.email ?? ''}
           className='placeholder:text-verdigris p-[5px]'
         />
 

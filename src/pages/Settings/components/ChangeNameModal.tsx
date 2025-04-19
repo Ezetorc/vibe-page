@@ -78,7 +78,7 @@ export default function ChangeNameModal () {
           reference={newNameRef}
           min={3}
           max={20}
-          placeholder={dictionary.namePlaceholder}
+          placeholder={loggedUser?.name ?? ''}
           className='placeholder:text-verdigris p-[5px]'
         />
 

@@ -7,7 +7,9 @@ import { useSession } from '../hooks/useSession'
 export function FollowButton (props: { following: User | null }) {
   const { dictionary, openModal } = useSettings()
   const { isSessionActive } = useSession()
-  const { isFollowing, follow, unfollow } = useFollow(props.following)
+  const { isFollowing, follow, unfollow, isLoading } = useFollow(
+    props.following
+  )
 
   const handleFollow = () => {
     if (isSessionActive) {
@@ -23,6 +25,7 @@ export function FollowButton (props: { following: User | null }) {
 
   return (
     <Button
+      loading={isLoading}
       onClick={handleFollow}
       type={
         !isSessionActive

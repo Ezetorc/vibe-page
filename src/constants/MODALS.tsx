@@ -12,8 +12,8 @@ export const MODALS: {
   comment: () => import('../components/CommentModal'),
   logout: () => import('../pages/Settings/components/LogoutModal'),
   deleteAccount: () => import('../pages/Settings/components/DeleteAccountModal'),
-  picture: () => import('../pages/Account/components/ChangePictureModal'),
-  crop: () => import('../pages/Account/components/CropImageModal'),
+  picture: () => import('../pages/Settings/components/ChangePictureModal'),
+  crop: () => import('../pages/Settings/components/CropImageModal'),
   name: () => import('../pages/Settings/components/ChangeNameModal'),
   description: () => import('../pages/Settings/components/ChangeDescriptionModal')
 }

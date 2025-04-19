@@ -1,6 +1,6 @@
 import Cropper, { Area, Point } from 'react-easy-crop'
 import { Slider } from '@mui/material'
-import { getCroppedImage } from '../utilities/getCroppedImage'
+import { getCroppedImage } from '../../Account/utilities/getCroppedImage'
 import { useEffect, useState } from 'react'
 import { useSettings } from '../../../hooks/useSettings'
 import { useSession } from '../../../hooks/useSession'

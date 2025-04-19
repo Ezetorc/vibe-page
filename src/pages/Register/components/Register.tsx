@@ -92,7 +92,11 @@ export default function Register () {
         />
         <TermsInput data={registerData} onChange={handleInputChange} />
         <ErrorMessage value={error} />
-        <Button onClick={handleValidation} text={dictionary.register} />
+        <Button
+          loading={isLoading}
+          onClick={handleValidation}
+          text={dictionary.register}
+        />
       </form>
 
       <LoginLink />

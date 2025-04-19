@@ -10,7 +10,7 @@ export function useFollow (following: User | null) {
   const { loggedUser: follower } = useSession()
   const queryKey = [follower?.id, QUERY_KEYS.Follow, following?.id]
 
-  const isFollowingQuery = useQuery({
+  const query = useQuery({
     queryKey,
     queryFn: async () => {
       if (!!follower && !!following && !!following.id) {
@@ -106,9 +106,9 @@ export function useFollow (following: User | null) {
   })
 
   return {
-    isFollowing:
-      isFollowingQuery.data === undefined ? null : isFollowingQuery.data,
+    isFollowing: query.data === undefined ? null : query.data,
     follow: follow.mutate,
-    unfollow: unfollow.mutate
+    unfollow: unfollow.mutate,
+    isLoading: query.isLoading
   }
 }

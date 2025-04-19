@@ -83,7 +83,7 @@ export default function ChangeDescriptionModal () {
           reference={newDescriptionRef}
           min={0}
           max={200}
-          placeholder={dictionary.descriptionPlaceholder}
+          placeholder={loggedUser?.description ?? ''}
           className='placeholder:text-verdigris p-[5px]'
         />
 

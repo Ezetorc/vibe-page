@@ -110,7 +110,11 @@ export function PostCreator () {
 
       <ErrorMessage value={error} />
 
-      <Button onClick={handleCreatePost} text={dictionary.post} />
+      <Button
+        loading={isLoading}
+        onClick={handleCreatePost}
+        text={dictionary.post}
+      />
     </article>
   )
 }

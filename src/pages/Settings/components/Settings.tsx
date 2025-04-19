@@ -6,38 +6,46 @@ import { SettingsSection } from './SettingsSection'
 import { SettingsButton } from './SettingsButton'
 import { PATHS } from '../../../constants/PATHS'
 import { useLocation } from 'wouter'
+import { useSession } from '../../../hooks/useSession'
 
 export default function Settings () {
   const [, navigate] = useLocation()
+  const { isSessionActive } = useSession()
   const { dictionary } = useSettings()
 
   return (
     <Section>
-      <SettingsSection name={dictionary.account}>
-        <SettingsButton modal='name' needsSession>
-          {dictionary.changeName}
-        </SettingsButton>
+      {isSessionActive && (
+        <SettingsSection name={dictionary.account}>
+          <SettingsButton modal='name' needsSession>
+            {dictionary.changeName}
+          </SettingsButton>
 
-        <SettingsButton modal='description' needsSession>
-          {dictionary.changeDescription}
-        </SettingsButton>
+          <SettingsButton modal='picture' needsSession>
+            {dictionary.changePicture}
+          </SettingsButton>
 
-        <SettingsButton modal='email' needsSession>
-          {dictionary.changeEmail}
-        </SettingsButton>
+          <SettingsButton modal='description' needsSession>
+            {dictionary.changeDescription}
+          </SettingsButton>
 
-        <SettingsButton modal='password' needsSession>
-          {dictionary.changePassword}
-        </SettingsButton>
+          <SettingsButton modal='email' needsSession>
+            {dictionary.changeEmail}
+          </SettingsButton>
 
-        <SettingsButton modal='logout' needsSession>
-          {dictionary.logout}
-        </SettingsButton>
+          <SettingsButton modal='password' needsSession>
+            {dictionary.changePassword}
+          </SettingsButton>
 
-        <SettingsButton modal='deleteAccount' needsSession dangerous>
-          {dictionary.deleteAccount}
-        </SettingsButton>
-      </SettingsSection>
+          <SettingsButton modal='logout' needsSession>
+            {dictionary.logout}
+          </SettingsButton>
+
+          <SettingsButton modal='deleteAccount' needsSession dangerous>
+            {dictionary.deleteAccount}
+          </SettingsButton>
+        </SettingsSection>
+      )}
 
       <SettingsSection name={dictionary.display}>
         <SettingsButton modal='language'>
