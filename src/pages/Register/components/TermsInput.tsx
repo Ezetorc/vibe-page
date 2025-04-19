@@ -30,7 +30,7 @@ export function TermsInput (props: {
         {dictionary.iAgreeWith}{' '}
         <Link
           to={PATHS.termsSection}
-          className='border-b-2 border-b-white hover:border-b-orange-crayola hover:text-orange-crayola'
+          className='border-b-2 border-b-white desktop:hover:border-b-orange-crayola desktop:hover:text-orange-crayola'
         >
           {dictionary.termsAndConditions}
         </Link>

@@ -12,7 +12,7 @@ export function Username (props: { user: User | null; className?: string }) {
     <>
       {userName && (
         <Link
-          className={`${props.className} overflow-ellipsis text-orange-crayola w-full hover:underline content-end text-[clamp(10px,1.5rem,30px)]`}
+          className={`${props.className} overflow-ellipsis text-orange-crayola w-full desktop:hover:underline content-end text-[clamp(10px,1.5rem,30px)]`}
           to={to}
         >
           {userName}

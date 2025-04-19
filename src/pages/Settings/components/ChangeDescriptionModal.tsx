@@ -28,8 +28,8 @@ export default function ChangeDescriptionModal () {
 
     if (
       !newDescription ||
-      newDescription.trim() === '' ||
-      newDescription.trim() === loggedUser?.description.trim()
+      newDescription?.trim() === '' ||
+      newDescription?.trim() === loggedUser?.description?.trim()
     ) {
       closeModal()
       return
@@ -61,12 +61,12 @@ export default function ChangeDescriptionModal () {
       const newLoggedUser = loggedUser.update({ description: newDescription })
 
       setLoggedUser(newLoggedUser)
+      setIsLoading(false)
       closeModal()
     } else {
+      setIsLoading(false)
       openModal('connection')
     }
-
-    setIsLoading(false)
   }
 
   return (

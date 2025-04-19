@@ -20,7 +20,7 @@ export function SettingsButton (props: {
 
   return (
     <Button
-      classname={`${props.dangerous && `bg-red-500 hover:text-red-500`} ${
+      classname={`${props.dangerous && `bg-red-500 desktop:hover:text-red-500`} ${
         props.className
       }`}
       onClick={handleClick}

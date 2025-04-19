@@ -16,7 +16,7 @@ export function PostMenu (props: { onDelete: () => void }) {
 
       <Content className='absolute right-[-40px] mt-2 w-40 bg-gunmetal border-vibe rounded-vibe border-caribbean-current text-white shadow-lg'>
         <Item
-          className='px-4 py-2 cursor-pointer hover:bg-gray-700'
+          className='px-4 py-2 cursor-pointer desktop:hover:bg-gray-700'
           onClick={props.onDelete}
         >
           {dictionary.delete}

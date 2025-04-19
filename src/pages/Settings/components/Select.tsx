@@ -11,7 +11,7 @@ export function Select (props: {
       onInput={props.onInput}
       title={props.title}
       defaultValue={props.defaultValue}
-      className='cursor-pointer text-center hover:bg-white hover:text-orange-crayola text-orange-crayola w-full h-[50px] border-orange-crayola border-vibe bg-transparent  rounded-vibe'
+      className='cursor-pointer text-center desktop:hover:bg-white desktop:hover:text-orange-crayola text-orange-crayola w-full h-[50px] border-orange-crayola border-vibe bg-transparent  rounded-vibe'
     >
       {props.children}
     </select>

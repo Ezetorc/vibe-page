@@ -52,7 +52,7 @@ export default function ChangePictureModal () {
               user={loggedUser}
             />
 
-            <label className='cursor-pointer text-center hover:bg-white hover:text-orange-crayola p-[10px] w-full h-[50px] bg-orange-crayola  rounded-vibe flex items-center justify-center'>
+            <label className='cursor-pointer text-center desktop:hover:bg-white desktop:hover:text-orange-crayola p-[10px] w-full h-[50px] bg-orange-crayola  rounded-vibe flex items-center justify-center'>
               {dictionary.uploadImage}
               <input
                 type='file'
