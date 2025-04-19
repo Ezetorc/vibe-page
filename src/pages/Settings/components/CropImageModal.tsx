@@ -3,12 +3,12 @@ import { useState } from 'react'
 import { Modal } from '../../../components/Modal'
 import { useSettings } from '../../../hooks/useSettings'
 import { User } from '../../../models/User'
-import { ImageCropper } from '../../Account/components/ImageCropper'
 import { useQueryClient } from '@tanstack/react-query'
 import { CLOUDINARY } from '../../../constants/CLOUDINARY'
 import { useSession } from '../../../hooks/useSession'
 import { Post } from '../../../models/Post'
 import { QUERY_KEYS } from '../../../constants/QUERY_KEYS'
+import { ImageCropper } from './ImageCropper'
 
 export default function CropImageModal () {
   const queryClient = useQueryClient()
