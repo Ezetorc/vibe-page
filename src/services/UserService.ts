@@ -41,7 +41,7 @@ export class UserService {
       endpoint: `users`
     })
 
-    if (response.success) {
+    if (!response.error) {
       if (!params.imageId) return params.userId
 
       const deleteSuccess = await this.deleteImage({
@@ -63,7 +63,7 @@ export class UserService {
       endpoint: `users/${params.userId}`
     })
 
-    if (!response.success) return null
+    if (response.error) return null
 
     const user: User = await this.getFromEndpoint({
       userEndpoint: response.value!
@@ -134,7 +134,7 @@ export class UserService {
       endpoint: `users?amount=${params.amount ?? 6}&page=${params.page ?? 1}`
     })
 
-    if (!response.success) return []
+    if (response.error) return []
 
     const users: User[] = await Promise.all(
       response.value.map(userEndpoint => this.getFromEndpoint({ userEndpoint }))
@@ -170,7 +170,7 @@ export class UserService {
       }&page=${params.page ?? 1}`
     })
 
-    if (!response.success) return []
+    if (response.error) return []
 
     const users: User[] = await Promise.all(
       response.value.map(userEndpoint => this.getFromEndpoint({ userEndpoint }))
@@ -210,7 +210,7 @@ export class UserService {
       body: JSON.stringify(params.body)
     })
 
-    if (!response.success) return false
+    if (response.error) return false
 
     const updatedUser = await this.getFromEndpoint({
       userEndpoint: response.value
@@ -225,6 +225,6 @@ export class UserService {
       endpoint: `users/image/${params.publicId}`
     })
 
-    return response.success
+    return !response.error
   }
 }

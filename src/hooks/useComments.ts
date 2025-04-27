@@ -1,4 +1,8 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query'
+import {
+  useInfiniteQuery,
+  useMutation,
+  useQueryClient
+} from '@tanstack/react-query'
 import { Post } from '../models/Post'
 import { useSettings } from './useSettings'
 import { CommentService } from '../services/CommentService'
@@ -8,15 +12,36 @@ import { useSession } from './useSession'
 import { QUERY_KEYS } from '../constants/QUERY_KEYS'
 import { User } from '../models/User'
 
-export function useComment (post: Post) {
+export function useComments (post: Post) {
   const { loggedUser, isSessionActive } = useSession()
   const { openModal, closeModal } = useSettings()
   const queryClient = useQueryClient()
   const queryKey = [QUERY_KEYS.Post, post.id]
 
+  const pagination = useInfiniteQuery({
+    queryKey: [QUERY_KEYS.Comments, post.id],
+    queryFn: async ({ pageParam }) => {
+      if (typeof post.comments === 'number' && post.comments === 0) {
+        return []
+      } else {
+        return await CommentService.getAllOfPost({
+          postId: post.id,
+          loggedUser,
+          page: pageParam
+        })
+      }
+    },
+    initialPageParam: 1,
+    getNextPageParam: (lastPage, allPages) =>
+      lastPage?.length ? allPages.length + 1 : undefined
+  })
+
+  const comments = pagination.data?.pages.flat() ?? []
+
   const updateComments = (updater: (comments: Comment[]) => Comment[]) => {
     queryClient.setQueryData(queryKey, (prevPost?: Post) => {
-      if (!prevPost?.comments) return prevPost
+      if (!prevPost?.comments || typeof prevPost.comments === 'number')
+        return prevPost
 
       return prevPost.update({
         comments: updater(prevPost.comments)
@@ -57,7 +82,7 @@ export function useComment (post: Post) {
         return
       }
 
-      post.comments = [...post.comments, newComment]
+      post.comments = [...comments, newComment]
       closeModal()
       updateComments(comments => [...comments, newComment])
       updatePostsAmount('create')
@@ -69,7 +94,7 @@ export function useComment (post: Post) {
     mutationFn: (commentId: number) =>
       CommentService.delete({ commentId, loggedUser }),
     onMutate: (commentId: number) => {
-      post.comments = post.comments.filter(comment => comment.id !== commentId)
+      post.comments = comments.filter(comment => comment.id !== commentId)
     },
     onSuccess: deletedComment => {
       if (!deletedComment) return
@@ -84,11 +109,9 @@ export function useComment (post: Post) {
   })
 
   return {
+    comments,
     createComment: createComment.mutate,
     deleteComment: deleteComment.mutate,
-    isCreating: createComment.isPending,
-    isDeleting: deleteComment.isPending,
-    errorCreating: createComment.error,
-    errorDeleting: deleteComment.error
+    isLoading: createComment.isPending || pagination.isFetching
   }
 }

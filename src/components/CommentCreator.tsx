@@ -3,7 +3,7 @@ import { useSettings } from '../hooks/useSettings'
 import { useValidation } from '../hooks/useValidation'
 import { getRandomNumber } from '../pages/Create/utilities/getRandomNumber'
 import { Button } from './Button'
-import eventEmitter from '../constants/EVENT_EMITTER'
+import EVENT_EMITTER from '../constants/EVENT_EMITTER'
 import { NewCommentEvent } from '../models/NewCommentEvent'
 import { ErrorMessage } from './ErrorMessage'
 import { useSession } from '../hooks/useSession'
@@ -37,7 +37,7 @@ export function CommentCreator () {
         postId: activeModal.data.postId as number
       }
 
-      eventEmitter.emit('commentCreated', event)
+      EVENT_EMITTER.emit('commentCreated', event)
     } else {
       setIsLoading(false)
     }

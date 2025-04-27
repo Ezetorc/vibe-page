@@ -9,6 +9,9 @@ const LazySearch = lazy(() => import('./pages/Search/components/Search.tsx'))
 const LazyCreate = lazy(() => import('./pages/Create/components/Create.tsx'))
 const LazyAccount = lazy(() => import('./pages/Account/components/Account.tsx'))
 const LazyTerms = lazy(() => import('./pages/Terms/components/Terms.tsx'))
+const LazyNotifications = lazy(
+  () => import('./pages/Notifications/components/Notifications.tsx')
+)
 const LazySettings = lazy(
   () => import('./pages/Settings/components/Settings.tsx')
 )
@@ -28,11 +31,13 @@ export default function App () {
       <Route path={PATHS.createSection} component={LazyCreate} />
       <Route path={PATHS.settingsSection} component={LazySettings} />
       <Route path={PATHS.termsSection} component={LazyTerms} />
+      <Route path={PATHS.notificationsSection} component={LazyNotifications} />
 
       <Switch>
         <Route path={PATHS.accountSection}>
           <LazyAccount />
         </Route>
+
         <Route path={PATHS.accountIdSection}>
           {(params: { userId?: string }) => (
             <LazyAccount userId={params.userId} />

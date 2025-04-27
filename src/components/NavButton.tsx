@@ -1,34 +1,33 @@
-import { Link, useLocation } from 'wouter'
-import { useSettings } from '../hooks/useSettings'
+import { Link } from 'wouter'
 import { useSession } from '../hooks/useSession'
+import { ReactNode } from 'react'
 
 export function NavButton (props: {
-  icon: JSX.Element
-  to: string
+  children: ReactNode
+  to?: string
+  onClick?: () => void
   needsSession?: boolean
   title: string
 }) {
-  const [location] = useLocation()
-  const { openModal } = useSettings()
   const { isSessionActive } = useSession()
 
-  const handleClick = (event: React.MouseEvent<HTMLAnchorElement>): void => {
-    if (!(props.needsSession ?? false)) return
+  if (props.needsSession && !isSessionActive) return null
 
-    if (!isSessionActive) {
-      event.preventDefault()
-      openModal('session')
-    }
-  }
-
-  return (
+  return props.to ? (
     <Link
       className='grid place-items-center aspect-square w-[60px] relative'
-      onClick={handleClick}
       title={props.title}
       to={props.to}
     >
-      {<props.icon.type filled={location === props.to} />}
+      {props.children}
     </Link>
+  ) : (
+    <button
+      className='cursor-pointer grid place-items-center aspect-square w-[60px] relative'
+      title={props.title}
+      onClick={props.onClick}
+    >
+      {props.children}
+    </button>
   )
 }

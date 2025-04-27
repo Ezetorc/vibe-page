@@ -57,7 +57,7 @@ export function PostFooter (props: {
           <CommentIcon filled={props.commentsOpened} />
         </button>
         <span className='text-verdigris font-poppins-semibold'>
-          {props.post.comments.length}
+          {typeof props.post.comments === 'number' && props.post.comments}
         </span>
       </div>
     </footer>

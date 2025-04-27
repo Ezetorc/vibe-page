@@ -6,6 +6,8 @@ import { CommentService } from '../services/CommentService'
 import { Comment } from './Comment'
 import { Like } from './Like'
 import { FollowService } from '../services/FollowService'
+import { NotificationService } from '../services/NotificationService'
+import { Notification } from './Notification'
 
 export class User {
   public id: number
@@ -116,6 +118,16 @@ export class User {
 
     await this.changeImageUrl({ newImageUrl: imageUrl })
     await this.changeImageId({ newImageId: publicId })
+  }
+
+  public async clearNotifications (): Promise<boolean> {
+    return await NotificationService.clearAllOfUser({ userId: this.id })
+  }
+
+  public async getNotifications (params: {
+    page: number
+  }): Promise<Notification[]> {
+    return await NotificationService.getAll({ page: params.page, senderId: this.id })
   }
 
   public async changeName (params: { newName: User['name'] }): Promise<boolean> {

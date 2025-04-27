@@ -54,6 +54,14 @@ export class CommentService {
     return comments
   }
 
+  static async getAmountOfPost (params: { postId: number }): Promise<number> {
+    const response = await VIBE.get<number>({
+      endpoint: `comments/post/amount/${params.postId}`
+    })
+
+    return response.value
+  }
+
   static async create (params: {
     content: string
     postId: number
@@ -68,7 +76,7 @@ export class CommentService {
       })
     })
 
-    if (!response.success) return null
+    if (response.error) return null
 
     const comment = await this.getFromEndpoint({
       commentEndpoint: response.value!,
@@ -86,7 +94,7 @@ export class CommentService {
       endpoint: `comments/${params.commentId}`
     })
 
-    if (!response.success) return null
+    if (response.error) return null
 
     const commentLikes = await LikeService.getAllOfComment({
       commentId: params.commentId
@@ -111,7 +119,7 @@ export class CommentService {
       endpoint: `comments/${params.commentId}`
     })
 
-    if (!response.success) return null
+    if (response.error) return null
 
     const comment = await this.getFromEndpoint({
       commentEndpoint: response.value!,

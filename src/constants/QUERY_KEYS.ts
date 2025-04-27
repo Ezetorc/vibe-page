@@ -4,5 +4,7 @@ export const enum QUERY_KEYS {
   Users = 'users',
   User = 'user',
   Comment = 'comment',
-  Follow = 'isFollowing'
+  Comments = 'comments',
+  Follow = 'isFollowing',
+  Notifications = 'notifications'
 }

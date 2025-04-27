@@ -1,8 +1,8 @@
 import { useState, useEffect, Suspense } from 'react'
 import App from './App'
-import { Loading } from './components/Loading'
 import { useSettings } from './hooks/useSettings'
 import { useSession } from './hooks/useSession'
+import { Loading } from './components/Loading'
 
 export function Root () {
   const { loadDictionaries } = useSettings()

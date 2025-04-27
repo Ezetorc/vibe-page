@@ -18,7 +18,7 @@ export class LikeService {
       endpoint: `likes/?type=post&targetId=${params.postId}`
     })
 
-    if (!response.success) return []
+    if (response.error) return []
 
     const likes = response.value!.map(likeEndpoint =>
       this.getFromEndpoint({ likeEndpoint })
@@ -32,7 +32,7 @@ export class LikeService {
       endpoint: `likes/?type=comment&targetId=${params.commentId}`
     })
 
-    if (!response.success) return []
+    if (response.error) return []
 
     const likes = response.value!.map(likeEndpoint =>
       this.getFromEndpoint({ likeEndpoint })
@@ -46,7 +46,7 @@ export class LikeService {
       endpoint: `likes/count?type=post&targetId=${params.postId}`
     })
 
-    if (response.success) {
+    if (!response.error) {
       return response.value
     } else {
       return -1
@@ -60,7 +60,7 @@ export class LikeService {
       endpoint: `likes/count?type=comment&targetId=${params.commentId}`
     })
 
-    if (response.success) {
+    if (!response.error) {
       return response.value
     } else {
       return -1
@@ -76,7 +76,7 @@ export class LikeService {
       signal: params.signal
     })
 
-    return response.success
+    return !response.error
   }
 
   static async create (params: {
@@ -94,7 +94,7 @@ export class LikeService {
       })
     })
 
-    if (!response.success) return null
+    if (response.error) return null
 
     const like = this.getFromEndpoint({ likeEndpoint: response.value })
 

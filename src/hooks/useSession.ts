@@ -47,12 +47,12 @@ export function useSession () {
   }
 
   const handleSession = async (): Promise<boolean> => {
-    const decodedSessionItem = SessionService.get()
+    const codedSessionItem = SessionService.get()
 
-    if (!decodedSessionItem) return false
+    if (!codedSessionItem) return false
 
     try {
-      const session: SessionItem = getDecodedJWT(decodedSessionItem)
+      const session: SessionItem = getDecodedJWT(codedSessionItem)
 
       if (session.isExpired) {
         SessionService.remove()

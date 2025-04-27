@@ -9,7 +9,7 @@ export class Post {
   public user: User
   public content: string
   public likes: number
-  public comments: Comment[]
+  public comments: Comment[] | number
   public date: string
   public userLiked: boolean
 
@@ -19,7 +19,7 @@ export class Post {
     content: string
     date: string
     likes: number
-    comments: Comment[]
+    comments: Comment[] | number
     userLiked: boolean
   }) {
     this.id = props.id

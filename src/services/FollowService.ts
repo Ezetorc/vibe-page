@@ -6,7 +6,7 @@ export class FollowService {
       endpoint: `follows/${params.followingId}`
     })
 
-    return response.success
+    return !response.error
   }
 
   static async delete (params: { followingId: number }): Promise<boolean> {
@@ -14,7 +14,7 @@ export class FollowService {
       endpoint: `follows/${params.followingId}`
     })
 
-    return response.success
+    return !response.error
   }
 
   static async exists (params: {
@@ -43,7 +43,7 @@ export class FollowService {
       endpoint: `follows/count?userId=${params.userId}&type=following`
     })
 
-    if (response.success) {
+    if (!response.error) {
       return response.value
     } else {
       return -1
@@ -55,7 +55,7 @@ export class FollowService {
       endpoint: `follows/count?userId=${params.userId}&type=follower`
     })
 
-    if (response.success) {
+    if (!response.error) {
       return response.value
     } else {
       return -1

@@ -8,10 +8,13 @@ settings,Configuración,Settings
 home,Inicio,Home
 post,Publicar,Post
 logout,Cerrar sesión,Log out
+notifications,Notificaciones,Notifications
 areYouSureLogout,¿Quieres cerrar sesión?,Do you wanna log out?
 deleteAccount,Eliminar cuenta,Delete account
 comment,Comentar,Comment
 cancel,Cancelar,Cancel
+noNotificationsYet,No tienes notificaciones...,No notifications yet...
+clearNotifications,Limpiar notificaciones,Clear notifications
 uploadImage,Subir imágen,Upload image
 removeImage,Remover imágen,Remove image
 changePicture,Cambiar foto de perfil,Change profile picture

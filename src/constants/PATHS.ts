@@ -12,5 +12,6 @@ export const PATHS = {
   accountIdSection: '/account/:userId',
   accountSection: '/account',
   settingsSection: '/settings',
-  termsSection: '/terms'
+  termsSection: '/terms',
+  notificationsSection: '/notifications'
 }

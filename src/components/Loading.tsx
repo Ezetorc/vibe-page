@@ -1,11 +1,9 @@
-import { useSettings } from '../hooks/useSettings'
+import { LoadSpinner } from './LoadSpinner'
 
 export function Loading () {
-  const { dictionary } = useSettings()
-
   return (
-    <h3 className='text-[clamp(20px,3rem,60px)] w-screen h-screen flex justify-center items-center'>
-      {dictionary.loading}
-    </h3>
+    <div className='w-screen h-screen scale-200 absolute top-0 left-0 grid place-items-center'>
+      <LoadSpinner />
+    </div>
   )
 }

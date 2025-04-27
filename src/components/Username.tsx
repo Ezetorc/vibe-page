@@ -2,7 +2,10 @@ import { Link } from 'wouter'
 import { useSession } from '../hooks/useSession'
 import { User } from '../models/User'
 
-export function Username (props: { user: User | null; className?: string }) {
+export function Username (props: {
+  user: User | null | undefined
+  className?: string
+}) {
   const { loggedUser } = useSession()
   const userName = props.user?.name
   const to: string =
