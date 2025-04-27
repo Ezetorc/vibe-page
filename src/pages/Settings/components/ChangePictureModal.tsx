@@ -27,7 +27,7 @@ export default function ChangePictureModal () {
     try {
       loggedUser.saveImage(null, null)
 
-      const newLoggedUser = loggedUser.update({ imageId: null, imageUrl: null })
+      const newLoggedUser = loggedUser.update({ imageId: undefined, imageUrl: undefined })
 
       setLoggedUser(newLoggedUser)
       closeModal()

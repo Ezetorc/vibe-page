@@ -9,6 +9,7 @@ import { AccountPicture } from './AccountPicture'
 import { AccountPosts } from './AccountPosts'
 import { AccountInfo } from './AccountInfo'
 import { useUser } from '../hooks/useUser'
+import { Loading } from '../../../components/Loading'
 
 export default function Account (props: { userId?: string | number }) {
   const { dictionary } = useSettings()
@@ -18,7 +19,7 @@ export default function Account (props: { userId?: string | number }) {
     <>
       {isLoading ? (
         <h3 className='text-[clamp(20px,3rem,60px)] w-screen h-screen flex justify-center items-center'>
-          {dictionary.loading}
+          <Loading />
         </h3>
       ) : isError ? (
         <h3 className='text-[clamp(20px,3rem,60px)] w-screen h-screen flex justify-center items-center'>

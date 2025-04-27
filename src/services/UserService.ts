@@ -7,6 +7,7 @@ import { Comment } from '../models/Comment'
 import { getDate } from '../utilities/getDate'
 import { FollowService } from './FollowService'
 import { PostService } from './PostService'
+import { CLOUDINARY } from '../constants/CLOUDINARY'
 
 export class UserService {
   static async getFromEndpoint (params: {
@@ -17,14 +18,15 @@ export class UserService {
     const postsAmount = await PostService.getAmountOfUser({ userId })
     const followersAmount = await FollowService.getFollowersAmount({ userId })
     const followingAmount = await FollowService.getFollowingAmount({ userId })
+    const { imageId, imageUrl } = CLOUDINARY.getImageData(
+      params.userEndpoint.image
+    )
 
     return new User({
       id: params.userEndpoint.id,
       name: params.userEndpoint.name,
-      email: params.userEndpoint.email,
-      password: params.userEndpoint.password,
-      imageId: params.userEndpoint.image_id,
-      imageUrl: params.userEndpoint.image_url,
+      imageId,
+      imageUrl,
       description: params.userEndpoint.description,
       date,
       postsAmount,
@@ -203,7 +205,7 @@ export class UserService {
 
   static async update (params: {
     body: object
-    onSuccess: (updatedUser: User) => void
+    onSuccess?: (updatedUser: User) => void
   }): Promise<boolean> {
     const response = await VIBE.patch<UserEndpoint>({
       endpoint: `users`,
@@ -216,7 +218,7 @@ export class UserService {
       userEndpoint: response.value
     })
 
-    params.onSuccess(updatedUser)
+    if (params.onSuccess) params.onSuccess(updatedUser)
     return true
   }
 

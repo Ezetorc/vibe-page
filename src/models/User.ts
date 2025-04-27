@@ -12,11 +12,9 @@ import { Notification } from './Notification'
 export class User {
   public id: number
   public name: string
-  public email: string
-  public password: string
-  public imageId: string | null
-  public imageUrl: string | null
-  public description: string
+  public imageId?: string
+  public imageUrl?: string
+  public description?: string
   public date: string
   public postsAmount: number
   public followersAmount: number
@@ -25,11 +23,9 @@ export class User {
   constructor (props: {
     id: number
     name: string
-    email: string
-    password: string
-    imageId: string | null
-    imageUrl: string | null
-    description: string
+    imageId?: string
+    imageUrl?: string
+    description?: string
     date: string
     postsAmount: number
     followersAmount: number
@@ -37,8 +33,6 @@ export class User {
   }) {
     this.id = props.id
     this.name = props.name
-    this.email = props.email
-    this.password = props.password
     this.imageId = props.imageId
     this.imageUrl = props.imageUrl
     this.description = props.description
@@ -59,8 +53,6 @@ export class User {
   public update (properties: Partial<User>): User {
     return new User({
       id: properties.id ?? this.id,
-      email: properties.email ?? this.email,
-      password: properties.password ?? this.password,
       name: properties.name ?? this.name,
       imageId: properties.imageId ?? this.imageId,
       imageUrl: properties.imageUrl ?? this.imageUrl,
@@ -112,6 +104,8 @@ export class User {
   }
 
   public async saveImage (imageUrl: string | null, publicId: string | null) {
+    if (!imageUrl || !publicId) return
+
     if (this.imageId) {
       await UserService.deleteImage({ publicId: this.imageId })
     }
@@ -127,7 +121,10 @@ export class User {
   public async getNotifications (params: {
     page: number
   }): Promise<Notification[]> {
-    return await NotificationService.getAll({ page: params.page, senderId: this.id })
+    return await NotificationService.getAll({
+      page: params.page,
+      senderId: this.id
+    })
   }
 
   public async changeName (params: { newName: User['name'] }): Promise<boolean> {
@@ -158,11 +155,10 @@ export class User {
   }
 
   public async changePassword (params: {
-    newPassword: User['password']
+    newPassword: string
   }): Promise<boolean> {
     return await UserService.update({
-      body: { password: params.newPassword },
-      onSuccess: updatedUser => (this.password = updatedUser.password)
+      body: { password: params.newPassword }
     })
   }
 
@@ -175,12 +171,9 @@ export class User {
     })
   }
 
-  public async changeEmail (params: {
-    newEmail: User['email']
-  }): Promise<boolean> {
+  public async changeEmail (params: { newEmail: string }): Promise<boolean> {
     return await UserService.update({
-      body: { email: params.newEmail },
-      onSuccess: updatedUser => (this.email = updatedUser.email)
+      body: { email: params.newEmail }
     })
   }
 
