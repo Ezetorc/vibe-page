@@ -7,6 +7,12 @@ users,Usuarios,Users
 settings,Configuración,Settings
 home,Inicio,Home
 post,Publicar,Post
+like,Me gusta,Like
+madeAPost,creó un post,made a post
+commentedOnYourPost,comentó en tu post,commented on your post
+startedFollowingYou,empezó a seguirte,started following you
+likedYourPost,likeó tu post:,liked your post:
+dislike,No me gusta,Dislike
 myNewEmail,miNuevoEmail@email.com,myNewEmail@email.com
 logout,Cerrar sesión,Log out
 notifications,Notificaciones,Notifications
@@ -18,11 +24,14 @@ noNotificationsYet,No tienes notificaciones...,No notifications yet...
 clearNotifications,Limpiar notificaciones,Clear notifications
 uploadImage,Subir imágen,Upload image
 removeImage,Remover imágen,Remove image
-changePicture,Cambiar foto de perfil,Change profile picture
+changeProfilePicture,Cambiar foto de perfil,Change profile picture
 searchMyPosts,Buscar mis publicaciones...,Search my posts...
 account,Cuenta,Account
+noImageSelected,No se seleccionó ninguna imágen,No image selected
 display,Visualización,Display
 youJoined,Te uniste el,You joined
+leaveBlankToRemove,Dejar blanco para remover,Leave blank to remove
+youAlreadyHaveThisDescription,Ya tienes esta descripción,You already have this description
 userNotFound,Usuario no encontrado,User not found
 password,Contraseña,Password
 nameInUse,"Nombre de usuario en uso, elige otro","Name in use, try other"

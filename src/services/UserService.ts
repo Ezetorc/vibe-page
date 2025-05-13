@@ -5,19 +5,17 @@ import { SessionService } from './SessionService'
 import { Post } from '../models/Post'
 import { Comment } from '../models/Comment'
 import { getDate } from '../utilities/getDate'
-import { FollowService } from './FollowService'
-import { PostService } from './PostService'
 import { CLOUDINARY } from '../constants/CLOUDINARY'
+import { SimplifiedUserEndpoint } from '../models/SimplifiedUserEndpoint'
 
 export class UserService {
-  static async getFromEndpoint (params: {
-    userEndpoint: UserEndpoint
-  }): Promise<User> {
-    const userId = params.userEndpoint.id
-    const date = getDate(params.userEndpoint.created_at)
-    const postsAmount = await PostService.getAmountOfUser({ userId })
-    const followersAmount = await FollowService.getFollowersAmount({ userId })
-    const followingAmount = await FollowService.getFollowingAmount({ userId })
+  static getFromEndpoint (params: {
+    userEndpoint: UserEndpoint | SimplifiedUserEndpoint
+  }): User {
+    const date =
+      'created_at' in params.userEndpoint
+        ? getDate(params.userEndpoint.created_at)
+        : undefined
     const { imageId, imageUrl } = CLOUDINARY.getImageData(
       params.userEndpoint.image
     )
@@ -27,11 +25,11 @@ export class UserService {
       name: params.userEndpoint.name,
       imageId,
       imageUrl,
-      description: params.userEndpoint.description,
-      date,
-      postsAmount,
-      followersAmount,
-      followingAmount
+      description:
+        'description' in params.userEndpoint
+          ? params.userEndpoint.description
+          : undefined,
+      date
     })
   }
 
@@ -67,7 +65,7 @@ export class UserService {
 
     if (response.error) return null
 
-    const user: User = await this.getFromEndpoint({
+    const user: User = this.getFromEndpoint({
       userEndpoint: response.value!
     })
 
@@ -138,8 +136,8 @@ export class UserService {
 
     if (response.error) return []
 
-    const users: User[] = await Promise.all(
-      response.value.map(userEndpoint => this.getFromEndpoint({ userEndpoint }))
+    const users: User[] = response.value.map(userEndpoint =>
+      this.getFromEndpoint({ userEndpoint })
     )
 
     return users
@@ -174,8 +172,8 @@ export class UserService {
 
     if (response.error) return []
 
-    const users: User[] = await Promise.all(
-      response.value.map(userEndpoint => this.getFromEndpoint({ userEndpoint }))
+    const users: User[] = response.value.map(userEndpoint =>
+      this.getFromEndpoint({ userEndpoint })
     )
 
     return users
@@ -214,7 +212,7 @@ export class UserService {
 
     if (response.error) return false
 
-    const updatedUser = await this.getFromEndpoint({
+    const updatedUser = this.getFromEndpoint({
       userEndpoint: response.value
     })
 

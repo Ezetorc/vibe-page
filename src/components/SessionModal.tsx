@@ -9,13 +9,8 @@ export default function SessionModal () {
   const { closeModal, dictionary } = useSettings()
   const [, navigate] = useLocation()
 
-  const handleLogin = () => {
-    navigate(PATHS.loginSection)
-    closeModal()
-  }
-
-  const handleRegister = () => {
-    navigate(PATHS.registerSection)
+  const handleClick = (path: string) => {
+    navigate(path)
     closeModal()
   }
 
@@ -32,12 +27,22 @@ export default function SessionModal () {
           <span className='font-poppins-light text-[clamp(20px,4vw,25px)]'>
             {dictionary.iHaveAnAccount}
           </span>
-          <Button onClick={handleLogin} text={dictionary.login} />
+
+          <Button
+            classname='w-full'
+            onClick={() => handleClick(PATHS.loginSection)}
+            text={dictionary.login}
+          />
 
           <span className='font-poppins-light text-[clamp(20px,4vw,25px)] mt-[40px]'>
             {dictionary.iDontHaveAnAccount}
           </span>
-          <Button onClick={handleRegister} text={dictionary.register} />
+
+          <Button
+            classname='w-full'
+            onClick={() => handleClick(PATHS.registerSection)}
+            text={dictionary.register}
+          />
         </div>
       </article>
     </Modal>

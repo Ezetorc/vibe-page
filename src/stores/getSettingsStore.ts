@@ -22,10 +22,6 @@ export const getSettingsStore = create<SettingsStore>(set => ({
   language: LanguageService.get(),
   setLanguage: (newLanguage: Language) => set({ language: newLanguage }),
 
-  activeModal: {
-    name: null,
-    data: undefined
-  },
-  setActiveModal: (newActiveModal: Modal) =>
-    set({ activeModal: newActiveModal })
+  modal: new Modal(),
+  setModal: (newModal: Modal) => set({ modal: newModal })
 }))

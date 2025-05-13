@@ -3,8 +3,8 @@ import { MODALS } from '../constants/MODALS'
 import { useSettings } from '../hooks/useSettings'
 
 export function ModalRenderer () {
-  const { activeModal } = useSettings()
-  const LazyModal = activeModal.name && lazy(MODALS[activeModal.name])
+  const { modal } = useSettings()
+  const LazyModal = modal.name && lazy(MODALS[modal.name])
 
   return (
     <>

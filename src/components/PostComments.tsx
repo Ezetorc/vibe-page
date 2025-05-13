@@ -1,7 +1,7 @@
 import { useEffect } from 'react'
 import { useSettings } from '../hooks/useSettings'
 import { Button } from './Button'
-import EVENT_EMITTER from '../constants/EVENT_EMITTER'
+import { EVENT_EMITTER } from '../constants/EVENT_EMITTER'
 import { CommentDisplay } from './CommentDisplay'
 import { Post } from '../models/Post'
 import { LoadSpinner } from './LoadSpinner'
@@ -23,7 +23,7 @@ export function PostComments (props: { post: Post }) {
     }
   }, [createComment])
 
-  const handleCreateComment = () => {
+  const openCommentCreator = () => {
     if (!isSessionActive) {
       openModal('session')
       return
@@ -34,7 +34,11 @@ export function PostComments (props: { post: Post }) {
 
   return (
     <div className='w-[clamp(300px,100%,700px)] animate-appear-from-top flex flex-col justify-center items-center gap-y-[10px] mt-[-10px]'>
-      <Button onClick={handleCreateComment} text={dictionary.comment} />
+      <Button
+        classname='w-full'
+        onClick={openCommentCreator}
+        text={dictionary.comment}
+      />
 
       {comments.map((comment, index) => (
         <CommentDisplay

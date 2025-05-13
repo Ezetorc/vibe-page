@@ -7,50 +7,64 @@ import {
 } from '@tanstack/react-query'
 import { useInView } from 'react-intersection-observer'
 import { PostService } from '../services/PostService'
-import { useSession } from './useSession'
 import { Post } from '../models/Post'
+import { User } from '../models/User'
+import { UserInteractions } from '../models/UserInteractions'
 import { QUERY_KEYS } from '../constants/QUERY_KEYS'
 
-export function usePosts (searchQuery?: string) {
+export function usePosts (searchQuery?: string, user?: User) {
   const queryClient = useQueryClient()
   const view = useInView()
-  const { loggedUser } = useSession()
-  const queryKey = searchQuery ? [QUERY_KEYS.Posts, searchQuery] : [QUERY_KEYS.Posts]
+  const queryKey = QUERY_KEYS.posts(user?.id, searchQuery)
+
+  const queryFn = async ({ pageParam = 1 }) => {
+    if (user)
+      return searchQuery
+        ? user.searchPosts({ query: searchQuery, page: pageParam })
+        : user.getPosts({ page: pageParam })
+
+    return searchQuery
+      ? PostService.search({ query: searchQuery, page: pageParam })
+      : PostService.getAll({ page: pageParam })
+  }
 
   const pagination = useInfiniteQuery({
     queryKey,
-    queryFn: async ({ pageParam = 1 }) => {
-      if (searchQuery) {
-        return await PostService.search({
-          page: pageParam,
-          query: searchQuery,
-          loggedUser
-        })
-      } else {
-        return await PostService.getAll({ page: pageParam, loggedUser })
-      }
-    },
+    queryFn,
     initialPageParam: 1,
     getNextPageParam: (lastPage, allPages) =>
       lastPage?.length ? allPages.length + 1 : undefined
   })
 
   const deleteMutation = useMutation({
-    mutationFn: (postId: number) => PostService.delete({ postId }),
-    onSuccess: (postId: number) => {
-      queryClient.setQueryData(
-        queryKey,
-        (oldPosts: InfiniteData<Post[]>) => {
-          if (!oldPosts) return oldPosts
+    mutationFn: (post: Post) => PostService.delete({ postId: post.id }),
+    onMutate: (post: Post) => {
+      queryClient.setQueriesData<InfiniteData<Post[]>>(
+        {
+          queryKey: QUERY_KEYS.posts(),
+          exact: false
+        },
+        prev => {
+          if (!prev) return prev
 
           return {
-            ...oldPosts,
-            pages: oldPosts.pages.map(posts =>
-              posts.filter(post => post.id !== postId)
+            ...prev,
+            pages: prev.pages.map(posts =>
+              posts.filter(postInPage => postInPage.id !== post.id)
             )
           }
         }
       )
+
+      if (user) {
+        queryClient.setQueryData<UserInteractions>(
+          QUERY_KEYS.userInteractions(user.id),
+          prev =>
+            prev
+              ? prev.update({ postsAmount: prev.postsAmount - 1 })
+              : undefined
+        )
+      }
     }
   })
 
@@ -61,11 +75,10 @@ export function usePosts (searchQuery?: string) {
   }, [pagination, view.inView])
 
   return {
-    status: pagination.status,
     posts: pagination.data?.pages.flat().toReversed() ?? [],
     hasMore: pagination.hasNextPage,
     ref: view.ref,
-    deletePost: (postId: number) => deleteMutation.mutate(postId),
+    deletePost: deleteMutation.mutate,
     isEmpty: (pagination.data?.pages.flat() ?? []).length === 0,
     success: pagination.status === 'success',
     failed: pagination.status === 'error'

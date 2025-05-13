@@ -9,21 +9,19 @@ export function UserImage (props: {
   title?: string
 }) {
   const { dictionary } = useSettings()
+  const title = props.title
+    ? props.title
+    : props.user
+    ? props.user.name
+    : dictionary.loading
+  const src = props.src ? props.src : props.user?.imageUrl ?? PATHS.guestImage
 
   return (
     <img
-      title={
-        props.title
-          ? props.title
-          : props.user
-          ? props.user.name
-          : dictionary.loading
-      }
+      title={title}
       className={`${props.className} rounded-user-image aspect-square border-vibe border-caribbean-current`}
-      src={props.src ? props.src : props.user?.imageUrl ?? PATHS.guestImage}
+      src={src}
       alt={props.user?.name}
     />
   )
-
-
 }

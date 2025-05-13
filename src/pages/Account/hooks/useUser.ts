@@ -5,7 +5,7 @@ import { QUERY_KEYS } from '../../../constants/QUERY_KEYS'
 
 export function useUser (userId?: string | number) {
   const { loggedUser } = useSession()
-  const queryKey = [QUERY_KEYS.User, userId ?? loggedUser?.id]
+  const queryKey = QUERY_KEYS.user(userId ? Number(userId) : loggedUser?.id)
 
   const query = useQuery({
     queryKey,
@@ -16,7 +16,7 @@ export function useUser (userId?: string | number) {
         return loggedUser
       }
     },
-    enabled: !!(userId || loggedUser)
+    enabled: Boolean(userId || loggedUser)
   })
 
   return {

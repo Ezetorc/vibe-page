@@ -1,50 +1,20 @@
-import { useRef, useState } from 'react'
+import { useState } from 'react'
 import { Button } from '../../../components/Button'
 import { FormInput } from '../../../components/FormInput'
 import { Modal } from '../../../components/Modal'
 import { useSettings } from '../../../hooks/useSettings'
-import { useValidation } from '../../../hooks/useValidation'
 import { CloseModalButton } from '../../../components/CloseModalButton'
-import { useSession } from '../../../hooks/useSession'
 import { ErrorMessage } from '../../../components/ErrorMessage'
+import { usePasswordChanger } from '../hooks/usePasswordChanger'
 
 export default function ChangePasswordModal () {
-  const { loggedUser } = useSession()
-  const { validatePasswords, error } = useValidation()
-  const { openModal, closeModal, dictionary } = useSettings()
-  const [isLoading, setIsLoading] = useState<boolean>(false)
-  const newPasswordRef = useRef<HTMLInputElement>(null)
-  const confirmedNewPasswordRef = useRef<HTMLInputElement>(null)
-
-  const handleChangePassword = async () => {
-    if (isLoading) return
-
-    setIsLoading(true)
-
-    const newPassword = newPasswordRef.current?.value
-    const confirmedNewPassword = confirmedNewPasswordRef.current?.value
-    const isNewPasswordValid = validatePasswords({
-      password: newPassword,
-      confirmedPassword: confirmedNewPassword
-    })
-
-    if (!isNewPasswordValid || !loggedUser || !newPassword) {
-      setIsLoading(false)
-      return
-    }
-
-    const passwordChangeSuccess = await loggedUser.changePassword({
-      newPassword
-    })
-
-    if (passwordChangeSuccess) {
-      closeModal()
-    } else {
-      openModal('connection')
-    }
-
-    setIsLoading(false)
-  }
+  const { dictionary } = useSettings()
+  const [newPassword, setNewPassword] = useState<string>('')
+  const [confirmedNewPassword, setConfirmedNewPassword] = useState<string>('')
+  const { error, isLoading, changePassword } = usePasswordChanger(
+    newPassword,
+    confirmedNewPassword
+  )
 
   return (
     <Modal>
@@ -58,15 +28,15 @@ export default function ChangePasswordModal () {
         <FormInput
           min={6}
           max={30}
-          reference={newPasswordRef}
           type='password'
+          onChange={event => setNewPassword(event.currentTarget.value)}
           placeholder={dictionary.password}
           className='placeholder:text-verdigris p-[5px]'
         />
         <FormInput
           min={6}
           max={30}
-          reference={confirmedNewPasswordRef}
+          onChange={event => setConfirmedNewPassword(event.currentTarget.value)}
           type='password'
           placeholder={dictionary.confirmPassword}
           className='placeholder:text-verdigris p-[5px]'
@@ -75,9 +45,10 @@ export default function ChangePasswordModal () {
         <ErrorMessage value={error} />
 
         <Button
+          classname='w-full'
           loading={isLoading}
           text={dictionary.change}
-          onClick={handleChangePassword}
+          onClick={changePassword}
         />
       </article>
     </Modal>

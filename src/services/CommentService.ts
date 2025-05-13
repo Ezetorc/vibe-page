@@ -1,29 +1,22 @@
 import { VIBE } from '../constants/VIBE'
 import { Comment } from '../models/Comment'
 import { CommentEndpoint } from '../models/CommentEndpoint'
-import { User } from '../models/User'
 import { getDate } from '../utilities/getDate'
 import { LikeService } from './LikeService'
 import { UserService } from './UserService'
 
 export class CommentService {
-  static async getFromEndpoint (params: {
+  static getFromEndpoint (params: {
     commentEndpoint: CommentEndpoint
-    loggedUser: User | null
-  }): Promise<Comment> {
+  }): Comment {
     const date = getDate(params.commentEndpoint.created_at)
-    const [user, likes, userLiked] = await Promise.all([
-      UserService.getById({ userId: params.commentEndpoint.user_id }),
-      LikeService.getAmountOfComment({ commentId: params.commentEndpoint.id }),
-      params.loggedUser?.hasLikedComment({
-        commentId: params.commentEndpoint.id
-      })
-    ])
+    const user = UserService.getFromEndpoint({
+      userEndpoint: params.commentEndpoint.user
+    })
 
     return new Comment({
-      user: user!,
-      likes,
-      userLiked: Boolean(userLiked),
+      user,
+      likes: params.commentEndpoint.likes,
       id: params.commentEndpoint.id,
       date,
       postId: params.commentEndpoint.post_id,
@@ -35,7 +28,6 @@ export class CommentService {
     postId: number
     amount?: number
     page?: number
-    loggedUser: User | null
   }): Promise<Comment[]> {
     const response = await VIBE.get<CommentEndpoint[]>({
       endpoint: `comments/post/${params.postId}?amount=${
@@ -47,7 +39,7 @@ export class CommentService {
 
     const comments = await Promise.all(
       response.value.map(commentEndpoint =>
-        this.getFromEndpoint({ commentEndpoint, loggedUser: params.loggedUser })
+        this.getFromEndpoint({ commentEndpoint })
       )
     )
 
@@ -66,7 +58,6 @@ export class CommentService {
     content: string
     postId: number
     userId: number
-    loggedUser: User | null
   }): Promise<Comment | null> {
     const response = await VIBE.post<CommentEndpoint>({
       endpoint: 'comments',
@@ -78,23 +69,19 @@ export class CommentService {
 
     if (response.error) return null
 
-    const comment = await this.getFromEndpoint({
-      commentEndpoint: response.value!,
-      loggedUser: params.loggedUser
+    const comment = this.getFromEndpoint({
+      commentEndpoint: response.value!
     })
 
     return comment
   }
 
-  static async delete (params: {
-    commentId: number
-    loggedUser: User | null
-  }): Promise<Comment | null> {
-    const response = await VIBE.delete<CommentEndpoint>({
+  static async delete (params: { commentId: number }): Promise<number> {
+    const response = await VIBE.delete<number>({
       endpoint: `comments/${params.commentId}`
     })
 
-    if (response.error) return null
+    if (response.error) return -1
 
     const commentLikes = await LikeService.getAllOfComment({
       commentId: params.commentId
@@ -103,27 +90,18 @@ export class CommentService {
 
     await Promise.all(likesIds.map(likeId => LikeService.delete({ likeId })))
 
-    const comment = await this.getFromEndpoint({
-      commentEndpoint: response.value!,
-      loggedUser: params.loggedUser
-    })
-
-    return comment
+    return response.value
   }
 
-  static async getById (params: {
-    commentId: number
-    loggedUser: User | null
-  }): Promise<Comment | null> {
+  static async getById (params: { commentId: number }): Promise<Comment | null> {
     const response = await VIBE.get<CommentEndpoint>({
       endpoint: `comments/${params.commentId}`
     })
 
     if (response.error) return null
 
-    const comment = await this.getFromEndpoint({
-      commentEndpoint: response.value!,
-      loggedUser: params.loggedUser
+    const comment = this.getFromEndpoint({
+      commentEndpoint: response.value!
     })
 
     return comment

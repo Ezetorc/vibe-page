@@ -1,8 +1,8 @@
 import { Button } from '../../../components/Button'
 import { useSettings } from '../../../hooks/useSettings'
-import { ReactNode, useCallback } from 'react'
-import { ModalName } from '../../../models/ModalName'
+import { ReactNode } from 'react'
 import { useSession } from '../../../hooks/useSession'
+import { ModalName } from '../../../models/ModalName'
 
 export function SettingsButton (props: {
   children: ReactNode
@@ -14,15 +14,18 @@ export function SettingsButton (props: {
   const { openModal } = useSettings()
   const { isSessionActive } = useSession()
 
-  const handleClick = useCallback(() => {
-    openModal(props.needsSession && !isSessionActive ? 'session' : props.modal)
-  }, [isSessionActive, openModal, props.modal, props.needsSession])
+  const handleClick = () => {
+    const modalName =
+      props.needsSession && !isSessionActive ? 'session' : props.modal
+
+    openModal(modalName)
+  }
 
   return (
     <Button
-      classname={`${props.dangerous && `bg-red-500 desktop:hover:text-red-500`} ${
-        props.className
-      }`}
+      classname={`${
+        props.dangerous && `bg-red-500 w-full desktop:hover:text-red-500`
+      } ${props.className}`}
       onClick={handleClick}
     >
       {props.children}

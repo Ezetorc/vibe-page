@@ -9,24 +9,22 @@ import { CommentService } from '../services/CommentService'
 import { Comment } from '../models/Comment'
 import { NewCommentEvent } from '../models/NewCommentEvent'
 import { useSession } from './useSession'
+import { UserInteractions } from '../models/UserInteractions'
 import { QUERY_KEYS } from '../constants/QUERY_KEYS'
-import { User } from '../models/User'
 
 export function useComments (post: Post) {
   const { loggedUser, isSessionActive } = useSession()
   const { openModal, closeModal } = useSettings()
   const queryClient = useQueryClient()
-  const queryKey = [QUERY_KEYS.Post, post.id]
 
   const pagination = useInfiniteQuery({
-    queryKey: [QUERY_KEYS.Comments, post.id],
+    queryKey: QUERY_KEYS.comments(post.id),
     queryFn: async ({ pageParam }) => {
       if (typeof post.comments === 'number' && post.comments === 0) {
         return []
       } else {
         return await CommentService.getAllOfPost({
           postId: post.id,
-          loggedUser,
           page: pageParam
         })
       }
@@ -39,7 +37,7 @@ export function useComments (post: Post) {
   const comments = pagination.data?.pages.flat() ?? []
 
   const updateComments = (updater: (comments: Comment[]) => Comment[]) => {
-    queryClient.setQueryData(queryKey, (prevPost?: Post) => {
+    queryClient.setQueryData(QUERY_KEYS.post(post.id), (prevPost?: Post) => {
       if (!prevPost?.comments || typeof prevPost.comments === 'number')
         return prevPost
 
@@ -50,19 +48,22 @@ export function useComments (post: Post) {
   }
 
   const updatePostsAmount = (type: 'create' | 'delete') => {
-    queryClient.setQueryData(['user', post.user.id], (prevUser?: User) => {
-      if (!prevUser) return prevUser
+    queryClient.setQueryData(
+      QUERY_KEYS.userInteractions(post.user.id),
+      (prevUserInteractions?: UserInteractions) => {
+        if (!prevUserInteractions) return prevUserInteractions
 
-      if (type == 'create') {
-        return prevUser.update({
-          postsAmount: prevUser.postsAmount + 1
-        })
-      } else {
-        return prevUser.update({
-          postsAmount: prevUser.postsAmount - 1
-        })
+        if (type == 'create') {
+          return prevUserInteractions.update({
+            postsAmount: prevUserInteractions.postsAmount + 1
+          })
+        } else {
+          return prevUserInteractions.update({
+            postsAmount: prevUserInteractions.postsAmount - 1
+          })
+        }
       }
-    })
+    )
   }
 
   const createComment = useMutation({
@@ -72,14 +73,17 @@ export function useComments (post: Post) {
       return await CommentService.create({
         userId: loggedUser!.id,
         postId: event.postId,
-        content: event.content,
-        loggedUser
+        content: event.content
       })
     },
     onSuccess: newComment => {
-      if (!newComment) {
+      if (!newComment || !loggedUser) {
         openModal('connection')
         return
+      }
+
+      if (loggedUser.id !== post.user.id) {
+        newComment.createNotification({ post, sender: loggedUser })
       }
 
       post.comments = [...comments, newComment]
@@ -91,17 +95,16 @@ export function useComments (post: Post) {
   })
 
   const deleteComment = useMutation({
-    mutationFn: (commentId: number) =>
-      CommentService.delete({ commentId, loggedUser }),
+    mutationFn: (commentId: number) => CommentService.delete({ commentId }),
     onMutate: (commentId: number) => {
       post.comments = comments.filter(comment => comment.id !== commentId)
     },
-    onSuccess: deletedComment => {
-      if (!deletedComment) return
+    onSuccess: deletedCommentId => {
+      if (!deletedCommentId) return
 
       closeModal()
       updateComments(comments =>
-        comments.filter(comment => comment.id !== deletedComment.id)
+        comments.filter(comment => comment.id !== deletedCommentId)
       )
       updatePostsAmount('delete')
     },

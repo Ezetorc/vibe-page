@@ -1,52 +1,15 @@
 import { Button } from '../../../components/Button'
 import { Modal } from '../../../components/Modal'
 import { CloseModalButton } from '../../../components/CloseModalButton'
-import { useSettings } from '../../../hooks/useSettings'
-import { useSession } from '../../../hooks/useSession'
-import { useValidation } from '../../../hooks/useValidation'
-import { useRef } from 'react'
-import { UserService } from '../../../services/UserService'
 import { ErrorMessage } from '../../../components/ErrorMessage'
-import { SessionService } from '../../../services/SessionService'
-import { useQueryClient } from '@tanstack/react-query'
-import { QUERY_KEYS } from '../../../constants/QUERY_KEYS'
+import { useSettings } from '../../../hooks/useSettings'
+import { useState } from 'react'
+import { useAccountDeleter } from '../hooks/useAccountDeleter'
 
 export default function DeleteAccountModal () {
-  const { error, setError } = useValidation()
-  const { loggedUser, isSessionActive } = useSession()
-  const queryClient = useQueryClient()
-  const { dictionary, openModal, closeModal } = useSettings()
-  const irreversibleActionRef = useRef<HTMLInputElement | null>(null)
-
-  const handleDeleteAccount = async () => {
-    if (!isSessionActive) {
-      openModal('session')
-      return
-    }
-
-    const understoodAction = irreversibleActionRef.current?.checked
-
-    if (!understoodAction) {
-      setError(dictionary.youMustUnderstandAction)
-      return
-    }
-
-    const deleteSuccess = await UserService.delete({
-      userId: loggedUser!.id,
-      imageId: loggedUser?.imageId
-    })
-
-    if (deleteSuccess >= 0) {
-      closeModal()
-      SessionService.remove()
-      queryClient.removeQueries({
-        queryKey: [QUERY_KEYS.User, loggedUser?.id]
-      })
-      location.reload()
-    } else {
-      openModal('connection')
-    }
-  }
+  const { dictionary } = useSettings()
+  const [canDelete, setCanDelete] = useState<boolean>(false)
+  const { error, deleteAccount } = useAccountDeleter(canDelete)
 
   return (
     <Modal>
@@ -60,7 +23,7 @@ export default function DeleteAccountModal () {
         <form className='w-full flex flex-col gap-y-[30px]'>
           <div className='flex gap-x-5 items-center'>
             <input
-              ref={irreversibleActionRef}
+              onChange={event => setCanDelete(event.currentTarget.checked)}
               type='checkbox'
               id='irreversible-action'
               className='peer hidden'
@@ -79,8 +42,9 @@ export default function DeleteAccountModal () {
           <ErrorMessage value={error} />
 
           <Button
+            classname='w-full'
             text={dictionary.deleteAccount}
-            onClick={handleDeleteAccount}
+            onClick={deleteAccount}
           />
         </form>
       </article>

@@ -1,39 +1,29 @@
 import Cropper, { Area, Point } from 'react-easy-crop'
 import { Slider } from '@mui/material'
 import { getCroppedImage } from '../../Account/utilities/getCroppedImage'
-import { useEffect, useState } from 'react'
-import { useSettings } from '../../../hooks/useSettings'
+import { useEffect, useMemo, useState } from 'react'
 import { useSession } from '../../../hooks/useSession'
 
-export function ImageCropper (props: { onCropComplete: (file: File) => void }) {
+export function ImageCropper (props: {
+  image: File
+  onCropComplete: (file: File) => void
+}) {
   const { loggedUser } = useSession()
-  const { activeModal } = useSettings()
   const [crop, setCrop] = useState<Point>({ x: 0, y: 0 })
   const [zoom, setZoom] = useState<number>(1)
-  const [imageSrc, setImageSrc] = useState<string | null>(null)
-
-  const newImage =
-    activeModal.data && 'newImage' in activeModal.data
-      ? (activeModal.data.newImage as File)
-      : null
+  const imageSrc = useMemo(
+    () => URL.createObjectURL(props.image),
+    [props.image]
+  )
 
   useEffect(() => {
-    if (!newImage) return
+    return () => {
+      URL.revokeObjectURL(imageSrc)
+    }
+  }, [imageSrc])
 
-    const objectUrl = URL.createObjectURL(newImage)
-    setImageSrc(objectUrl)
-
-    return () => URL.revokeObjectURL(objectUrl)
-  }, [newImage])
-
-  if (!newImage) return null
-
-  const handleCropComplete = async (_: Area, croppedAreaPixels: Area) => {
-    const file = await getCroppedImage(
-      newImage,
-      croppedAreaPixels,
-      String(loggedUser?.id)
-    )
+  const handleCropComplete = async (_: Area, croppedArea: Area) => {
+    const file = await getCroppedImage(props.image, croppedArea, loggedUser?.id)
 
     if (file) {
       props.onCropComplete(file)
@@ -43,7 +33,7 @@ export function ImageCropper (props: { onCropComplete: (file: File) => void }) {
   return (
     <div className='relative w-full h-[500px]'>
       <Cropper
-        image={imageSrc ?? ''}
+        image={imageSrc}
         crop={crop}
         zoom={zoom}
         aspect={1 / 1}

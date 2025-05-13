@@ -4,11 +4,9 @@ import { Modal } from './Modal'
 import { CommentCreator } from './CommentCreator'
 
 export default function CommentModal () {
-  const { activeModal, dictionary } = useSettings()
+  const { modal, dictionary } = useSettings()
 
-  if (typeof activeModal.data !== 'object' || !('postId' in activeModal.data))
-    return
-
+  if (!modal.has('postId')) return
 
   return (
     <Modal>

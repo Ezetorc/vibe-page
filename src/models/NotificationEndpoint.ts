@@ -1,11 +1,12 @@
 import { NotificationType } from './NotificationType'
+import { SimplifiedUserEndpoint } from './SimplifiedUserEndpoint'
 
 export interface NotificationEndpoint {
-  sender_id: number
+  id: number
+  sender: SimplifiedUserEndpoint
   target_id: number
   type: NotificationType
-  id: number
-  data?: null | {
+  data?: {
     post_id?: number
     comment_id?: number
   }

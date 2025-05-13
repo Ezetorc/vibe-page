@@ -1,73 +1,17 @@
-import { useRef, useState } from 'react'
+import { useState } from 'react'
 import { Button } from '../../../components/Button'
 import { FormInput } from '../../../components/FormInput'
 import { Modal } from '../../../components/Modal'
 import { useSettings } from '../../../hooks/useSettings'
-import { useValidation } from '../../../hooks/useValidation'
 import { CloseModalButton } from '../../../components/CloseModalButton'
-import { useQueryClient } from '@tanstack/react-query'
-import { User } from '../../../models/User'
-import { useSession } from '../../../hooks/useSession'
-import { QUERY_KEYS } from '../../../constants/QUERY_KEYS'
 import { ErrorMessage } from '../../../components/ErrorMessage'
+import { useDescriptionChanger } from '../hooks/useDescriptionChanger'
 
 export default function ChangeDescriptionModal () {
-  const queryClient = useQueryClient()
-  const { loggedUser, setLoggedUser } = useSession()
-  const { validateDescription, error } = useValidation()
-  const { openModal, closeModal, dictionary } = useSettings()
-  const [isLoading, setIsLoading] = useState<boolean>(false)
-  const newDescriptionRef = useRef<HTMLInputElement>(null)
-
-  const handleChangeDescription = async () => {
-    if (isLoading) return
-
-    setIsLoading(true)
-
-    const newDescription: string | undefined = newDescriptionRef.current?.value
-
-    if (
-      !newDescription ||
-      newDescription?.trim() === '' ||
-      newDescription?.trim() === loggedUser?.description?.trim()
-    ) {
-      closeModal()
-      return
-    }
-
-    const isNewDescriptionValid: boolean = validateDescription({
-      description: newDescription
-    })
-
-    if (newDescription === undefined || !loggedUser || !isNewDescriptionValid) {
-      setIsLoading(false)
-      return
-    }
-
-    const descriptionChangeSuccess = await loggedUser.changeDescription({
-      newDescription
-    })
-
-    if (descriptionChangeSuccess) {
-      queryClient.setQueryData(
-        [QUERY_KEYS.User, loggedUser.id],
-        (prevUser?: User) => {
-          if (!prevUser) return prevUser
-
-          return prevUser.update({ description: newDescription })
-        }
-      )
-
-      const newLoggedUser = loggedUser.update({ description: newDescription })
-
-      setLoggedUser(newLoggedUser)
-      setIsLoading(false)
-      closeModal()
-    } else {
-      setIsLoading(false)
-      openModal('connection')
-    }
-  }
+  const { dictionary } = useSettings()
+  const [newDescription, setNewDescription] = useState<string>('')
+  const { error, isLoading, changeDescription } =
+    useDescriptionChanger(newDescription)
 
   return (
     <Modal>
@@ -80,19 +24,20 @@ export default function ChangeDescriptionModal () {
 
         <FormInput
           type='text'
-          reference={newDescriptionRef}
+          onChange={event => setNewDescription(event.currentTarget.value)}
           min={0}
           max={200}
-          placeholder={loggedUser?.description ?? ''}
+          placeholder={dictionary.leaveBlankToRemove}
           className='placeholder:text-verdigris p-[5px]'
         />
 
         <ErrorMessage value={error} />
 
         <Button
+          classname='w-full'
           loading={isLoading}
           text={dictionary.change}
-          onClick={handleChangeDescription}
+          onClick={changeDescription}
         />
       </article>
     </Modal>

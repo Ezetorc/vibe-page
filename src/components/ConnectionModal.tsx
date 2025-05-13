@@ -19,7 +19,11 @@ export default function ConnectionModal () {
           {dictionary.solveConnectionError}
         </span>
 
-        <Button onClick={location.reload} text={dictionary.refreshPage} />
+        <Button
+          classname='w-full'
+          onClick={() => location.reload()}
+          text={dictionary.refreshPage}
+        />
       </article>
     </Modal>
   )

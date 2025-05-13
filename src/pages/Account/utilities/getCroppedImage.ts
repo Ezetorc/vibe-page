@@ -4,7 +4,7 @@ import { getImage } from './getImage'
 export async function getCroppedImage (
   imageFile: File,
   croppedAreaPixels: Area,
-  fileName?: string
+  fileName?: string | number
 ): Promise<File | null> {
   const imageSrc = URL.createObjectURL(imageFile)
   const image = await getImage(imageSrc)
@@ -31,7 +31,7 @@ export async function getCroppedImage (
   return new Promise(resolve => {
     canvas.toBlob(blob => {
       if (blob) {
-        const file = new File([blob], fileName ?? 'cropped-image', {
+        const file = new File([blob], String(fileName) || 'cropped-image', {
           type: 'image/webp'
         })
         resolve(file)

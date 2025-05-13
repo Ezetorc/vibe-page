@@ -1,4 +1,4 @@
-import { ModalName } from '../models/ModalName'
+import { ModalName } from '../models/ModalName';
 
 export const MODALS: {
   [key in ModalName]: () => Promise<{ default: React.ComponentType }>
@@ -11,9 +11,11 @@ export const MODALS: {
   password: () => import('../pages/Settings/components/ChangePasswordModal'),
   comment: () => import('../components/CommentModal'),
   logout: () => import('../pages/Settings/components/LogoutModal'),
-  deleteAccount: () => import('../pages/Settings/components/DeleteAccountModal'),
+  deleteAccount: () =>
+    import('../pages/Settings/components/DeleteAccountModal'),
   picture: () => import('../pages/Settings/components/ChangePictureModal'),
   crop: () => import('../pages/Settings/components/CropImageModal'),
   name: () => import('../pages/Settings/components/ChangeNameModal'),
-  description: () => import('../pages/Settings/components/ChangeDescriptionModal')
+  description: () =>
+    import('../pages/Settings/components/ChangeDescriptionModal')
 }

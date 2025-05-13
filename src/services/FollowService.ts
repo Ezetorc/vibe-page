@@ -1,4 +1,6 @@
 import { VIBE } from '../constants/VIBE'
+import { User } from '../models/User'
+import { NotificationService } from './NotificationService'
 
 export class FollowService {
   static async create (params: { followingId: number }): Promise<boolean> {
@@ -28,12 +30,12 @@ export class FollowService {
     return Boolean(response.value)
   }
 
-  static async getIdsOfUser (params: { userId: number }): Promise<number[]> {
+  static async getFollowersIdsOfLoggedUser (): Promise<number[]> {
     const response = await VIBE.get<number[]>({
-      endpoint: `follows/?userId=${params.userId}`
+      endpoint: `follows/id`
     })
 
-    if (!response.value) return []
+    if (response.error) return []
 
     return response.value
   }
@@ -60,5 +62,13 @@ export class FollowService {
     } else {
       return -1
     }
+  }
+
+  static async createNotification (params: { follower: User; following: User }) {
+    return await NotificationService.create({
+      senderId: params.follower.id,
+      targetId: params.following.id,
+      type: 'follow'
+    })
   }
 }

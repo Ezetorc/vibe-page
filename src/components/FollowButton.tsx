@@ -5,44 +5,29 @@ import { User } from '../models/User'
 import { useSession } from '../hooks/useSession'
 
 export function FollowButton (props: { following: User | null }) {
-  const { dictionary, openModal } = useSettings()
+  const { dictionary } = useSettings()
   const { isSessionActive } = useSession()
-  const { isFollowing, follow, unfollow, isLoading } = useFollow(
-    props.following
-  )
-
-  const handleFollow = () => {
-    if (isSessionActive) {
-      if (isFollowing) {
-        unfollow()
-      } else {
-        follow()
-      }
-    } else {
-      openModal('session')
-    }
-  }
+  const { isFollowing, handleFollow, isLoading } = useFollow(props.following)
+  const filled = !isSessionActive
+    ? true
+    : isFollowing === undefined
+    ? false
+    : true
+  const text = !isSessionActive
+    ? dictionary.follow
+    : isFollowing === undefined
+    ? dictionary.loading
+    : isFollowing
+    ? dictionary.unfollow
+    : dictionary.follow
 
   return (
     <Button
       loading={isLoading}
       onClick={handleFollow}
-      type={
-        !isSessionActive
-          ? 'filled'
-          : isFollowing === null
-          ? 'outline'
-          : 'filled'
-      }
-      text={
-        !isSessionActive
-          ? dictionary.follow
-          : isFollowing === null
-          ? dictionary.loading
-          : isFollowing
-          ? dictionary.unfollow
-          : dictionary.follow
-      }
+      classname='w-full'
+      filled={filled}
+      text={text}
     />
   )
 }

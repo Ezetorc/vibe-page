@@ -3,15 +3,16 @@ import { LikeService } from '../services/LikeService'
 import { Comment } from './Comment'
 import { PostService } from '../services/PostService'
 import { User } from './User'
+import { NotificationService } from '../services/NotificationService'
+import { SimplifiedUser } from './SimplifiedUser'
 
 export class Post {
   public id: number
-  public user: User
+  public user: SimplifiedUser
   public content: string
   public likes: number
   public comments: Comment[] | number
   public date: string
-  public userLiked: boolean
 
   constructor (props: {
     id: number
@@ -20,7 +21,6 @@ export class Post {
     date: string
     likes: number
     comments: Comment[] | number
-    userLiked: boolean
   }) {
     this.id = props.id
     this.user = props.user
@@ -28,7 +28,17 @@ export class Post {
     this.date = props.date
     this.likes = props.likes
     this.comments = props.comments
-    this.userLiked = props.userLiked
+  }
+
+  public async createNotification (params: { owner: User; followerId: number }) {
+    return await NotificationService.create({
+      senderId: params.owner.id,
+      targetId: params.followerId,
+      type: 'post',
+      data: {
+        post_id: this.id
+      }
+    })
   }
 
   public update (properties: Partial<Post>): Post {
@@ -37,7 +47,6 @@ export class Post {
       likes: properties.likes ?? this.likes,
       comments: properties.comments ?? this.comments,
       date: properties.date ?? this.date,
-      userLiked: properties.userLiked ?? this.userLiked,
       id: properties.id ?? this.id,
       content: properties.content ?? this.content
     })

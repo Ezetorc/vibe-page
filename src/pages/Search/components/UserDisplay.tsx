@@ -14,7 +14,7 @@ export function UserDisplay (props: { user: User | null }) {
 
       <div className='overflow-hidden relative'>
         <Username user={props.user} />
-        <div className='pointer-events-none absolute right-0 top-0 h-full w-12 bg-gradient-to-l from-gunmetal to-transparent'></div>
+        <div className='w-full pointer-events-none absolute right-0 top-0 h-full bg-gradient-to-l from-gunmetal to-transparent'></div>
       </div>
 
       {isLogged && <FollowButton following={props.user} />}

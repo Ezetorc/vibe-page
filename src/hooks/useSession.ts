@@ -3,13 +3,13 @@ import { UserService } from '../services/UserService'
 import { SessionItem } from '../models/SessionItem'
 import { SessionService } from '../services/SessionService'
 import { useQueryClient } from '@tanstack/react-query'
-import { QUERY_KEYS } from '../constants/QUERY_KEYS'
 import { useEffect } from 'react'
 import { SessionStore } from '../models/SessionStore'
 import { getSessionStore } from '../stores/getSessionStore'
 import { useSettings } from './useSettings'
 import { PATHS } from '../constants/PATHS'
 import { useLocation } from 'wouter'
+import { QUERY_KEYS } from '../constants/QUERY_KEYS'
 
 export function useSession () {
   const sessionStore: SessionStore = getSessionStore()
@@ -40,8 +40,8 @@ export function useSession () {
   const logout = () => {
     if (!loggedUser) return
 
-    queryClient.resetQueries({ queryKey: [QUERY_KEYS.User, loggedUser.id] })
-    queryClient.removeQueries({ queryKey: [QUERY_KEYS.User, loggedUser.id] })
+    queryClient.resetQueries({ queryKey: QUERY_KEYS.user(loggedUser.id) })
+    queryClient.removeQueries({ queryKey:  QUERY_KEYS.user(loggedUser.id) })
     SessionService.remove()
     setLoggedUser(null)
   }

@@ -1,68 +1,18 @@
-import { useRef, useState } from 'react'
+import { useState } from 'react'
 import { Button } from '../../../components/Button'
 import { FormInput } from '../../../components/FormInput'
 import { Modal } from '../../../components/Modal'
 import { useSettings } from '../../../hooks/useSettings'
-import { useValidation } from '../../../hooks/useValidation'
 import { CloseModalButton } from '../../../components/CloseModalButton'
-import { useQueryClient } from '@tanstack/react-query'
-import { User } from '../../../models/User'
-import { useSession } from '../../../hooks/useSession'
-import { QUERY_KEYS } from '../../../constants/QUERY_KEYS'
 import { ErrorMessage } from '../../../components/ErrorMessage'
+import { useNameChanger } from '../hooks/useNameChanger'
+import { useSession } from '../../../hooks/useSession'
 
 export default function ChangeNameModal () {
-  const queryClient = useQueryClient()
-  const { loggedUser, setLoggedUser } = useSession()
-  const { validateName, error } = useValidation()
-  const { openModal, closeModal, dictionary } = useSettings()
-  const [isLoading, setIsLoading] = useState<boolean>(false)
-  const newNameRef = useRef<HTMLInputElement>(null)
-
-  const handleChangeName = async () => {
-    if (isLoading) return
-
-    setIsLoading(true)
-
-    const newName: string | undefined = newNameRef.current?.value
-
-    if (newName === loggedUser?.name) {
-      closeModal()
-      return
-    }
-
-    const isNewNameValid: boolean = await validateName({
-      name: newName,
-      unique: true
-    })
-
-    if (newName === undefined || !loggedUser || !isNewNameValid) {
-      setIsLoading(false)
-      return
-    }
-
-    const nameChangeSuccess = await loggedUser.changeName({ newName })
-
-    if (nameChangeSuccess) {
-      queryClient.setQueryData(
-        [QUERY_KEYS.User, loggedUser.id],
-        (prevUser?: User) => {
-          if (!prevUser) return prevUser
-
-          return prevUser.update({ name: newName })
-        }
-      )
-
-      const newLoggedUser = loggedUser.update({ name: newName })
-
-      setLoggedUser(newLoggedUser)
-      closeModal()
-    } else {
-      openModal('connection')
-    }
-
-    setIsLoading(false)
-  }
+  const { dictionary } = useSettings()
+  const { loggedUser } = useSession()
+  const [newName, setNewName] = useState<string>('')
+  const { error, isLoading, changeName } = useNameChanger(newName)
 
   return (
     <Modal>
@@ -75,9 +25,9 @@ export default function ChangeNameModal () {
 
         <FormInput
           type='text'
-          reference={newNameRef}
           min={3}
           max={20}
+          onChange={event => setNewName(event.currentTarget.value)}
           placeholder={loggedUser?.name ?? ''}
           className='placeholder:text-verdigris p-[5px]'
         />
@@ -85,9 +35,10 @@ export default function ChangeNameModal () {
         <ErrorMessage value={error} />
 
         <Button
+          classname='w-full'
           loading={isLoading}
           text={dictionary.change}
-          onClick={handleChangeName}
+          onClick={changeName}
         />
       </article>
     </Modal>

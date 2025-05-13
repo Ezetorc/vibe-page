@@ -1,43 +1,16 @@
-import { useRef, useState } from 'react'
 import { Button } from '../../../components/Button'
 import { FormInput } from '../../../components/FormInput'
 import { Modal } from '../../../components/Modal'
 import { useSettings } from '../../../hooks/useSettings'
-import { useValidation } from '../../../hooks/useValidation'
 import { CloseModalButton } from '../../../components/CloseModalButton'
-import { useSession } from '../../../hooks/useSession'
 import { ErrorMessage } from '../../../components/ErrorMessage'
+import { useState } from 'react'
+import { useEmailChanger } from '../hooks/useEmailChanger'
 
 export default function ChangeEmailModal () {
-  const { loggedUser } = useSession()
-  const { validateEmail, error } = useValidation()
-  const { openModal, closeModal, dictionary } = useSettings()
-  const [isLoading, setIsLoading] = useState<boolean>(false)
-  const newEmailRef = useRef<HTMLInputElement>(null)
-
-  const handleChangeEmail = async () => {
-    if (isLoading) return
-
-    setIsLoading(true)
-
-    const newEmail: string | undefined = newEmailRef.current?.value
-    const isNewEmailValid: boolean = await validateEmail({ email: newEmail })
-
-    if (newEmail === undefined || !loggedUser || !isNewEmailValid) {
-      setIsLoading(false)
-      return
-    }
-
-    const emailChangeSuccess = await loggedUser.changeEmail({ newEmail })
-
-    if (emailChangeSuccess) {
-      closeModal()
-    } else {
-      openModal('connection')
-    }
-
-    setIsLoading(false)
-  }
+  const { dictionary } = useSettings()
+  const [newEmail, setNewEmail] = useState<string>('')
+  const { error, isLoading, changeEmail } = useEmailChanger(newEmail)
 
   return (
     <Modal>
@@ -50,9 +23,9 @@ export default function ChangeEmailModal () {
 
         <FormInput
           type='email'
-          reference={newEmailRef}
           min={1}
           max={31}
+          onChange={event => setNewEmail(event.currentTarget.value)}
           placeholder={dictionary.myNewEmail}
           className='placeholder:text-verdigris p-[5px]'
         />
@@ -60,9 +33,10 @@ export default function ChangeEmailModal () {
         <ErrorMessage value={error} />
 
         <Button
+          classname='w-full'
           loading={isLoading}
           text={dictionary.change}
-          onClick={handleChangeEmail}
+          onClick={changeEmail}
         />
       </article>
     </Modal>

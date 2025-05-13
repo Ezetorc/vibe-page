@@ -1,38 +1,29 @@
 import { Button } from '../../../components/Button'
 import { CloseModalButton } from '../../../components/CloseModalButton'
 import { Modal } from '../../../components/Modal'
-import { ChangeEvent } from 'react'
 import { useSettings } from '../../../hooks/useSettings'
 import { UserImage } from '../../../components/UserImage'
 import { PATHS } from '../../../constants/PATHS'
 import { useSession } from '../../../hooks/useSession'
+import { ChangeEvent } from 'react'
+import { useProfilePictureRemover } from '../hooks/useProfilePictureRemover'
 
 export default function ChangePictureModal () {
-  const { loggedUser, setLoggedUser, isSessionActive } = useSession()
-  const { openModal, dictionary, closeModal } = useSettings()
+  const { loggedUser, isSessionActive } = useSession()
+  const { openModal, dictionary } = useSettings()
+  const removeImage = useProfilePictureRemover()
+  const hasImage = loggedUser?.imageUrl !== null
 
-  if (!isSessionActive) return
+  const goToUploader = (event: ChangeEvent<HTMLInputElement>) => {
+    if (!isSessionActive) {
+      openModal('session')
+      return
+    }
 
-  const handleUploadImage = (event: ChangeEvent<HTMLInputElement>) => {
     const newImage = event.target.files?.[0]
 
     if (newImage) {
       openModal('crop', { newImage })
-    }
-  }
-
-  const handleRemoveImage = async () => {
-    if (!loggedUser) return
-
-    try {
-      loggedUser.saveImage(null, null)
-
-      const newLoggedUser = loggedUser.update({ imageId: undefined, imageUrl: undefined })
-
-      setLoggedUser(newLoggedUser)
-      closeModal()
-    } catch {
-      openModal('connection')
     }
   }
 
@@ -42,7 +33,7 @@ export default function ChangePictureModal () {
         <CloseModalButton />
 
         <h2 className='text-center font-poppins-semibold text-[clamp(20px,7vw,60px)] bg-clip-text text-transparent bg-orange-gradient'>
-          {dictionary.changePicture}
+          {dictionary.changeProfilePicture}
         </h2>
 
         <section className='flex gap-x-[5%]'>
@@ -58,12 +49,12 @@ export default function ChangePictureModal () {
                 type='file'
                 className='hidden'
                 accept='image/*'
-                onChange={handleUploadImage}
+                onChange={goToUploader}
               />
             </label>
           </div>
 
-          {loggedUser!.imageUrl && (
+          {hasImage && (
             <div className='flex flex-col justify-center gap-y-[30px] items-center'>
               <UserImage
                 className='border-verdigris desktop:w-[clamp(40px,30vw,300px)] mobile:w-[clamp(40px,30vw,90px)]'
@@ -71,8 +62,9 @@ export default function ChangePictureModal () {
               />
 
               <Button
+                classname='w-full'
                 text={dictionary.removeImage}
-                onClick={handleRemoveImage}
+                onClick={removeImage}
               />
             </div>
           )}

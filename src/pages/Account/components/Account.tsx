@@ -1,13 +1,12 @@
 import { Section } from '../../../components/Section'
-import { Nav } from '../../../components/Nav'
 import { useSettings } from '../../../hooks/useSettings'
 import { AccountName } from './AccountName'
 import { AccountDescription } from './AccountDescription'
 import { AccountDate } from './AccountDate'
-import { AccountInteractions } from './AccountInteractions'
+import { AccountFollow } from './AccountFollow'
 import { AccountPicture } from './AccountPicture'
 import { AccountPosts } from './AccountPosts'
-import { AccountInfo } from './AccountInfo'
+import { AccountInteractions } from './AccountInteractions'
 import { useUser } from '../hooks/useUser'
 import { Loading } from '../../../components/Loading'
 
@@ -33,16 +32,14 @@ export default function Account (props: { userId?: string | number }) {
               <AccountName user={user} />
               <AccountDescription user={user} />
               <AccountDate user={user} />
-              <AccountInfo user={user} />
               <AccountInteractions user={user} />
+              <AccountFollow user={user} />
             </article>
 
             <AccountPosts user={user} />
           </Section>
         )
       )}
-
-      <Nav />
     </>
   )
 }

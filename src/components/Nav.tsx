@@ -12,14 +12,16 @@ import {
 } from './Icons'
 import { NavButton } from './NavButton'
 import { UserImage } from './UserImage'
+import { useHasNotifications } from '../hooks/useHasNotifications'
 
 export function Nav () {
   const { dictionary, openModal } = useSettings()
   const { loggedUser, isSessionActive } = useSession()
+  const { hasNotifications } = useHasNotifications()
   const [location] = useLocation()
 
   return (
-    <nav className='flex z-30 justify-center gap-x-[4%] fixed bottom-0 left-0 items-center w-full h-[70px] bg-caribbean-current'>
+    <nav className='flex z-30 justify-center desktop:gap-x-[4%] fixed bottom-0 left-0 items-center w-full h-[70px] bg-caribbean-current'>
       <NavButton title={dictionary.home} to={PATHS.homeSection}>
         <HomeIcon filled={location === PATHS.homeSection} />
       </NavButton>
@@ -40,13 +42,16 @@ export function Nav () {
       <NavButton title={dictionary.post} to={PATHS.createSection} needsSession>
         <PlusIcon filled={location === PATHS.createSection} />
       </NavButton>
-      
+
       <NavButton
         title={dictionary.notifications}
         to={PATHS.notificationsSection}
         needsSession
       >
         <BellIcon filled={location === PATHS.notificationsSection} />
+        {hasNotifications && (
+          <div className='bg-red-600 absolute top-0 right-0 rounded-full m-[20%] aspect-square w-[20%]' />
+        )}
       </NavButton>
 
       <NavButton title={dictionary.settings} to={PATHS.settingsSection}>

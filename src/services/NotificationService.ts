@@ -1,22 +1,26 @@
+import { NotificationEndpoint } from './../models/NotificationEndpoint'
 import { VIBE } from '../constants/VIBE'
-import { NotificationEndpoint } from '../models/NotificationEndpoint'
 import { Notification } from '../models/Notification'
+import { NotificationType } from '../models/NotificationType'
+import { UserService } from './UserService'
 
 export class NotificationService {
   static getFromEndpoint (params: {
     notificationEndpoint: NotificationEndpoint
   }): Notification {
     const endpoint = params.notificationEndpoint
-
     const data = endpoint.data
       ? {
           postId: endpoint.data.post_id,
           commentId: endpoint.data.comment_id
         }
       : null
+    const sender = UserService.getFromEndpoint({
+      userEndpoint: params.notificationEndpoint.sender
+    })
 
     return new Notification({
-      senderId: endpoint.sender_id,
+      sender,
       targetId: endpoint.target_id,
       type: endpoint.type,
       id: endpoint.id,
@@ -27,11 +31,19 @@ export class NotificationService {
   }
 
   static async markAsSeen (params: {
-    notificationIds: number[]
+    notificationsIds: number[]
   }): Promise<boolean> {
     const response = await VIBE.post<boolean>({
       endpoint: 'notifications/seen',
-      body: JSON.stringify({ notificationIds: params.notificationIds })
+      body: JSON.stringify({ notificationsIds: params.notificationsIds })
+    })
+
+    return response.value
+  }
+
+  static async loggedUserHasNotifications (): Promise<boolean> {
+    const response = await VIBE.get<boolean>({
+      endpoint: 'notifications/hasNew'
     })
 
     return response.value
@@ -60,5 +72,24 @@ export class NotificationService {
     })
 
     return !response.error
+  }
+
+  static async create (params: {
+    senderId: number
+    targetId: number
+    type: NotificationType
+    data?: object
+  }): Promise<boolean> {
+    const response = await VIBE.post<boolean>({
+      endpoint: 'notifications',
+      body: JSON.stringify({
+        sender_id: params.senderId,
+        target_id: params.targetId,
+        type: params.type,
+        data: params.data
+      })
+    })
+
+    return response.value
   }
 }

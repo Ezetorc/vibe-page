@@ -15,10 +15,7 @@ export class User {
   public imageId?: string
   public imageUrl?: string
   public description?: string
-  public date: string
-  public postsAmount: number
-  public followersAmount: number
-  public followingAmount: number
+  public date?: string
 
   constructor (props: {
     id: number
@@ -26,10 +23,7 @@ export class User {
     imageId?: string
     imageUrl?: string
     description?: string
-    date: string
-    postsAmount: number
-    followersAmount: number
-    followingAmount: number
+    date?: string
   }) {
     this.id = props.id
     this.name = props.name
@@ -37,9 +31,6 @@ export class User {
     this.imageUrl = props.imageUrl
     this.description = props.description
     this.date = props.date
-    this.postsAmount = props.postsAmount
-    this.followersAmount = props.followersAmount
-    this.followingAmount = props.followingAmount
   }
 
   public isOwnerOfPost (params: { post: Post }): boolean {
@@ -57,10 +48,7 @@ export class User {
       imageId: properties.imageId ?? this.imageId,
       imageUrl: properties.imageUrl ?? this.imageUrl,
       description: properties.description ?? this.description,
-      date: properties.date ?? this.date,
-      postsAmount: properties.postsAmount ?? this.postsAmount,
-      followersAmount: properties.followersAmount ?? this.followersAmount,
-      followingAmount: properties.followingAmount ?? this.followingAmount
+      date: properties.date ?? this.date
     })
   }
 
@@ -177,34 +165,20 @@ export class User {
     })
   }
 
-  public async getPosts (params: {
-    page?: number
-    loggedUser: User | null
-  }): Promise<Post[]> {
-    const posts = await PostService.getAll({
-      page: params.page ?? 1,
+  public async delete (): Promise<number> {
+    return await UserService.delete({
       userId: this.id,
-      loggedUser: params.loggedUser
+      imageId: this.imageId
     })
-
-    return posts
   }
 
-  public async getFollowers (): Promise<User[]> {
-    const followersIds = await FollowService.getIdsOfUser({
+  public async getPosts (params: { page?: number }): Promise<Post[]> {
+    const posts = await PostService.getAll({
+      page: params.page ?? 1,
       userId: this.id
     })
 
-    if (!followersIds) return []
-
-    const followers = await Promise.all(
-      followersIds.map(followerId =>
-        UserService.getById({ userId: followerId })
-      )
-    )
-    const userFollowers = followers.filter(follower => follower !== null)
-
-    return userFollowers
+    return posts
   }
 
   public async likePost (params: {
@@ -224,11 +198,9 @@ export class User {
   public async dislikePost (params: {
     postId: number
     signal?: AbortSignal
-    loggedUser: User | null
   }): Promise<boolean> {
     const post = await PostService.getById({
-      postId: params.postId,
-      loggedUser: params.loggedUser
+      postId: params.postId
     })
 
     if (!post) return false
@@ -261,13 +233,9 @@ export class User {
     return response
   }
 
-  public async dislikeComment (params: {
-    commentId: number
-    loggedUser: User | null
-  }): Promise<boolean> {
+  public async dislikeComment (params: { commentId: number }): Promise<boolean> {
     const post = await CommentService.getById({
-      commentId: params.commentId,
-      loggedUser: params.loggedUser
+      commentId: params.commentId
     })
 
     if (!post) return false
@@ -287,13 +255,11 @@ export class User {
   public async searchPosts (params: {
     query: string
     page: number
-    loggedUser: User | null
   }): Promise<Post[]> {
     return await PostService.search({
       query: params.query,
       userId: this.id,
-      page: params.page,
-      loggedUser: params.loggedUser
+      page: params.page
     })
   }
 }

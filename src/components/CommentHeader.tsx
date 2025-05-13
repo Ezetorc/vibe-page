@@ -18,8 +18,6 @@ export function CommentHeader (props: {
     props.onDelete(props.comment.id)
   }
 
-  if (!props.comment.user.id) return
-
   return (
     <header className='w-full flex items-center relative'>
       <div className='w-[93%] gap-x-[3%] px-1 flex items-center'>
@@ -31,7 +29,7 @@ export function CommentHeader (props: {
         <div className='w-full'>
           <Username
             user={props.comment.user}
-            className='mobile:text-[clamp(15px,1rem,20px)] desktop:text-[clamp(20px,1.8rem,25px)]'
+            className='w-full mobile:text-[clamp(15px,1rem,20px)] desktop:text-[clamp(20px,1.8rem,25px)]'
           />
         </div>
 

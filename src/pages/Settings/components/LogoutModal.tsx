@@ -27,7 +27,7 @@ export default function LogoutModal () {
           {dictionary.areYouSureLogout}
         </h2>
 
-        <Button text={dictionary.logout} onClick={handleLogout} />
+        <Button classname='w-full' text={dictionary.logout} onClick={handleLogout} />
       </article>
     </Modal>
   )

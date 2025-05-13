@@ -11,11 +11,11 @@ export function NavButton (props: {
 }) {
   const { isSessionActive } = useSession()
 
-  if (props.needsSession && !isSessionActive) return null
+  if (props.needsSession && !isSessionActive) return
 
   return props.to ? (
     <Link
-      className='grid place-items-center aspect-square w-[60px] relative'
+      className='desktop:scale-100 mobile:scale-75 grid place-items-center aspect-square w-[60px] relative'
       title={props.title}
       to={props.to}
     >

@@ -5,24 +5,24 @@ export function Button (props: {
   onClick: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void
   children?: ReactNode
   text?: string
-  type?: 'filled' | 'outline'
+  filled?: boolean
   classname?: string
   loading?: boolean
 }) {
   const { dictionary } = useSettings()
-  const type: 'filled' | 'outline' = props.type ?? 'filled'
+  const filled = props.filled ?? true
+  const loading = props.loading ?? false
 
-  
-  const className =
-    type === 'filled'
-      ? `${props.classname} cursor-pointer desktop:hover:bg-white desktop:hover:text-orange-crayola w-full h-[50px] bg-orange-crayola rounded-vibe`
-      : `${props.classname} cursor-pointer text-orange-crayola desktop:hover:bg-white desktop:hover:border-white w-full h-[50px] bg-transparent border-orange-crayola border-vibe  rounded-vibe`
+  const classes =
+    filled && !loading
+      ? `${props.classname} desktop:hover:bg-white desktop:hover:text-orange-crayola bg-orange-crayola`
+      : `${props.classname} text-orange-crayola desktop:hover:bg-white desktop:hover:border-white bg-transparent border-orange-crayola border-vibe`
 
   return (
     <button
       onClick={props.onClick}
-      disabled={props.loading}
-      className={className}
+      disabled={loading}
+      className={`${classes} cursor-pointer h-[50px] rounded-vibe`}
     >
       {props.loading ? `${dictionary.loading}...` : props.text}
       {props.children}

@@ -1,49 +1,67 @@
-import { useQueryClient, useMutation } from '@tanstack/react-query'
-import { QUERY_KEYS } from '../constants/QUERY_KEYS'
+import {
+  useQueryClient,
+  useMutation,
+  useQuery,
+  InfiniteData
+} from '@tanstack/react-query'
 import { Comment } from '../models/Comment'
 import { Post } from '../models/Post'
 import { useSession } from './useSession'
 import { useSettings } from './useSettings'
 import { LikeType } from '../models/LikeType'
+import { QUERY_KEYS } from '../constants/QUERY_KEYS'
 
-interface UseLikeReturnType {
-  like: () => void
-  dislike: () => void
-}
-
-export function useLike(target: Comment): UseLikeReturnType
-export function useLike(target: Post): UseLikeReturnType
-
-export function useLike (target: Comment | Post): UseLikeReturnType {
-  const { loggedUser } = useSession()
+export function useLike (target: Comment | Post) {
+  const { loggedUser, isSessionActive } = useSession()
   const { openModal } = useSettings()
   const queryClient = useQueryClient()
   const type: LikeType = target instanceof Comment ? 'comment' : 'post'
-  const queryKey = [
-    type == 'comment' ? QUERY_KEYS.Comment : QUERY_KEYS.Post,
-    target.id
-  ]
+  const queryKey = QUERY_KEYS.userLiked(loggedUser?.id, target)
 
-  const updateTarget = (liked: boolean) => {
+  const query = useQuery({
+    queryKey,
+    queryFn: async () => {
+      if (type === 'comment') {
+        return await loggedUser?.hasLikedComment({ commentId: target.id })
+      } else {
+        return await loggedUser?.hasLikedPost({ postId: target.id })
+      }
+    },
+    enabled: Boolean(loggedUser)
+  })
+
+  const updateCache = (liked: boolean) => {
     const delta = liked ? 1 : -1
-    target.userLiked = liked
-    target.likes += delta
 
-    queryClient.setQueryData(queryKey, (prevTarget?: Post | Comment) => {
-      if (!prevTarget) return prevTarget
+    queryClient.setQueryData(queryKey, liked)
 
-      return prevTarget.update({
-        likes: prevTarget.likes + delta,
-        userLiked: liked
-      })
-    })
+    queryClient.setQueriesData<InfiniteData<Post[]>>(
+      {
+        queryKey: QUERY_KEYS.posts(),
+        exact: false
+      },
+      prev => {
+        if (!prev) return prev
+
+        return {
+          ...prev,
+          pages: prev.pages.map(postsPage =>
+            postsPage.map(post =>
+              post.id === target.id
+                ? post.update({ likes: post.likes + delta })
+                : post
+            )
+          )
+        }
+      }
+    )
   }
 
   const likeMutation = useMutation({
     mutationFn: async () => {
       if (!loggedUser) {
         openModal('session')
-        return false
+        return null
       }
 
       if (type == 'post') {
@@ -52,8 +70,14 @@ export function useLike (target: Comment | Post): UseLikeReturnType {
         return await loggedUser.likeComment({ commentId: target.id })
       }
     },
-    onMutate: () => updateTarget(true),
-    onError: () => updateTarget(false)
+    onSuccess: newLike => {
+      updateCache(true)
+
+      if (loggedUser && newLike && loggedUser.id !== target.user.id) {
+        newLike.createNotification({ sender: loggedUser, target })
+      }
+    },
+    onError: () => updateCache(false)
   })
 
   const dislikeMutation = useMutation({
@@ -64,20 +88,37 @@ export function useLike (target: Comment | Post): UseLikeReturnType {
       }
 
       if (type == 'post') {
-        return await loggedUser.dislikePost({ postId: target.id, loggedUser })
+        return await loggedUser.dislikePost({ postId: target.id })
       } else {
         return await loggedUser.dislikeComment({
-          commentId: target.id,
-          loggedUser
+          commentId: target.id
         })
       }
     },
-    onMutate: () => updateTarget(false),
-    onError: () => updateTarget(true)
+    onSuccess: () => updateCache(false),
+    onError: () => updateCache(true)
   })
 
+  const handleLike = () => {
+    if (!isSessionActive) {
+      openModal('session')
+      return
+    }
+
+    if (query.isLoading) return
+
+    if (query.data === true) {
+      dislikeMutation.mutate()
+    } else {
+      likeMutation.mutate()
+    }
+  }
+
   return {
+    hasUserLiked: query.data ?? false,
     like: likeMutation.mutate,
-    dislike: dislikeMutation.mutate
+    dislike: dislikeMutation.mutate,
+    handleLike,
+    isLoading: query.isLoading
   }
 }

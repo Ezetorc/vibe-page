@@ -1,9 +1,10 @@
 import { CloseModalButton } from '../../../components/CloseModalButton'
+import { LoadSpinner } from '../../../components/LoadSpinner'
 import { Modal } from '../../../components/Modal'
 import { useSettings } from '../../../hooks/useSettings'
 
 export default function InvalidEditModal () {
-  const { activeModal, dictionary } = useSettings()
+  const { modal, dictionary } = useSettings()
 
   return (
     <Modal>
@@ -15,11 +16,7 @@ export default function InvalidEditModal () {
         </h2>
 
         <span className='text-center  text-[clamp(20px,7vw,40px)]  '>
-          {'data' in activeModal &&
-          typeof activeModal.data === 'object' &&
-          'message' in activeModal.data
-            ? String(activeModal.data.message)
-            : 'Error'}
+          {modal.has('message') ? modal.data!.message : <LoadSpinner />}
         </span>
       </article>
     </Modal>

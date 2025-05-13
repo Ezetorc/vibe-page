@@ -7,9 +7,10 @@ import { Post } from '../models/Post'
 
 export function PostDisplay (props: {
   post: Post
-  onDelete: (postId: number) => void
+  onDelete: (post: Post) => void
 }) {
   const [commentsOpened, setCommentsOpened] = useState<boolean>(false)
+
   return (
     <>
       <article className='w-[clamp(300px,100%,700px)] py-[10px] pr-[5px] pl-[10px] rounded-vibe border-vibe border-caribbean-current overflow-hidden'>
@@ -26,5 +27,3 @@ export function PostDisplay (props: {
     </>
   )
 }
-
-

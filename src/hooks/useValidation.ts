@@ -1,9 +1,11 @@
 import { UserService } from './../services/UserService'
 import { useState } from 'react'
 import { useSettings } from './useSettings'
+import { useSession } from './useSession'
 
 export function useValidation () {
   const { dictionary, openModal } = useSettings()
+  const { loggedUser } = useSession()
   const [error, setError] = useState<string | null>(null)
 
   const validateName = async ({
@@ -52,6 +54,11 @@ export function useValidation () {
 
     if (description.length > 200) {
       setError(dictionary.descriptionLengthError)
+      return false
+    }
+
+    if (description.trim() === loggedUser?.description?.trim()) {
+      setError(dictionary.youAlreadyHaveThisDescription)
       return false
     }
 
@@ -152,13 +159,13 @@ export function useValidation () {
     return true
   }
 
-  const validatePost = ({ post }: { post: string }) => {
-    if (post.length === 0) {
+  const validatePost = ({ postContent }: { postContent: string }) => {
+    if (postContent.length === 0) {
       setError(dictionary.emptyPostError)
       return false
     }
 
-    if (post.length > 200) {
+    if (postContent.length > 200) {
       setError(dictionary.postLengthError)
       return false
     }
@@ -167,13 +174,13 @@ export function useValidation () {
     return true
   }
 
-  const validateComment = ({ comment }: { comment: string }) => {
-    if (comment.length === 0) {
+  const validateComment = ({ commentContent }: { commentContent: string }) => {
+    if (commentContent.length === 0) {
       setError(dictionary.emptyPostError)
       return false
     }
 
-    if (comment.length > 200) {
+    if (commentContent.length > 200) {
       setError(dictionary.commentLengthError)
       return false
     }

@@ -2,39 +2,29 @@ import { Post } from '../models/Post'
 import { PostEndpoint } from '../models/PostEndpoint'
 import { LikeService } from './LikeService'
 import { VIBE } from '../constants/VIBE'
-import { User } from '../models/User'
 import { getDate } from '../utilities/getDate'
 import { UserService } from './UserService'
-import { CommentService } from './CommentService'
 
 export class PostService {
-  static async getFromEndpoint (params: {
-    postEndpoint: PostEndpoint
-    loggedUser: User | null
-  }): Promise<Post> {
+  static getFromEndpoint (params: { postEndpoint: PostEndpoint }): Post {
     const date = getDate(params.postEndpoint.created_at)
-    const [user, likes, commentsAmount, userLiked] = await Promise.all([
-      UserService.getById({ userId: params.postEndpoint.user_id }),
-      LikeService.getAmountOfPost({ postId: params.postEndpoint.id }),
-      CommentService.getAmountOfPost({ postId: params.postEndpoint.id }),
-      params.loggedUser?.hasLikedPost({ postId: params.postEndpoint.id })
-    ])
+    const user = UserService.getFromEndpoint({
+      userEndpoint: params.postEndpoint.user
+    })
 
     return new Post({
       id: params.postEndpoint.id,
       content: params.postEndpoint.content,
-      user: user!,
+      user,
       date,
-      likes,
-      comments: commentsAmount,
-      userLiked: Boolean(userLiked)
+      likes: params.postEndpoint.likes,
+      comments: params.postEndpoint.comments
     })
   }
 
   static async create (params: {
     userId: number
     content: string
-    loggedUser: User | null
   }): Promise<Post | null> {
     const response = await VIBE.post<PostEndpoint>({
       endpoint: 'posts',
@@ -44,8 +34,7 @@ export class PostService {
     if (response.error) return null
 
     const post = this.getFromEndpoint({
-      postEndpoint: response.value!,
-      loggedUser: params.loggedUser
+      postEndpoint: response.value!
     })
 
     return post
@@ -70,7 +59,6 @@ export class PostService {
   }
 
   static async getAll (params: {
-    loggedUser: User | null
     amount?: number
     page?: number
     userId?: number
@@ -84,10 +72,8 @@ export class PostService {
 
     if (!response.value) return []
 
-    const posts = await Promise.all(
-      response.value.map(postEndpoint =>
-        this.getFromEndpoint({ postEndpoint, loggedUser: params.loggedUser })
-      )
+    const posts = response.value.map(postEndpoint =>
+      this.getFromEndpoint({ postEndpoint })
     )
 
     return posts
@@ -105,19 +91,15 @@ export class PostService {
     }
   }
 
-  static async getById (params: {
-    postId: number
-    loggedUser: User | null
-  }): Promise<Post | null> {
+  static async getById (params: { postId: number }): Promise<Post | null> {
     const response = await VIBE.get<PostEndpoint>({
       endpoint: `posts/${params.postId}`
     })
 
     if (response.error) return null
 
-    const post = await this.getFromEndpoint({
-      postEndpoint: response.value!,
-      loggedUser: params.loggedUser
+    const post = this.getFromEndpoint({
+      postEndpoint: response.value!
     })
 
     return post
@@ -125,7 +107,6 @@ export class PostService {
 
   static async search (params: {
     query: string
-    loggedUser: User | null
     userId?: number
     amount?: number
     page?: number
@@ -141,10 +122,8 @@ export class PostService {
 
     if (response.error) return []
 
-    const posts = await Promise.all(
-      response.value.map(postEndpoint =>
-        this.getFromEndpoint({ postEndpoint, loggedUser: params.loggedUser })
-      )
+    const posts = response.value.map(postEndpoint =>
+      this.getFromEndpoint({ postEndpoint })
     )
 
     return posts

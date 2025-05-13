@@ -1,28 +1,14 @@
-import { useState, useEffect } from 'react'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
-import { useSettings } from '../../../hooks/useSettings'
 import { Section } from '../../../components/Section'
-import { Nav } from '../../../components/Nav'
-import { PATHS } from '../../../constants/PATHS'
+import { useTermsContent } from '../hooks/useTermsContent'
 
-export default function MarkdownRenderer () {
-  const { language } = useSettings()
-  const [content, setContent] = useState('')
-
-  useEffect(() => {
-    const fileName = PATHS.termsFile(language)
-
-    fetch(fileName)
-      .then(res => res.text())
-      .then(text => setContent(text))
-  }, [language])
+export default function Terms () {
+  const { content } = useTermsContent()
 
   return (
     <Section>
       <ReactMarkdown remarkPlugins={[remarkGfm]}>{content}</ReactMarkdown>
-
-      <Nav />
     </Section>
   )
 }

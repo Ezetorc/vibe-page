@@ -3,48 +3,39 @@ import { LoadSpinner } from '../../../components/LoadSpinner'
 import { PostsDisplay } from '../../../components/PostsDisplay'
 import { SearchBar } from '../../../components/SearchBar'
 import { useSettings } from '../../../hooks/useSettings'
-import { useUserPosts } from '../hooks/useUserPosts'
 import { User } from '../../../models/User'
+import { usePosts } from '../../../hooks/usePosts'
 
 export function AccountPosts (props: { user: User }) {
   const { dictionary } = useSettings()
-  const [searchQuery, setSearchQuery] = useState<string | undefined>(undefined)
-  const { deletePost, posts, hasMore, ref, failed, success, isEmpty } =
-    useUserPosts(props.user, searchQuery)
+  const [searchQuery, setSearchQuery] = useState<string>('')
+  const { deletePost, posts, hasMore, ref, failed, isEmpty } = usePosts(
+    searchQuery,
+    props.user
+  )
 
-  const handleSearch = (query: string) => {
-    setSearchQuery(query)
-  }
-
-  const handlePostDelete = async (postId: number) => {
-    deletePost(postId)
-  }
-
-  if (failed)
+  if (failed) {
     return (
       <p className='font-poppins-light text-caribbean-current'>
         {dictionary.error}
       </p>
     )
+  } else {
+    return (
+      <>
+        <SearchBar
+          onSearch={query => setSearchQuery(query)}
+          placeholder={dictionary.searchMyPosts}
+        />
 
-  return (
-    <>
-      <SearchBar
-        onSearch={handleSearch}
-        placeholder={dictionary.searchMyPosts}
-      />
-
-      {success ? (
-        isEmpty ? (
+        {isEmpty ? (
           <span className='text-caribbean-current '>{dictionary.noPosts}</span>
         ) : (
-          <PostsDisplay onPostDelete={handlePostDelete} posts={posts} />
-        )
-      ) : (
-        <LoadSpinner />
-      )}
+          <PostsDisplay onPostDelete={deletePost} posts={posts} />
+        )}
 
-      {hasMore && <LoadSpinner reference={ref} />}
-    </>
-  )
+        {hasMore && <LoadSpinner reference={ref} />}
+      </>
+    )
+  }
 }

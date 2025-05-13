@@ -5,9 +5,11 @@
 ## 🚀 Features
 
 ✅ User authentication (signup/login)  
-✅ Create, edit, and delete posts  
+✅ Create and delete posts  
 ✅ Like and comment on posts and comments
 ✅ Customize your profile
+✅ Notification system
+✅ Follow other users
 
 ## 🛠️ Built With
 

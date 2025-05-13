@@ -1,5 +1,4 @@
 import { Button } from '../../../components/Button'
-import { Nav } from '../../../components/Nav'
 import { Section } from '../../../components/Section'
 import { useSettings } from '../../../hooks/useSettings'
 import { SettingsSection } from './SettingsSection'
@@ -22,7 +21,7 @@ export default function Settings () {
           </SettingsButton>
 
           <SettingsButton modal='picture' needsSession>
-            {dictionary.changePicture}
+            {dictionary.changeProfilePicture}
           </SettingsButton>
 
           <SettingsButton modal='description' needsSession>
@@ -55,12 +54,11 @@ export default function Settings () {
 
       <SettingsSection name={dictionary.policy}>
         <Button
+        classname='w-full'
           text={dictionary.seeTerms}
           onClick={() => navigate(PATHS.termsSection)}
         />
       </SettingsSection>
-
-      <Nav />
     </Section>
   )
 }

@@ -17,9 +17,7 @@ export function SearchUsers (props: { searchQuery: string | undefined }) {
     <>
       {success ? (
         isEmpty ? (
-          <span className='text-caribbean-current '>
-            {dictionary.noUsers}
-          </span>
+          <span className='text-caribbean-current '>{dictionary.noUsers}</span>
         ) : (
           <UsersDisplay users={filteredUsers} />
         )

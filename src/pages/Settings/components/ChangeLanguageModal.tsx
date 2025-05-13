@@ -12,13 +12,6 @@ export default function ChangeLanguageModal () {
   const { closeModal, language, setLanguage, dictionary } = useSettings()
   const [newLanguage, setNewLanguage] = useState<Language>(language)
 
-  const handleChangeNewLanguage = async (
-    event: React.FormEvent<HTMLSelectElement>
-  ) => {
-    const newLanguage: Language = event.currentTarget.value as Language
-    setNewLanguage(newLanguage)
-  }
-
   const handleChangeLanguage = () => {
     setLanguage(newLanguage)
     LanguageService.set(newLanguage)
@@ -36,13 +29,19 @@ export default function ChangeLanguageModal () {
 
         <Select
           title={dictionary.changeLanguage}
-          onInput={handleChangeNewLanguage}
+          onInput={event =>
+            setNewLanguage(event.currentTarget.value as Language)
+          }
           defaultValue={language}
         >
           <Languages />
         </Select>
 
-        <Button text={dictionary.change} onClick={handleChangeLanguage} />
+        <Button
+          classname='w-full'
+          text={dictionary.change}
+          onClick={handleChangeLanguage}
+        />
       </article>
     </Modal>
   )

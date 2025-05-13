@@ -2,15 +2,17 @@ import { Like } from './Like'
 import { LikeService } from '../services/LikeService'
 import { CommentService } from '../services/CommentService'
 import { User } from './User'
+import { NotificationService } from '../services/NotificationService'
+import { Post } from './Post'
+import { SimplifiedUser } from './SimplifiedUser'
 
 export class Comment {
   public id: number
   public postId: number
   public content: string
-  public user: User
+  public user: SimplifiedUser
   public likes: number
   public date: string
-  public userLiked: boolean
 
   constructor (props: {
     id: number
@@ -19,7 +21,6 @@ export class Comment {
     date: string
     user: User
     likes: number
-    userLiked: boolean
   }) {
     this.id = props.id
     this.postId = props.postId
@@ -27,7 +28,18 @@ export class Comment {
     this.user = props.user
     this.date = props.date
     this.likes = props.likes
-    this.userLiked = props.userLiked
+  }
+
+  public async createNotification (params: { post: Post; sender: User }) {
+    return await NotificationService.create({
+      senderId: params.sender.id,
+      targetId: params.post.user.id,
+      type: 'comment',
+      data: {
+        post_id: params.post.id,
+        comment_id: this.id
+      }
+    })
   }
 
   public update (properties: Partial<Comment>): Comment {
@@ -35,19 +47,15 @@ export class Comment {
       user: properties.user ?? this.user,
       likes: properties.likes ?? this.likes,
       date: properties.date ?? this.date,
-      userLiked: properties.userLiked ?? this.userLiked,
       id: properties.id ?? this.id,
       content: properties.content ?? this.content,
       postId: properties.postId ?? this.postId
     })
   }
 
-  public async delete (params: {
-    loggedUser: User | null
-  }): Promise<Comment | null> {
+  public async delete (): Promise<number> {
     return await CommentService.delete({
-      commentId: this.id,
-      loggedUser: params.loggedUser
+      commentId: this.id
     })
   }
 
