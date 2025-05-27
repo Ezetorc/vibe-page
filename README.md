@@ -21,6 +21,4 @@
 
 ## Contact
 
-You can contact me by my email: ezeplaythis@gmail.com
-
-Project Link: [https://github.com/Ezetorc/vibe-page](https://github.com/Ezetorc/vibe-page)
+You can contact me by my email: ezetorc@gmail.com
